@@ -1,0 +1,10 @@
+*.egg-info
+*.mo
+*.pyc
+*.db
+build/
+node_modules/
+froide/
+*.map
+*hot-update.json
+*hot-update.js

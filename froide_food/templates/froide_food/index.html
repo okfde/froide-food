@@ -1,0 +1,24 @@
+{% extends "froide_food/base.html" %}
+
+{% load static %}
+{% load sekizai_tags %}
+
+
+
+{% block main %}
+<button id="food-map-button">Search!</button>
+<div class="food-map"></div>
+
+{% addtoblock 'css' %}
+  <link rel="stylesheet" href="{% static 'food/css/main.css' %}">
+{% endaddtoblock %}
+
+{% addtoblock 'js' %}
+  <script src="{% static 'food/js/main.js' %}" charset="utf-8"></script>
+  <script type="text/javascript">
+    window.L.Icon.Default.imagePath = '{% static "food/images/leaflet/marker-icon.png" %}'.split('/').slice(0, -1).join('/') + '/'
+  </script>
+{% endaddtoblock %}
+
+
+{% endblock %}
