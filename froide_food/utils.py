@@ -14,20 +14,18 @@ def get_hygiene_publicbody(lat, lng):
 
     regions = GeoRegion.objects.filter(
         geom__covers=point,
-        kind__in=('district', 'borough')
     ).order_by('kind')
     if not regions:
-        return ValueError('Nicht in DE')
-    region = regions[0]
+        raise ValueError('Nicht in DE')
 
     pbs = PublicBody.objects.filter(
         categories__name='Lebensmittelüberwachung',
-        region=region
+        region__in=regions
     )
     if len(pbs) == 0:
-        raise ValueError('Keine Behoerde gefunden in %s' % region)
+        raise ValueError('Keine Behoerde gefunden in %s' % regions)
     elif len(pbs) > 1:
-        raise ValueError('Mehr als eine Behoerde gefunden in %s' % region)
+        raise ValueError('Mehr als eine Behoerde gefunden in %s' % regions)
     return pbs[0]
 
 
