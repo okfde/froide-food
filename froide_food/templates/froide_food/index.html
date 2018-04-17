@@ -18,7 +18,7 @@
   <script src="{% static 'food/js/main.js' %}" charset="utf-8"></script>
   <script type="text/javascript">
     window.L.Icon.Default.imagePath = '{% static "food/images/leaflet/marker-icon.png" %}'.split('/').slice(0, -1).join('/') + '/'
-    window.loadMap({{ city }})
+    window.loadMap({{ city|safe }})
   </script>
 {% endaddtoblock %}
 
