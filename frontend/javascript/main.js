@@ -43,7 +43,7 @@ function search () {
         var marker = L.marker([r.lat, r.lng]).addTo(map)
         marker.bindPopup(`
           <h3>${r.name}</h3>
-          <a class="btn btn-primary" href="/lebensmittel/anfragen/?ident=${encodeURIComponent(r.ident)}">Anfragen</a>
+          <a class="btn btn-primary" href="./anfragen/?ident=${encodeURIComponent(r.ident)}">Anfragen</a>
         `)
       })
     })
