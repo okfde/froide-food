@@ -1,12 +1,19 @@
+import json
+
 from django.shortcuts import render, redirect
 from django.contrib import messages
 
 from .venue_providers import venue_providers
-from .utils import get_hygiene_publicbody, make_request_url
+from .utils import (
+    get_hygiene_publicbody, make_request_url, get_city_from_request
+)
 
 
 def index(request):
-    return render(request, 'froide_food/index.html')
+    city = get_city_from_request(request)
+    return render(request, 'froide_food/index.html', {
+        'city': json.dumps(city or {})
+    })
 
 
 def make_request(request):

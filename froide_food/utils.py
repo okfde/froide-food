@@ -5,8 +5,15 @@ except ImportError:
 
 from django.urls import reverse
 
+try:
+    from django.contrib.gis.geoip2 import GeoIP2
+    from django.contrib.gis.geoip2.base import GeoIP2Exception
+except ImportError:
+    GeoIP2 = None
+
 from froide.publicbody.models import PublicBody
 from froide.georegion.models import GeoRegion
+from froide.helper.utils import get_client_ip
 
 
 def get_hygiene_publicbody(lat, lng):
@@ -57,3 +64,18 @@ def make_request_url(place, publicbody):
     query.update({f: b'1' for f in hide_features})
     query = urlencode(query)
     return '%s?%s' % (url, query)
+
+
+def get_city_from_request(request):
+    if GeoIP2 is None:
+        return
+
+    try:
+        g = GeoIP2()
+    except GeoIP2Exception:
+        return
+
+    ip = get_client_ip(request)
+    result = g.city(ip)
+    if result and result.get('latitude'):
+        return result
