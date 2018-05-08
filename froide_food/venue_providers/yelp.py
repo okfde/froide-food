@@ -29,7 +29,7 @@ class YelpVenueProvider(BaseVenueProvider):
         }
         if q is not None:
             params['term'] = q
-        if categories is not None:
+        if categories:
             params['categories'] = ','.join(categories)
         if radius is not None:
             params['radius'] = radius
