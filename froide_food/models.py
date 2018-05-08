@@ -10,7 +10,7 @@ class VenueRequest(models.Model):
     ident = models.CharField(max_length=255, db_index=True)
     name = models.CharField(max_length=1000)
 
-    context = JSONField(blank=True)
+    context = JSONField(blank=True, default=dict)
 
     timestamp = models.DateTimeField(auto_now=True)
 
