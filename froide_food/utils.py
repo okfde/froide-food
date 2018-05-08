@@ -47,10 +47,9 @@ def make_request_url(place, publicbody):
     )
     if len(subject) > 250:
         subject = subject[:250] + '...'
-    body = '''Letzten Kontrollbericht für folgende Einrichtung:
+    body = '''Letzten Kontrollbericht für die Einrichtung
 {name}
-{address}
-    '''.format(**place)
+{address}'''.format(**place)
     ref = ('food:%s' % place['ident']).encode('utf-8')
     query = {
         'subject': subject.encode('utf-8'),
