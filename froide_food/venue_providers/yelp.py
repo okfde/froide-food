@@ -65,7 +65,8 @@ class YelpVenueProvider(BaseVenueProvider):
             ),
             'city': r['location']['city'],
             'image': r['image_url'],
-            'rating': r.get('rating')
+            'rating': r.get('rating'),
+            'url': r['url']
         }
 
     def get_place(self, ident):

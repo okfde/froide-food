@@ -12,6 +12,7 @@ class VenueSerializer(serializers.Serializer):
     name = serializers.CharField()
     address = serializers.CharField()
     image = serializers.CharField()
+    url = serializers.CharField()
     rating = serializers.FloatField()
 
 
