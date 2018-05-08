@@ -6,19 +6,21 @@
 
 
 {% block main %}
-<p>{{ city }}</p>
-<button id="food-map-button">Search!</button>
-<div class="food-map"></div>
+<div id="food-map">
+  <food-map :config="config"></food-map>
+</div>
 
 {% addtoblock 'css' %}
-  <link rel="stylesheet" href="{% static 'food/css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'food/css/food.css' %}">
 {% endaddtoblock %}
 
 {% addtoblock 'js' %}
-  <script src="{% static 'food/js/main.js' %}" charset="utf-8"></script>
+  <script src="{% static 'food/js/food.js' %}" charset="utf-8"></script>
   <script type="text/javascript">
     window.L.Icon.Default.imagePath = '{% static "food/images/leaflet/marker-icon.png" %}'.split('/').slice(0, -1).join('/') + '/'
-    window.loadMap({{ city|safe }})
+    window.Froide.components.food.createFoodMap('#food-map', {
+      city: {{ city | safe }}
+    })
   </script>
 {% endaddtoblock %}
 
