@@ -13,7 +13,7 @@ const extractSass = new ExtractTextPlugin({
 
 const config = {
   entry: {
-    main: ['./frontend/javascript/main.js']
+    food: ['./frontend/javascript/main.js']
   },
   output: {
     path: path.resolve(__dirname, 'froide_food/static/food/js'),
@@ -24,7 +24,7 @@ const config = {
   devtool: 'source-map', // any "source-map"-like devtool is possible
   resolve: {
     modules: ['node_modules'],
-    extensions: ['.js', '.json'],
+    extensions: ['.js', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js'
     }
