@@ -9,6 +9,12 @@ class BaseVenueProvider(object):
         qs = qs.select_related('foirequest')
         fvr = {r.ident: r for r in qs}
         for p in places:
+            p['request_url'] = None
+            p['request_status'] = None
+            p['request_timestamp'] = None
             if p['ident'] in fvr:
-                p['request'] = fvr[p['ident']].foirequest.get_absolute_url()
+                fr = fvr[p['ident']].foirequest
+                p['request_url'] = fr.get_absolute_url()
+                p['request_status'] = fr.status
+                p['request_timestamp'] = fr.first_message
         return places

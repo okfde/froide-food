@@ -14,6 +14,9 @@ class VenueSerializer(serializers.Serializer):
     image = serializers.CharField()
     url = serializers.CharField()
     rating = serializers.FloatField()
+    request_url = serializers.CharField()
+    request_status = serializers.CharField()
+    request_timestamp = serializers.DateTimeField()
 
 
 class VenueViewSet(viewsets.ViewSet):
