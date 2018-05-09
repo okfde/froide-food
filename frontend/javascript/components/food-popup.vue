@@ -1,7 +1,7 @@
 <template>
-  <div class="food-popup">
+  <div class="food-popup" :id="'popup-' + itemId">
     <h3>{{ data.name }}</h3>
-    <div class="row ">
+    <div class="row">
       <div class="col-6">
         <p>
           <img :src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
@@ -9,31 +9,34 @@
       </div>
       <div class="col-6 food-popup-info">
         <p>{{ data.address }}</p>
+        <a v-if="hasRequest" class="btn btn-success request-button" :href="data.request_url" target="_blank">
+          zur Anfrage
+        </a>
+        <a v-else class="btn btn-primary request-button" :href="requestUrl"  target="_blank">Jetzt anfragen</a>
         <p>
-          <a class="btn btn-primary request-button" :href="requestUrl">Anfragen</a>
+          <small v-if="hasRequest">
+            Anfrage wurde am {{ requestDate }} gestellt und {{ requestStatus }}.
+          </small>
         </p>
       </div>
     </div>
     <div class="row">
       <div class="col-12">
-        <a :href="data.url" class="provider-logo"></a>
+        <a :href="data.url" class="provider-logo" target="_blank" rel="nooopener"></a>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import FoodItemMixin from '../lib/mixin'
+
 export default {
   name: 'food-popup',
+  mixins: [FoodItemMixin],
   props: {
     data: {
-      type: Object,
-      default: () => ({})
-    }
-  },
-  computed: {
-    requestUrl () {
-      return `./anfragen/?ident=${encodeURIComponent(this.data.ident)}`
+      type: Object
     }
   }
 }
@@ -43,7 +46,8 @@ export default {
 
 .food-popup {
   h3 {
-    min-width: 200px;
+    max-width: 90vw;
+    overflow: hidden;
   }
   p {
     margin: 0 0 1rem !important;
@@ -58,6 +62,7 @@ export default {
 
 .request-button {
   color: #fff !important;
+  white-space: normal !important;
 }
 
 
