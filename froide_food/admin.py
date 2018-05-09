@@ -4,7 +4,7 @@ from .models import VenueRequest
 
 
 class VenueRequestAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ('foirequest', 'publicbody')
 
 
 admin.site.register(VenueRequest, VenueRequestAdmin)
