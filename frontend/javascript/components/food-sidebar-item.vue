@@ -1,10 +1,14 @@
 <template>
   <div class="sidebar-item" :id="'sidebar-' + itemId">
     <div class="sidebar-item-inner" :class="{requested: hasRequest, highlighted: data.sidebarHighlight}">
-      <h5>
-        {{ data.name }}
-      </h5>
       <div class="container-fluid">
+        <div class="row ">
+          <div class="col-12">
+            <h5>
+              {{ data.name }}
+            </h5>
+          </div>
+        </div>
         <div class="row ">
           <div class="col-6">
             <p>
@@ -70,8 +74,7 @@ export default {
 <style lang="scss" scoped>
 
 .sidebar-item {
-  padding: 80px 0.5rem 0.25rem;
-  margin-top: -80px;
+  padding: 0rem 0.5rem 0.25rem;
   width: 100%;
 
   small {
@@ -82,6 +85,11 @@ export default {
 
 .sidebar-item-inner {
   padding: 0.5rem;
+  border-bottom: 2px solid #eee;
+}
+
+.sidebar-item:last-child .sidebar-item-inner {
+  border-bottom: 0px;
 }
 
 .requested {
@@ -103,8 +111,6 @@ export default {
   white-space: normal !important;
   display: block;
 }
-
-
 
 .provider-logo {
   background-image: url('/static/food/images/yelp_logo.png');

@@ -6,7 +6,7 @@
 
 
 {% block main %}
-<div id="food-map">
+<div id="food-map-wrapper">
   <food-map :config="config"></food-map>
 </div>
 
@@ -18,7 +18,7 @@
   <script src="{% static 'food/js/food.js' %}" charset="utf-8"></script>
   <script type="text/javascript">
     window.L.Icon.Default.imagePath = '{% static "food/images/leaflet/marker-icon.png" %}'.split('/').slice(0, -1).join('/') + '/'
-    window.Froide.components.food.createFoodMap('#food-map', {
+    window.Froide.components.food.createFoodMap('#food-map-wrapper', {
       city: {{ city | safe }}
     })
   </script>
