@@ -148,13 +148,13 @@ export default {
     }
 
     return {
-      zoom: zoom || 6,
+      zoom: zoom || (this.config.city.latitude ? DETAIL_ZOOM_LEVEL : 6),
       locationKnown: locationKnown,
       showLocator: false,
       showFilter: false,
       filters: this.config.filters,
       maxBounds: L.latLngBounds(GERMANY_BOUNDS),
-      postcode: '' + (postcode || this.config.city.postcode || ''),
+      postcode: '' + (postcode || this.config.city.postal_code || ''),
       center: center || [
         this.config.city.latitude || 51.00289959043832,
         this.config.city.longitude || 10.245523452758789
