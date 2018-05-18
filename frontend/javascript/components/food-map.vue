@@ -182,8 +182,6 @@ export default {
     Vue.directive('focusmarker', {
       // When the bound element is inserted into the DOM...
       componentUpdated: (el, binding, vnode) => {
-        console.log(el, binding, vnode, self)
-        console.log(vnode.key, self.selectedFacilityId)
         if (vnode.key === self.selectedFacilityId) {
           vnode.componentInstance.mapObject.setZIndexOffset(300)
         } else {
