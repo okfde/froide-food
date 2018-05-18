@@ -1,9 +1,13 @@
+import os
+import json
+
 from django.conf import settings
 
 import requests
 import logging
 
-from .base import BaseVenueProvider
+from .base import BaseVenueProvider, VenueProviderException
+
 
 logger = logging.getLogger('froide')
 
@@ -17,8 +21,132 @@ RELEVANT_TYPES = [
     'servicestations'
 ]
 
+DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'categories.json')
+
+FILTERS = [
+    {
+      'name': 'Fleischerei/Metzgerei',
+      'icon': 'fa-tree',
+      'active': False,
+      'categories': ['meats', 'butcher']
+    },
+    {
+      'name': 'Bäckerei/Konditorei',
+      'icon': 'fa-asterisk',
+      'active': False,
+      'categories': ['bakeries']
+    },
+    {
+      'name': 'Restaurant/Gaststätte',
+      'icon': 'fa-cutlery',
+      'active': False,
+      'categories': ['restaurants']
+    },
+    {
+      'name': 'Café/Bar',
+      'icon': 'fa-coffee',
+      'active': False,
+      'categories': ['coffee', 'bars']
+    },
+    {
+      'name': 'Eisdiele',
+      'icon': 'fa-child',
+      'active': False,
+      'categories': ['icecream']
+    },
+    {
+      'name': 'Kiosk/Spätkauf',
+      'icon': 'fa-anchor',
+      'active': False,
+      'categories': ['kiosk']
+    },
+    {
+      'name': 'Diskothek/Club',
+      'icon': 'fa-anchor',
+      'active': False,
+      'categories': ['danceclubs']
+    },
+    {
+      'name': 'Imbiss',
+      'icon': 'fa-anchor',
+      'active': False,
+      'categories': ['foodtrucks', 'foodstands']
+    },
+    {
+      'name': 'Systemgastronomie',
+      'icon': 'fa-anchor',
+      'active': False,
+      'categories': ['hotdogs']
+    },
+    {
+      'name': 'Hotel/Pension',
+      'icon': 'fa-anchor',
+      'active': False,
+      'categories': ['hotels', 'hostels']
+    },
+    {
+      'name': 'Supermarkt/Discounter',
+      'icon': 'fa-anchor',
+      'active': False,
+      'categories': ['discountstore']
+    },
+    {
+      'name': 'Einzelhandel',
+      'icon': 'fa-anchor',
+      'active': False,
+      'categories': ['grocery']
+    },
+    {
+      'name': 'Tankstelle',
+      'icon': 'fa-anchor',
+      'active': False,
+      'categories': ['servicestations']
+    }
+    # // Fleischerei/Metzgerei
+    # // Bäckerei/Konditorei
+    # // Restaurant/Gaststätte
+    # // Café/Bar
+    # // Eisdiele
+    # // Kiosk/Spätkauf
+    # // Diskothek/Club
+    # // Imbiss
+    # // Systemgastronomie
+    # // Hotel/Pension
+    # // Supermarkt/Discounter
+    # // Einzelhandel (Sonstige)
+    # // Tankstelle
+]
+
+
+def make_mapping(category_path, filters):
+    if not os.path.exists(category_path):
+        logger.warn('data path not found: %s', category_path)
+        return {}
+    with open(category_path) as f:
+        cats = json.load(f)
+
+    filter_cats = []
+    for fil in filters:
+        filter_cats.extend(fil['categories'])
+
+    return dict(_get_mapping(cats, filter_cats))
+
+
+def _get_mapping(cats, filter_cats):
+    for fc in filter_cats:
+        yield fc, fc
+    for cat in cats:
+        for parent in cat['parents']:
+            if parent in filter_cats:
+                yield cat['alias'], parent
+
+
+CATEGORY_MAPPING = make_mapping(DATA_PATH, FILTERS)
+
 
 class YelpVenueProvider(BaseVenueProvider):
+    FILTERS = FILTERS
+
     def get_places(self, latlng, q=None, categories=None, radius=None):
         params = {
             'latitude': latlng[0],
@@ -27,7 +155,7 @@ class YelpVenueProvider(BaseVenueProvider):
             'limit': 50,
             'locale': 'de_DE'
         }
-        if q is not None:
+        if q:
             params['term'] = q
         if categories:
             params['categories'] = ','.join(categories)
@@ -41,7 +169,13 @@ class YelpVenueProvider(BaseVenueProvider):
                 'Authorization': 'Bearer %s' % API_KEY
             }
         )
-        logger.info('API Request: %s', response.request.url)
+        logger.info('API Request: %s (%s)',
+                    response.request.url, response.status_code)
+        if response.status_code != 200:
+            logger.warn('API response: %s - %s',
+                        response.status_code, response.text)
+            raise VenueProviderException()
+
         results = response.json()
         if 'businesses' not in results:
             return []
@@ -53,12 +187,20 @@ class YelpVenueProvider(BaseVenueProvider):
         ]
 
     def extract_result(self, r):
+        cats = r['categories']
+        category = None
+        if cats:
+            category = [CATEGORY_MAPPING.get(c['alias'], None) for c in cats]
+            category = [c for c in category if c is not None]
+        if category:
+            category = category[0]
+
         return {
             'ident': 'yelp:%s' % r['id'],
             'lat': r['coordinates']['latitude'],
             'lng': r['coordinates']['longitude'],
             'name': r['name'],
-            'address': '%s, %s %s' % (
+            'address': '%s\n%s %s' % (
                 r['location']['address1'],
                 r['location']['zip_code'],
                 r['location']['city']
@@ -66,7 +208,8 @@ class YelpVenueProvider(BaseVenueProvider):
             'city': r['location']['city'],
             'image': r['image_url'],
             'rating': r.get('rating'),
-            'url': r['url']
+            'url': r['url'],
+            'category': category
         }
 
     def get_place(self, ident):
@@ -77,6 +220,7 @@ class YelpVenueProvider(BaseVenueProvider):
                 'Authorization': 'Bearer %s' % API_KEY
             }
         )
-        logger.info('API Request: %s', response.request.url)
+        logger.info('API Request: %s (%s)',
+                    response.request.url, response.status_code)
         result = response.json()
         return self.extract_result(result)

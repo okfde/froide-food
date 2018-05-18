@@ -1,6 +1,10 @@
 from ..models import VenueRequest
 
 
+class VenueProviderException(Exception):
+    pass
+
+
 class BaseVenueProvider(object):
     def search_places(self, *args, **kwargs):
         places = self.get_places(*args, **kwargs)

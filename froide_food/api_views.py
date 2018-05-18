@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from .venue_providers import venue_provider
+from .venue_providers import venue_provider, VenueProviderException
 
 
 class VenueSerializer(serializers.Serializer):
@@ -14,6 +14,7 @@ class VenueSerializer(serializers.Serializer):
     image = serializers.CharField()
     url = serializers.CharField()
     rating = serializers.FloatField()
+    category = serializers.CharField()
     request_url = serializers.CharField()
     request_status = serializers.CharField()
     request_timestamp = serializers.DateTimeField()
@@ -38,12 +39,16 @@ class VenueViewSet(viewsets.ViewSet):
         query = request.GET.get('q')
         categories = request.GET.getlist('categories', [])
 
-        places = venue_provider.search_places(
-            (lat, lng),
-            q=query,
-            radius=radius,
-            categories=categories
-        )
+        try:
+            places = venue_provider.search_places(
+                (lat, lng),
+                q=query,
+                radius=radius,
+                categories=categories
+            )
+        except VenueProviderException:
+            return Response({'results': [], 'error': True})
+
         serializer = VenueSerializer(places, many=True)
 
-        return Response(serializer.data)
+        return Response({'results': serializer.data, 'error': False})

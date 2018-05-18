@@ -3,7 +3,7 @@ import json
 from django.shortcuts import render, redirect
 from django.contrib import messages
 
-from .venue_providers import venue_providers
+from .venue_providers import venue_providers, venue_provider
 from .utils import (
     get_hygiene_publicbody, make_request_url, get_city_from_request
 )
@@ -12,7 +12,8 @@ from .utils import (
 def index(request):
     city = get_city_from_request(request)
     return render(request, 'froide_food/index.html', {
-        'city': json.dumps(city or {})
+        'city': json.dumps(city or {}),
+        'filters': json.dumps(venue_provider.FILTERS)
     })
 
 
