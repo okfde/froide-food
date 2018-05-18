@@ -14,10 +14,10 @@
           <div class="row">
             <div class="col-12">
               <p v-if="geolocationAvailable">
-                Suche in einem PLZ-Bereich oder in deiner Umgebung.
+                Suchen Sie in einem PLZ-Bereich oder in Ihrer Umgebung.
               </p>
               <p v-else>
-                Bitte gib eine Postleitzahl ein, um in der Nähe zu suchen.
+                Bitte geben Sie eine Postleitzahl ein, um in der Nähe zu suchen.
               </p>
             </div>
           </div>
