@@ -1,56 +1,27 @@
 <template>
   <div class="sidebar-item" :id="'sidebar-' + itemId">
-    <div class="sidebar-item-inner" :class="{requested: hasRequest, highlighted: data.sidebarHighlight}">
+    <div class="sidebar-item-inner" :class="{requested: hasRequest, highlighted: isSelected}" @click="$emit('select', data)">
       <div class="container-fluid">
         <div class="row ">
-          <div class="col-12">
-            <h5>
+          <div class="col-4 col-md-3 image-column">
+            <a :href="data.url" class="image-column-inner" target="_blank" rel="noopener">
+              <img v-if="data.image" :src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
+              <div v-else class="dummy-image"></div>
+              <div :href="data.url" class="provider-logo" target="_blank" rel="noopener"></div>
+            </a>
+          </div>
+          <div class="col-8 col-md-9 info-column">
+            <h5 class="venue-name">
               {{ data.name }}
             </h5>
+            <p class="venue-address">{{ data.address }}</p>
+            <a v-if="!data.request_status" class="request-button" :href="requestUrl"  target="_blank">
+              Hygienekontrolle anfragen&nbsp;&rarr;
+            </a>
+            <a  v-else class="to-request-button" :href="data.request_url" target="_blank">
+              zur Anfrage&nbsp;&rarr;
+            </a>
           </div>
-        </div>
-        <div class="row ">
-          <div class="col-6">
-            <p>
-              <a :href="data.url" target="_blank" rel="noopener">
-                <img :src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
-              </a>
-            </p>
-          </div>
-          <div class="col-6 food-popup-info">
-            <p>{{ data.address }}</p>
-            <div class="col-12">
-              <a :href="data.url" class="provider-logo" target="_blank" rel="noopener"></a>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <template v-if="hasRequest">
-            <div class="col-6">
-              <p>
-                <small>
-                  Anfrage zum Kontrollbericht wurde am {{ requestDate }} gestellt und {{ requestStatus }}.
-                </small>
-              </p>
-            </div>
-            <div class="col-6">
-              <a class="btn btn-success request-button" :href="data.request_url" target="_blank">
-                zur Anfrage
-              </a>
-            </div>
-          </template>
-          <template v-else>
-            <div class="col-6">
-              <p>
-                <small>
-                  Kontrollbericht kann angefragt werden.
-                </small>
-              </p>
-            </div>
-            <div class="col-6">
-              <a class="btn btn-primary request-button" :href="requestUrl"  target="_blank">Jetzt anfragen!</a>
-            </div>
-          </template>
         </div>
       </div>
     </div>
@@ -66,6 +37,9 @@ export default {
   props: {
     data: {
       type: Object
+    },
+    selectedFacilityId: {
+      type: String
     }
   }
 }
@@ -74,26 +48,70 @@ export default {
 <style lang="scss" scoped>
 
 .sidebar-item {
-  padding: 0rem 0.5rem 0.25rem;
+  padding: 0;
   width: 100%;
-
-  small {
-    line-height: 1.1;
-    display: inline-block;
-  }
 }
 
 .sidebar-item-inner {
-  padding: 0.5rem;
+  padding: 1rem 0 1rem;
   border-bottom: 2px solid #eee;
+  cursor: pointer;
+}
+
+.sidebar-item:first-child .sidebar-item-inner {
+  padding-top: 0.5rem;
+}
+
+@media screen and (min-width: 768px){
+  .sidebar-item:first-child .sidebar-item-inner {
+    padding-top: 1rem;
+  }
 }
 
 .sidebar-item:last-child .sidebar-item-inner {
   border-bottom: 0px;
 }
 
-.requested {
+.image-column {
+  padding: 0 5px 0 5px;
+}
+
+@media screen and (min-width: 768px){
+  .image-column {
+    padding: 0 5px 0 5px;
+  }
+}
+
+@media screen and (min-width: 768px){
+  .map-container {
+    height: 80vh;
+  }
+  .sidebar {
+    height: 80vh;
+    overflow-y: scroll;
+  }
+}
+
+.image-column-inner {
+  display: block;
   background-color: #eee;
+  padding: 0;
+}
+
+.info-column {
+  padding-left: 15px;
+  padding-right: 0;
+}
+
+.venue-address {
+  font-size: 0.8em;
+  color: #687683;
+  display: inline-block;
+  white-space: pre-line;
+}
+
+.requested {
+
 }
 
 .highlighted {
@@ -101,15 +119,24 @@ export default {
 }
 
 .venue-img {
-  height: 120px;
+  height: 70px;
   width: 100%;
   object-fit: cover;
 }
 
+.dummy-image {
+  height: 70px;
+  width: 100%;
+  background-color: #aaa;
+}
+
 .request-button {
-  color: #fff !important;
-  white-space: normal !important;
   display: block;
+}
+
+.to-request-button {
+  display: block;
+  color: #28a745;
 }
 
 .provider-logo {
@@ -117,10 +144,9 @@ export default {
   background-repeat: no-repeat;
   background-size: contain;
   display: inline-block;
-  width: 80px;
+  width: 65px;
   height: 40px;
-  // margin: 1rem 2rem;
-  float: right;
+  margin: 0.5rem 0 0 0.25rem;
 }
 
 </style>

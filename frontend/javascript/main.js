@@ -1,3 +1,5 @@
+import '../styles/main.scss'
+
 import Vue from 'vue'
 
 import FoodMap from './components/food-map'

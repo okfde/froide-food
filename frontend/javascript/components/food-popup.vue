@@ -1,28 +1,19 @@
 <template>
   <div class="food-popup" :id="'popup-' + itemId">
-    <h3>{{ data.name }}</h3>
     <div class="row">
-      <div class="col-6">
-        <p>
-          <img :src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
-        </p>
-      </div>
-      <div class="col-6 food-popup-info">
-        <p>{{ data.address }}</p>
-        <a v-if="hasRequest" class="btn btn-success request-button" :href="data.request_url" target="_blank">
-          zur Anfrage
-        </a>
-        <a v-else class="btn btn-primary request-button" :href="requestUrl"  target="_blank">Jetzt anfragen</a>
-        <p>
-          <small v-if="hasRequest">
-            Anfrage wurde am {{ requestDate }} gestellt und {{ requestStatus }}.
-          </small>
-        </p>
+      <div class="col-12">
+        <h4>{{ data.name }}</h4>
+        <p class="venue-address">{{ data.address }}</p>
       </div>
     </div>
     <div class="row">
       <div class="col-12">
-        <a :href="data.url" class="provider-logo" target="_blank" rel="nooopener"></a>
+        <a v-if="!data.request_status" class="request-button" :href="requestUrl"  target="_blank">
+          Hygienekontrolle anfragen&nbsp;&rarr;
+        </a>
+        <a v-else class="to-request-button" :href="data.request_url" target="_blank">
+          zur Anfrage&nbsp;&rarr;
+        </a>
       </div>
     </div>
   </div>
@@ -44,37 +35,38 @@ export default {
 
 <style lang="scss" scoped>
 
-.food-popup {
-  h3 {
-    max-width: 90vw;
-    overflow: hidden;
-  }
-  p {
-    margin: 0 0 1rem !important;
-  }
+.image-column {
+  padding: 0 5px;
+}
+
+.info-column {
+  padding: 0 5px;
 }
 
 .venue-img {
-  height: 120px;
+  height: 70px;
   width: 100%;
   object-fit: cover;
 }
 
-.request-button {
-  color: #fff !important;
-  white-space: normal !important;
-}
-
-
-.provider-logo {
-  background-image: url('/static/food/images/yelp_logo.png');
-  background-repeat: no-repeat;
-  background-size: contain;
+.venue-address {
+  color: #687683;
+  font-size: 1rem;
   display: inline-block;
-  width: 80px;
-  height: 40px;
-  // margin: 1rem 2rem;
-  float: right;
+  margin: 0 0 0.5rem;
+  white-space: pre-line;
 }
+
+.request-button {
+  display: block;
+  font-size: 1rem;
+}
+
+.to-request-button {
+  display: block;
+  font-size: 1rem;
+  color: #28a745;
+}
+
 
 </style>

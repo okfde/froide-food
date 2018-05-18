@@ -16,6 +16,9 @@ var FoodItemMixin = {
       }
       return null
     },
+    isSelected () {
+      return this.data.id === this.selectedFacilityId
+    },
     requestStatus () {
       if (this.hasRequest) {
         if (this.data.request_status === 'resolved') {

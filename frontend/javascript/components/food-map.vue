@@ -1,27 +1,43 @@
 <template>
-  <div class="container-fluid food-map-container">
+  <div class="container-fluid food-map-container" id="food-map-container">
     <div class="searchbar" id="searchbar">
-      <div class="input-group">
-        <input type="text" v-model="query" class="form-control" placeholder="Name"  @keydown.enter.prevent="userSearch">
-        <div class="input-group-append">
-          <button class="btn btn-outline-secondary" type="button" @click="userSearch">
-            Suchen
-          </button>
-        </div>
-        <div class="input-group-append">
-          <button class="btn btn-outline-secondary" @click="showLocator = true">
-            <i class="fa fa-location-arrow" aria-hidden="true"></i>
-            <span class="d-none d-sm-none d-md-inline">PLZ</span>
-          </button>
+      <div class="searchbar-inner">
+        <div class="input-group">
+          <input type="text" v-model="query" class="form-control" placeholder="Name"  @keydown.enter.prevent="userSearch">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" @click="userSearch">
+              <i class="fa fa-search" aria-hidden="true"></i>
+              <span class="d-none d-sm-none d-md-inline">Suchen</span>
+            </button>
+          </div>
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" @click="showLocator = true">
+              <i class="fa fa-location-arrow" aria-hidden="true"></i>
+              <span class="d-none d-sm-none d-md-inline">PLZ</span>
+            </button>
+          </div>
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" :class="{'active': showFilter}" @click="openFilter">
+              <i class="fa fa-gears" aria-hidden="true"></i>
+              <span class="d-none d-sm-none d-md-inline">Filter</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
+    <slide-up-down :active="showFilter" :duration="300">
+      <food-filter :filters="filters" @change="filterChanged" @apply="applyFilter"></food-filter>
+    </slide-up-down>
     <div class="row">
-      <div class="col-md-8 order-md-2 map-column">
+      <div class="col-md-7 col-lg-8 order-md-2 map-column">
         <div class="map-container" id="food-map">
-          <div v-if="mapMoved" class="redo-search">
-            <button class="btn btn-secondary btn-sm" @click="searchArea">
+          <div v-if="mapMoved || searching" class="redo-search">
+            <button v-if="mapMoved" class="btn btn-secondary btn-sm" @click="searchArea">
               Im aktuellen Bereich suchen
+            </button>
+            <button v-if="searching" class="btn btn-secondary btn-sm disabled">
+              <food-loader></food-loader>
+              Suche läuft&hellip;
             </button>
           </div>
 
@@ -30,28 +46,38 @@
               layerType="base" :name="tileProvider.name" :visible="true"
               :url="tileProvider.url" :attribution="tileProvider.attribution"/>
 
-            <l-marker v-for="marker in facilities" :key="marker.ident" :lat-lng="marker.position" :title="marker.name" :draggable="false" :icon="marker.icon">
-              <l-tooltip :content="marker.name" />
+            <l-marker v-for="marker in facilities" :key="marker.id" :lat-lng="marker.position" :title="marker.name" :draggable="false" :icon="marker.icon" :options="markerOptions"
+            @click="markerClick(marker)"
+            @touchstart.prevent="markerClick(marker)" v-focusmarker>
+              <l-tooltip :content="marker.name" v-if="!isMobile"/>
               <l-popup :options="popupOptions" v-if="!isMobile">
                 <food-popup :data="marker" />
               </l-popup>
             </l-marker>
            </l-map>
+           <food-mapoverlay :data="selectedFacility" v-if="isMobile && selectedFacility" @close="clearSelected"></food-mapoverlay>
          </div>
        </div>
+
        <div class="col-12 d-block d-md-none divider-column" id="divider">
          <p v-if="listShown" class="divider-button">
-           <a @click.prevent="goToMap">zurück zur Karte</a>
+           <a @click.prevent="goToMap" @touchstart.prevent="goToMap">zurück zur Karte</a>
          </p>
          <p v-else class="divider-button">
-           <a href="#food-list">zur Liste</a>
+           <a @click.prevent="goToList" @touchstart.prevent="goToList">zur Liste</a>
          </p>
        </div>
-       <div class="col-md-4 order-md-1 sidebar-column">
+
+       <div class="col-md-5 col-lg-4 order-md-1 sidebar-column">
          <div class="sidebar" id="food-list" v-scroll="handleSidebarScroll">
-           <food-sidebar-item v-for="data in facilities" :key="data.ident" :data="data"></food-sidebar-item>
+           <div v-if="searching" class="loader"></div>
+           <food-sidebar-item v-else v-for="data in facilities"
+              :key="data.ident" :data="data"
+              :selectedFacilityId="selectedFacilityId"
+              @select="markerClick(data)"></food-sidebar-item>
          </div>
        </div>
+
      </div>
 
      <food-locator v-if="showLocator" :defaultPostcode="postcode" @close="showLocator = false" @postcodeChosen="postcodeChosen" @locationChosen="locationChosen"></food-locator>
@@ -68,10 +94,15 @@ import Vue from 'vue'
 import { LMap, LTileLayer, LControlZoom, LMarker, LPopup, LTooltip } from 'vue2-leaflet'
 import 'leaflet.icon.glyph'
 import bbox from '@turf/bbox'
+import smoothScroll from '../lib/smoothscroll'
+import SlideUpDown from 'vue-slide-up-down'
 
 import FoodPopup from './food-popup'
 import FoodSidebarItem from './food-sidebar-item'
 import FoodLocator from './food-locator'
+import FoodMapoverlay from './food-mapoverlay'
+import FoodFilter from './food-filter'
+import FoodLoader from './food-loader'
 
 var getIdFromPopup = (e) => {
   let node = e.popup._content.firstChild
@@ -98,7 +129,7 @@ const DETAIL_ZOOM_LEVEL = 12
 export default {
   name: 'food-map',
   props: ['config'],
-  components: { LMap, LTileLayer, LControlZoom, LMarker, LPopup, LTooltip, FoodPopup, FoodSidebarItem, FoodLocator
+  components: { LMap, LTileLayer, LControlZoom, LMarker, LPopup, LTooltip, FoodPopup, FoodSidebarItem, FoodLocator, FoodMapoverlay, FoodFilter, FoodLoader, SlideUpDown
   },
   data () {
     let locationKnown = false
@@ -120,28 +151,49 @@ export default {
       zoom: zoom || 6,
       locationKnown: locationKnown,
       showLocator: false,
+      showFilter: false,
+      filters: this.config.filters,
       maxBounds: L.latLngBounds(GERMANY_BOUNDS),
       postcode: '' + (postcode || this.config.city.postcode || ''),
       center: center || [
         this.config.city.latitude || 51.00289959043832,
         this.config.city.longitude || 10.245523452758789
       ],
+      selectedFacilityId: null,
       facilityMap: {},
       facilities: [],
-      isMobile: this.detectMobile(),
+      searching: false,
+      isMobile: L.Browser.mobile,
       listShown: false,
       query: '',
       mapMoved: false,
+      markerOptions: {
+        riseOnHover: true
+      },
       tileProvider: {
         name: 'Carto',
-        url: '//cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+        url: `//cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}${window.L.Browser.retina ? '@2x' : ''}.png`,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>'
       }
     }
   },
+  created () {
+    var self = this
+    Vue.directive('focusmarker', {
+      // When the bound element is inserted into the DOM...
+      componentUpdated: (el, binding, vnode) => {
+        console.log(el, binding, vnode, self)
+        console.log(vnode.key, self.selectedFacilityId)
+        if (vnode.key === self.selectedFacilityId) {
+          vnode.componentInstance.mapObject.setZIndexOffset(300)
+        } else {
+          vnode.componentInstance.mapObject.setZIndexOffset(0)
+        }
+      }
+    })
+  },
   mounted () {
     this.map.attributionControl.setPrefix('')
-    console.log(L.latLngBounds(GERMANY_BOUNDS))
     this.map.on('zoomend', (e) => {
       this.mapMoved = true
       this.recordMapPosition()
@@ -150,15 +202,12 @@ export default {
       this.mapMoved = true
       this.recordMapPosition()
     })
-    this.map.on('resize', (e) => {
-      this.isMobile = this.detectMobile()
+    this.map.on('click', (e) => {
+      this.clearSelected()
     })
     this.map.on('popupopen', (e) => {
       let nodeId = getIdFromPopup(e)
-      Vue.set(this.facilities, this.facilityMap[nodeId], {
-        ...this.facilities[this.facilityMap[nodeId]],
-        sidebarHighlight: true
-      })
+      this.selectedFacilityId = nodeId
       let sidebarId = 'sidebar-' + nodeId
       let sidebarItem = document.getElementById(sidebarId)
       if (sidebarItem && sidebarItem.scrollIntoView) {
@@ -166,11 +215,7 @@ export default {
       }
     })
     this.map.on('popupclose', (e) => {
-      let nodeId = getIdFromPopup(e)
-      Vue.set(this.facilities, this.facilityMap[nodeId], {
-        ...this.facilities[this.facilityMap[nodeId]],
-        sidebarHighlight: false
-      })
+      this.clearSelected()
     })
     if (!this.locationKnown) {
       this.showLocator = true
@@ -182,20 +227,54 @@ export default {
     map () {
       return this.$refs.map.mapObject
     },
-    iconRequested () {
-      return window.L.Icon.Default.imagePath + '/markers-request.png'
-    },
     iconUnRequested () {
-      return window.L.Icon.Default.imagePath + '/glyph-marker-icon.png'
+      return this.config.imagePath + '/pin_0.svg'
+    },
+    iconRequested () {
+      return this.config.imagePath + '/pin_1.svg'
+    },
+    iconSelectedUnRequested () {
+      return this.config.imagePath + '/pin_0_1.svg'
+    },
+    iconSelectedRequested () {
+      return this.config.imagePath + '/pin_1_1.svg'
+    },
+    iconCategoryMapping () {
+      let filterIconMapping = {}
+      this.filters.forEach((f) => {
+        f.categories.forEach((c) => {
+          filterIconMapping[c] = f.icon
+        })
+      })
+      return filterIconMapping
+    },
+    filterCategories () {
+      let filterCats = []
+      this.filters.forEach((f) => {
+        if (f.active) {
+          filterCats = filterCats.concat(f.categories)
+        }
+      })
+      if (filterCats.length === 0) {
+        this.filters.forEach((f) => {
+          filterCats = filterCats.concat(f.categories)
+        })
+      }
+      return filterCats
     },
     mapOptions () {
       return {
         scrollWheelZoom: !this.isMobile
       }
     },
-    topToolsHeight () {
-      let height = document.getElementById('searchbar').getBoundingClientRect().height
-      return height
+    dividerSwitchHeight () {
+      return window.innerHeight / 2
+    },
+    selectedFacility () {
+      if (this.selectedFacilityId) {
+        return this.facilities[this.facilityMap[this.selectedFacilityId]]
+      }
+      return null
     },
     popupOptions () {
       return {
@@ -233,6 +312,24 @@ export default {
           this.map.on('zoomend', this.preventMapMoved)
         })
     },
+    filterChanged (filter) {
+      this.filters = this.filters.map((f) => {
+        if (f.name === filter.name) {
+          f.active = !f.active
+        }
+        return f
+      })
+    },
+    applyFilter () {
+      this.showFilter = false
+      this.search()
+    },
+    openFilter () {
+      this.showFilter = !this.showFilter
+      if (this.isMobile) {
+        this.goToMap()
+      }
+    },
     preventMapMoved () {
       window.requestAnimationFrame(() => {
         this.mapMoved = false
@@ -249,9 +346,12 @@ export default {
     },
     searchArea () {
       this.search()
-      this.mapMoved = false
     },
     search (latlng, bounds) {
+      this.mapMoved = false
+      this.searching = true
+      this.clearSelected()
+      this.facilities = []
       if (!latlng) {
         latlng = this.map.getCenter()
       }
@@ -269,37 +369,72 @@ export default {
         )
       )
       radius = Math.round(Math.min(radius, 40000))
-      let categories = ['restaurants']
+      let categories = this.filterCategories
       let cats = categories.map((c) => `categories=${encodeURIComponent(c)}`)
       cats = cats.join('&')
       window.fetch(`/api/v1/venue/?lat=${latlng.lat}&lng=${latlng.lng}&radius=${radius}&q=${encodeURIComponent(this.query)}&${cats}`)
         .then((response) => {
           return response.json()
         }).then((data) => {
+          if (data.error) {
+            console.warn('Error requesting the API')
+          }
+          this.searching = false
           this.facilityMap = {}
-          this.facilities = data.map((r, i) => {
+          this.facilities = data.results.map((r, i) => {
             let d = {
               position: [r.lat, r.lng],
-              icon: L.icon.glyph({
-                prefix: 'fa',
-                glyph: r.request_url ? 'check' : 'cutlery',
-                iconUrl: r.request_url ? this.iconRequested : this.iconUnRequested
-              }),
               id: r.ident.replace(/:/g, '-'),
-              sidebarHighlight: false,
               ...r
             }
+            d.icon = this.getIcon(d)
             this.facilityMap[d.id] = i
             return d
           })
         })
     },
+    getIcon (r) {
+      let iconUrl = r.request_url ? this.iconRequested : this.iconUnRequested
+      if (this.selectedFacilityId === r.id) {
+        iconUrl = r.request_url ? this.iconSelectedRequested : this.iconSelectedUnRequested
+      }
+      return L.icon.glyph({
+        className: 'food-marker-icon ',
+        prefix: 'fa',
+        glyph: this.iconCategoryMapping[r.category] || 'question',
+        iconUrl: iconUrl
+      })
+    },
+    clearSelected () {
+      if (this.selectedFacilityId === null) {
+        return
+      }
+      let marker = this.facilities[this.facilityMap[this.selectedFacilityId]]
+      this.selectedFacilityId = null
+      if (marker) {
+        Vue.set(marker, 'icon', this.getIcon(marker))
+      }
+    },
+    markerClick (marker) {
+      this.clearSelected()
+      this.selectedFacilityId = marker.id
+      Vue.set(marker, 'icon', this.getIcon(marker))
+    },
     goToMap () {
-      window.scrollTo(0, 0)
+      let y = document.getElementById('food-map-container').offsetTop
+      smoothScroll({x: 0, y: y}, 300)
+    },
+    goToList () {
+      let y = document.getElementById('food-map-container').offsetTop
+      let y2 = document.getElementById('food-map').getBoundingClientRect().height
+      smoothScroll({x: 0, y: y + y2 + 2}, 300)
     },
     handleSidebarScroll (evt, el) {
       let listTop = el.getBoundingClientRect().top
-      if (listTop < this.topToolsHeight) {
+      if (listTop < this.dividerSwitchHeight) {
+        if (!this.listShown) {
+          this.showFilter = false
+        }
         this.listShown = true
       } else {
         this.listShown = false
@@ -313,9 +448,6 @@ export default {
       }
       window.localStorage.setItem('froide-food:zoom', zoom)
       window.localStorage.setItem('froide-food:center', JSON.stringify(latlng))
-    },
-    detectMobile () {
-      return window.innerWidth <= 768
     }
   }
 }
@@ -333,13 +465,24 @@ export default {
   top: 0;
   z-index: 2050;
   background-color: #fff;
-  padding: 0.25rem 0;
+  padding: 0;
+  margin:0 -15px;
+}
+
+.searchbar-inner {
+  padding: 0 5px;
+}
+
+@media screen and (min-width: 768px){
+  .searchbar-inner {
+    padding: 0 15px;
+  }
 }
 
 .map-column {
   position: -webkit-sticky;
   position: sticky;
-  top: 50px;
+  top: 38px;
 
   padding-right: 0;
   padding-left: 0;
@@ -348,7 +491,7 @@ export default {
 @media screen and (min-width: 768px){
   .map-column {
     padding-right: 15px;
-    padding-left: 15px;
+    padding-left: 5px;
   }
 }
 
@@ -356,23 +499,8 @@ export default {
   width: 100%;
   height: 50vh;
   position: relative;
+  overflow: hidden;
 }
-
-.sidebar-column {
-  transform: translate3d(0px, 0px, 0px);
-  z-index: 2020;
-  margin-top: -1px;
-  padding-right: 0;
-  padding-left: 0;
-}
-
-@media screen and (min-width: 768px){
-  .sidebar-column {
-    padding-right: 15px;
-    padding-left: 15px;
-  }
-}
-
 .sidebar {
   background-color: #fff;
 }
@@ -386,10 +514,22 @@ export default {
     overflow-y: scroll;
   }
 }
-//
-// .noScroll {
-//   overflow-y: hidden;
-// }
+
+.sidebar-column {
+  transform: translate3d(0px, 0px, 0px);
+  z-index: 2020;
+  margin-top: -1px;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+@media screen and (min-width: 768px){
+  .sidebar-column {
+    padding-right: 0px;
+    padding-left: 15px;
+  }
+}
+
 
 .redo-search {
   position: absolute;
@@ -409,7 +549,8 @@ export default {
   z-index: 2025;
   position: -webkit-sticky;
   position: sticky;
-  top: 45px;
+  top: 37px;
+  padding: 10px 0;
   text-align: center;
 }
 .divider-button {
@@ -421,7 +562,5 @@ export default {
     border-radius: 5px;
   }
 }
-
-
 
 </style>
