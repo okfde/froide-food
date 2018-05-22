@@ -138,7 +138,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   #food-locator {
     z-index: 3000;
   }
