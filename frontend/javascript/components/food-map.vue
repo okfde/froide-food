@@ -125,6 +125,7 @@ const GERMANY_BOUNDS = [
   [44.402391829093915, -3.5156250000000004]
 ]
 const DETAIL_ZOOM_LEVEL = 12
+const DEFAULT_ZOOM = 6
 
 export default {
   name: 'food-map',
@@ -143,12 +144,12 @@ export default {
       center = JSON.parse(window.localStorage.getItem('froide-food:center'))
       postcode = JSON.parse(window.localStorage.getItem('froide-food:postcode'))
     }
-    if (zoom) {
+    if (zoom && zoom !== DEFAULT_ZOOM) {
       locationKnown = true
     }
 
     return {
-      zoom: zoom || (this.config.city.latitude ? DETAIL_ZOOM_LEVEL : 6),
+      zoom: zoom || (this.config.city.latitude ? DETAIL_ZOOM_LEVEL : DEFAULT_ZOOM),
       locationKnown: locationKnown,
       showLocator: false,
       showFilter: false,
@@ -415,6 +416,9 @@ export default {
     },
     markerClick (marker) {
       this.clearSelected()
+      if (!this.isMobile) {
+        this.center = marker.position
+      }
       this.selectedFacilityId = marker.id
       Vue.set(marker, 'icon', this.getIcon(marker))
     },
