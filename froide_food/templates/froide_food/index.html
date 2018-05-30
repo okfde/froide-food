@@ -22,6 +22,7 @@
 {% endaddtoblock %}
 
 {% addtoblock 'js' %}
+  <script src="{% static 'js/common.js' %}" charset="utf-8"></script>
   <script src="{% static 'js/food.js' %}" charset="utf-8"></script>
   <script type="text/javascript">
     window.L.Icon.Default.imagePath = '{% static "food/images/leaflet/marker-icon.png" %}'.split('/').slice(0, -1).join('/') + '/'
