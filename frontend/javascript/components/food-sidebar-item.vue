@@ -7,7 +7,7 @@
             <a :href="data.url" class="image-column-inner" target="_blank" rel="noopener">
               <img v-if="data.image" :src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
               <div v-else class="dummy-image"></div>
-              <div :href="data.url" class="provider-logo" target="_blank" rel="noopener"></div>
+              <div class="provider-logo" target="_blank" rel="noopener"></div>
             </a>
           </div>
           <div class="col-8 col-md-9 info-column">

@@ -2,13 +2,6 @@
   <transition name="mapoverlay">
     <div class="food-mapoverlay container-fluid" :class="{'closing': closing}" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend" :style="{transform: currentTransform}">
       <div class="row">
-        <!-- <div class="col-3 image-column">
-          <a :href="data.url" class="image-column-inner" target="_blank" rel="noopener">
-            <img v-if="data.image" :src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
-            <div v-else class="dummy-image"></div>
-            <div :href="data.url" class="provider-logo" target="_blank" rel="noopener"></div>
-          </a>
-        </div> -->
         <div class="col-12 info-column">
           <div class="mapoverlay-header">
             <h4 class="venue-name">{{ data.name }}</h4>
@@ -17,12 +10,15 @@
             </button>
           </div>
           <p class="venue-address">{{ data.address }}</p>
-          <a v-if="!data.request_status" class="request-button" :href="requestUrl"  target="_blank">
-            Hygienekontrolle anfragen &rarr;
-          </a>
-          <a  v-else class="to-request-button" :href="data.request_url" target="_blank">
-            zur Anfrage  &rarr;
-          </a>
+          <a :href="data.url" class="provider-logo" target="_blank" rel="noopener"></a>
+          <div class="clearfix">
+            <a v-if="!data.request_status" class="request-button" :href="requestUrl"  target="_blank">
+              Hygienekontrolle anfragen &rarr;
+            </a>
+            <a  v-else class="to-request-button" :href="data.request_url" target="_blank">
+              zur Anfrage  &rarr;
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -179,5 +175,18 @@ export default {
 .mapoverlay-leave-active {
   transition: all .3s ease-in-out;
 }
+
+
+.provider-logo {
+  background-image: url('/static/food/images/yelp_logo.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  display: inline-block;
+  float: right;
+  width: 65px;
+  height: 40px;
+  margin: 0.25rem;
+}
+
 
 </style>

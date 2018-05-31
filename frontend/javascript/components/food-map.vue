@@ -416,9 +416,7 @@ export default {
     },
     markerClick (marker) {
       this.clearSelected()
-      if (!this.isMobile) {
-        this.center = marker.position
-      }
+      this.map.panTo(marker.position)
       this.selectedFacilityId = marker.id
       Vue.set(marker, 'icon', this.getIcon(marker))
     },
