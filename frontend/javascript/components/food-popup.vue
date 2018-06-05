@@ -29,6 +29,9 @@ export default {
   props: {
     data: {
       type: Object
+    },
+    config: {
+      type: Object
     }
   }
 }

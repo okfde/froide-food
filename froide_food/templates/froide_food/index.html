@@ -36,7 +36,8 @@
       city: {{ city | safe }},
       filters: {{ filters | safe }},
       imagePath: '{% static "food/images/pin_0.svg" %}'.split('/').slice(0, -1).join('/') + '/',
-      embed: {% if embed %}true{% else %}false{% endif %}
+      embed: {% if embed %}true{% else %}false{% endif %},
+      requestUrl: '{{ SITE_URL }}{% url "food-make_request" %}'
     })
   </script>
 {% endaddtoblock %}

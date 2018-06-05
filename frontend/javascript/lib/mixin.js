@@ -4,7 +4,7 @@ var FoodItemMixin = {
       return this.data.id
     },
     requestUrl () {
-      return `./anfragen/?ident=${encodeURIComponent(this.data.ident)}`
+      return `${this.config.requestUrl}?ident=${encodeURIComponent(this.data.ident)}`
     },
     hasRequest () {
       return this.data.request_url !== null

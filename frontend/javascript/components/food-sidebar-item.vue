@@ -40,6 +40,9 @@ export default {
     },
     selectedFacilityId: {
       type: String
+    },
+    config: {
+      type: Object
     }
   }
 }

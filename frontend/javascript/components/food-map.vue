@@ -51,11 +51,11 @@
             @touchstart.prevent="markerClick(marker)" v-focusmarker>
               <l-tooltip :content="marker.name" v-if="!isMobile"/>
               <l-popup :options="popupOptions" v-if="!isMobile">
-                <food-popup :data="marker" />
+                <food-popup :data="marker" :config="config" />
               </l-popup>
             </l-marker>
            </l-map>
-           <food-mapoverlay :data="selectedFacility" v-if="isMobile && selectedFacility" @close="clearSelected"></food-mapoverlay>
+           <food-mapoverlay :data="selectedFacility" :config="config" v-if="isMobile && selectedFacility" @close="clearSelected"></food-mapoverlay>
          </div>
        </div>
 
@@ -73,6 +73,7 @@
            <div v-if="searching" class="loader"></div>
            <food-sidebar-item v-else v-for="data in facilities"
               :key="data.ident" :data="data"
+               :config="config"
               :selectedFacilityId="selectedFacilityId"
               @select="markerClick(data)"></food-sidebar-item>
          </div>
