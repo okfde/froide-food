@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid food-map-container" id="food-map-container">
+  <div class="food-map-container container-fluid" id="food-map-container" :class="{'is-embed': config.embed}">
     <div class="searchbar" id="searchbar">
       <div class="searchbar-inner">
         <div class="input-group">
@@ -164,10 +164,11 @@ export default {
       facilityMap: {},
       facilities: [],
       searching: false,
-      isMobile: L.Browser.mobile,
+      isMobile: L.Browser.mobile || (window.innerWidth < 768),
       listShown: false,
       query: '',
       mapMoved: false,
+      tooltipOffset: L.point([-10, -50]),
       markerOptions: {
         riseOnHover: true
       },
@@ -465,12 +466,12 @@ export default {
   top: 0;
   z-index: 2050;
   background-color: #fff;
-  padding: 0;
+  padding: 15px 0 0;
   margin:0 -15px;
 }
 
 .searchbar-inner {
-  padding: 0 5px;
+  padding: 0;
 }
 
 @media screen and (min-width: 768px){
@@ -482,7 +483,7 @@ export default {
 .map-column {
   position: -webkit-sticky;
   position: sticky;
-  top: 38px;
+  top: 53px;
 
   padding-right: 0;
   padding-left: 0;
@@ -509,9 +510,15 @@ export default {
   .map-container {
     height: 80vh;
   }
+  .is-embed .map-container {
+    height: 90vh;
+  }
   .sidebar {
     height: 80vh;
     overflow-y: scroll;
+  }
+  .is-embed .sidebar {
+    height: 90vh;
   }
 }
 
@@ -545,13 +552,15 @@ export default {
 
 .divider-column {
   background-color: #fff;
+  border-bottom: 2px solid #eee;
   padding: 0.25rem 0;
   z-index: 2025;
   position: -webkit-sticky;
   position: sticky;
-  top: 37px;
-  padding: 10px 0;
+  top: 52px;
+  padding: 8px 0 8px;
   text-align: center;
+  cursor: pointer;
 }
 .divider-button {
   margin: 0;

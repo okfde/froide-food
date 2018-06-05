@@ -10,3 +10,16 @@
   background-size: contain;
   background-repeat: no-repeat;
 }
+
+.food-map-embed {
+  border: 1px solid #eee;
+  padding: 0 10px 10px;
+  height: 100vh;
+  overflow: scroll;
+}
+
+@media screen and (min-width: 768px){
+  .food-map-embed {
+    padding: 0;
+  }
+}
