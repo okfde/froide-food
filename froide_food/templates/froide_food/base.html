@@ -1,5 +1,11 @@
 {% extends CMS_TEMPLATE %}
 
+{% load cms_tags %}
+
 {% block body %}
+  {% static_placeholder 'froide_food_header' %}
+
   {% block main %}{% endblock %}
+
+  {% static_placeholder 'froide_food_footer' %}
 {% endblock %}
