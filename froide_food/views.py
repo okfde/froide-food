@@ -2,6 +2,7 @@ import json
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 from .venue_providers import venue_providers, venue_provider
 from .utils import (
@@ -9,12 +10,27 @@ from .utils import (
 )
 
 
-def index(request):
+def index(request, base_template='froide_food/base.html', extra_context=None):
     city = get_city_from_request(request)
-    return render(request, 'froide_food/index.html', {
+    context = {
+        'base_template': base_template,
         'city': json.dumps(city or {}),
         'filters': json.dumps(venue_provider.FILTERS)
-    })
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+    return render(request, 'froide_food/index.html', context)
+
+
+@xframe_options_exempt
+def embed(request):
+    return index(
+        request,
+        base_template='froide_food/embed_base.html',
+        extra_context={
+            'embed': True
+        }
+    )
 
 
 def make_request(request):

@@ -1,4 +1,4 @@
-{% extends "froide_food/base.html" %}
+{% extends base_template %}
 
 {% load static %}
 {% load sekizai_tags %}
@@ -6,16 +6,22 @@
 
 
 {% block main %}
-<div id="food-map-wrapper">
-  <food-map :config="config">
-    <div class="text-center">
-      <h3>Anwendung wird geladen</h3>
-      <p>
-        <img src="{% static "img/spinner.gif" %}" alt="wird geladen"/>
-      </p>
-    </div>
-  </food-map>
-</div>
+{% if embed %}
+<div class="food-map-embed">
+{% endif %}
+  <div id="food-map-wrapper">
+    <food-map :config="config">
+      <div class="text-center">
+        <h3>Anwendung wird geladen</h3>
+        <p>
+          <img src="{% static "img/spinner.gif" %}" alt="wird geladen"/>
+        </p>
+      </div>
+    </food-map>
+  </div>
+{% if embed %}
+  </div>
+{% endif %}
 
 {% addtoblock 'css' %}
   <link rel="stylesheet" href="{% static 'css/food.css' %}">
@@ -29,7 +35,8 @@
     window.Froide.components.food.createFoodMap('#food-map-wrapper', {
       city: {{ city | safe }},
       filters: {{ filters | safe }},
-      imagePath: '{% static "food/images/pin_0.svg" %}'.split('/').slice(0, -1).join('/') + '/'
+      imagePath: '{% static "food/images/pin_0.svg" %}'.split('/').slice(0, -1).join('/') + '/',
+      embed: {% if embed %}true{% else %}false{% endif %}
     })
   </script>
 {% endaddtoblock %}
