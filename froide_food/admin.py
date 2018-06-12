@@ -1,10 +1,17 @@
 from django.contrib import admin
 
-from .models import VenueRequest
+from .models import VenueRequest, VenueRequestItem
+
+
+class VenueRequestItemInlineAdmin(admin.StackedInline):
+    model = VenueRequestItem
+    raw_id_fields = ('venue', 'foirequest', 'publicbody',)
 
 
 class VenueRequestAdmin(admin.ModelAdmin):
-    raw_id_fields = ('foirequest', 'publicbody')
+    inlines = [
+        VenueRequestItemInlineAdmin
+    ]
 
 
 admin.site.register(VenueRequest, VenueRequestAdmin)
