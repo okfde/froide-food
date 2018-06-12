@@ -208,6 +208,7 @@ class YelpVenueProvider(BaseVenueProvider):
             'city': r['location']['city'],
             'image': r['image_url'],
             'rating': r.get('rating'),
+            'review_count': r.get('review_count'),
             'url': r['url'],
             'category': category
         }

@@ -14,6 +14,7 @@ class VenueSerializer(serializers.Serializer):
     image = serializers.CharField()
     url = serializers.CharField()
     rating = serializers.FloatField()
+    review_count = serializers.FloatField()
     category = serializers.CharField()
     request_url = serializers.CharField()
     request_status = serializers.CharField()

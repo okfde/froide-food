@@ -1,0 +1,54 @@
+.yelp-stars {
+    background: url(/static/food/images/yelp_stars.png) no-repeat;
+    display: inline-block;
+    vertical-align: middle;
+    width: 100%;
+    height: 14px;
+    background-size: 82px 140px;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .yelp-stars {
+        background-image:url(/static/food/images/yelp_stars@2x.png)
+    }
+}
+
+.yelp-stars--small-0 {
+    background-position: 0 -0px;
+}
+
+.yelp-stars--small-1 {
+    background-position: 0 -14px;
+}
+
+.yelp-stars--small-1-half {
+    background-position: 0 -28px;
+}
+
+.yelp-stars--small-2 {
+    background-position: 0 -42px;
+}
+
+.yelp-stars--small-2-half {
+    background-position: 0 -56px;
+}
+
+.yelp-stars--small-3 {
+    background-position: 0 -70px;
+}
+
+.yelp-stars--small-3-half {
+    background-position: 0 -84px;
+}
+
+.yelp-stars--small-4 {
+    background-position: 0 -98px;
+}
+
+.yelp-stars--small-4-half {
+    background-position: 0 -112px;
+}
+
+.yelp-stars--small-5 {
+   background-position: 0 -126px;
+}

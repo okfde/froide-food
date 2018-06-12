@@ -3,19 +3,23 @@
     <div class="sidebar-item-inner" :class="{requested: hasRequest, highlighted: isSelected}" @click="$emit('select', data)">
       <div class="container-fluid">
         <div class="row ">
-          <div class="col-4 col-md-3 image-column">
-            <a :href="data.url" class="image-column-inner" target="_blank" rel="noopener">
+          <div class="col-3 col-md-4 image-column">
+            <a class="image-column-inner" :href="data.url" target="_blank" rel="noopener">
               <img v-if="data.image" :src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
               <div v-else class="dummy-image"></div>
-              <div class="provider-logo" target="_blank" rel="noopener"></div>
+              <div class="image-column-provider">
+                <div class="provider-logo"></div>
+                <div :class="starClass" :title="starRating"></div>
+                <small class="review-count">{{ data.review_count }} Beiträge</small>
+              </div>
             </a>
           </div>
-          <div class="col-8 col-md-9 info-column">
+          <div class="col col-md-8 info-column">
             <h5 class="venue-name">
               {{ data.name }}
             </h5>
             <p class="venue-address">{{ data.address }}</p>
-            <a v-if="!data.request_status" class="request-button" :href="requestUrl"  target="_blank">
+            <a v-if="!data.request_status" class="btn btn-primary" :href="requestUrl"  target="_blank">
               Hygienekontrolle anfragen&nbsp;&rarr;
             </a>
             <a  v-else class="to-request-button" :href="data.request_url" target="_blank">
@@ -50,6 +54,8 @@ export default {
 
 <style lang="scss" scoped>
 
+@import "../../styles/yelp_stars";
+
 .sidebar-item {
   padding: 0;
   width: 100%;
@@ -58,7 +64,6 @@ export default {
 .sidebar-item-inner {
   padding: 1rem 0 1rem;
   border-bottom: 2px solid #eee;
-  cursor: pointer;
 }
 
 .sidebar-item:first-child .sidebar-item-inner {
@@ -77,6 +82,8 @@ export default {
 
 .image-column {
   padding: 0 5px 0 5px;
+  min-width: 110px;
+  cursor: pointer;
 }
 
 @media screen and (min-width: 768px){
@@ -84,6 +91,7 @@ export default {
     padding: 0 5px 0 5px;
   }
 }
+
 
 @media screen and (min-width: 768px){
   .map-container {
@@ -99,6 +107,10 @@ export default {
   display: block;
   background-color: #eee;
   padding: 0;
+}
+
+.image-column-inner:hover {
+  text-decoration: none;
 }
 
 .info-column {
@@ -133,23 +145,32 @@ export default {
   background-color: #aaa;
 }
 
-.request-button {
-  display: block;
-}
-
 .to-request-button {
   display: block;
   color: #28a745;
+}
+
+.image-column-provider {
+  padding: 0 0.5rem;
 }
 
 .provider-logo {
   background-image: url('/static/food/images/yelp_logo.png');
   background-repeat: no-repeat;
   background-size: contain;
-  display: inline-block;
-  width: 65px;
-  height: 40px;
-  margin: 0.5rem 0 0 0.25rem;
+  display: block;
+  margin: 0.25rem 0 0;
+  width: 60px;
+  height: 32px;
+}
+
+.review-count {
+  font-size: 0.7rem;
+  display: block;
+  margin: 0.25rem 0 0;
+  padding: 0 0 0.25rem;
+  color: #888;
+  text-decoration: none;
 }
 
 </style>

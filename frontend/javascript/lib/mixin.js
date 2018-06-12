@@ -19,6 +19,18 @@ var FoodItemMixin = {
     isSelected () {
       return this.data.id === this.selectedFacilityId
     },
+    starClass () {
+      let suffix = ''
+      let rating = this.data.rating
+      if (rating !== Math.floor(rating)) {
+        suffix = '-half'
+        rating = Math.floor(rating)
+      }
+      return 'yelp-stars yelp-stars--small-' + rating + suffix
+    },
+    starRating () {
+      return `Bewertung ${this.data.rating} Sterne`
+    },
     requestStatus () {
       if (this.hasRequest) {
         if (this.data.request_status === 'resolved') {
