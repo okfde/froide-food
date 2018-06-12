@@ -1,4 +1,6 @@
-from .models import VenueRequest
+from django.utils import timezone
+
+from .models import VenueRequest, VenueRequestItem
 
 
 def connect_request_object(sender, **kwargs):
@@ -9,9 +11,30 @@ def connect_request_object(sender, **kwargs):
         return
     namespace, food_place_id = reference.split(':', 1)
 
-    VenueRequest.objects.create(
+    venue, _ = VenueRequest.objects.get_or_create(
         ident=food_place_id,
-        name=sender.title,
+        defaults={
+            'name': sender.title,
+            'last_request': timezone.now(),
+            'last_status': 'awaiting_response'
+        }
+    )
+    VenueRequestItem.objects.create(
+        venue=venue,
         foirequest=sender,
         publicbody=sender.public_body
     )
+
+
+def connect_request_status_changed(sender, **kwargs):
+    data = kwargs.pop('data', None)
+    if data is None:
+        return
+    status = data['status']
+
+    vris = VenueRequestItem.objects.filter(foirequest=sender).select_related()
+    for vri in vris:
+        venue = vri.venue
+        venue.last_status = status
+        venue.last_request = sender.last_message
+        venue.save()

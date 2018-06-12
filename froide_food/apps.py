@@ -8,10 +8,14 @@ class FroideFoodConfig(AppConfig):
     verbose_name = _("Froide Food App")
 
     def ready(self):
-        from .listeners import connect_request_object
+        from .listeners import (
+            connect_request_object,
+            connect_request_status_changed
+        )
         from froide.foirequest.models import FoiRequest
 
         FoiRequest.request_created.connect(connect_request_object)
+        FoiRequest.status_changed.connect(connect_request_status_changed)
 
         from froide.helper import api_router
 
