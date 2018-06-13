@@ -1,7 +1,8 @@
 <template>
   <div :class="{'food-map-embed': config.embed}" v-scroll="handleSidebarScroll">
     <div class="food-map-container container-fluid" id="food-map-container" :class="{'is-embed': config.embed}">
-      <div class="searchbar" id="searchbar">
+
+      <div class="searchbar d-block d-md-none" id="searchbar">
         <div class="searchbar-inner">
           <div class="input-group">
             <input type="text" v-model="query" class="form-control" placeholder="Name"  @keydown.enter.prevent="userSearch">
@@ -32,8 +33,9 @@
       <div class="row">
         <div class="col-md-7 col-lg-8 order-md-2 map-column">
           <div class="map-container" id="food-map">
+
             <div v-if="showRefresh || searching" class="redo-search">
-              <button v-if="showRefresh" class="btn btn-secondary btn-sm" @click="searchArea">
+              <button v-if="showRefresh" class="btn btn-dark btn-sm" @click="searchArea">
                 Im aktuellen Bereich suchen
               </button>
               <button v-if="searching" class="btn btn-secondary btn-sm disabled">
@@ -42,10 +44,24 @@
               </button>
             </div>
 
+            <div class="map-search d-none d-md-block">
+              <div class="input-group">
+                <input type="text" v-model="query" class="form-control" placeholder="Restaurant"  @keydown.enter.prevent="userSearch">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" @click="userSearch">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                    <span class="d-none d-sm-none d-lg-inline">Suchen</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <l-map ref="map" :zoom="zoom" :center="center" :options="mapOptions" :maxBounds="maxBounds">
               <l-tile-layer
                 layerType="base" :name="tileProvider.name" :visible="true"
                 :url="tileProvider.url" :attribution="tileProvider.attribution"/>
+
+              <l-control-zoom position="bottomright" v-if="!isTouch"/>
 
               <l-marker v-for="marker in facilities" :key="marker.id" :lat-lng="marker.position" :title="marker.name" :draggable="false" :icon="marker.icon" :options="markerOptions"
               @click="markerClick(marker)"
@@ -55,6 +71,7 @@
                   <food-popup :data="marker" :config="config" />
                 </l-popup>
               </l-marker>
+
             </l-map>
             <food-mapoverlay :data="selectedFacility" :config="config" v-if="isMobile && selectedFacility" @close="clearSelected"></food-mapoverlay>
           </div>
@@ -94,7 +111,7 @@
 import 'whatwg-fetch'
 import Vue from 'vue'
 
-import { LMap, LTileLayer, LControlZoom, LMarker, LPopup, LTooltip } from 'vue2-leaflet'
+import { LMap, LTileLayer, LControlLayers, LControlZoom, LMarker, LPopup, LTooltip } from 'vue2-leaflet'
 import 'leaflet.icon.glyph'
 import bbox from '@turf/bbox'
 import smoothScroll from '../lib/smoothscroll'
@@ -137,7 +154,7 @@ const DEFAULT_ZOOM = 6
 export default {
   name: 'food-map',
   props: ['config'],
-  components: { LMap, LTileLayer, LControlZoom, LMarker, LPopup, LTooltip, FoodPopup, FoodSidebarItem, FoodLocator, FoodMapoverlay, FoodFilter, FoodLoader, SlideUpDown
+  components: { LMap, LTileLayer, LControlLayers, LControlZoom, LMarker, LPopup, LTooltip, FoodPopup, FoodSidebarItem, FoodLocator, FoodMapoverlay, FoodFilter, FoodLoader, SlideUpDown
   },
   data () {
     let locationKnown = false
@@ -171,7 +188,8 @@ export default {
       facilityMap: {},
       facilities: [],
       searching: false,
-      isMobile: L.Browser.mobile || (window.innerWidth < 768),
+      stacked: (window.innerWidth < 768),
+      isTouch: L.Browser.touch,
       listShown: false,
       query: '',
       mapMoved: false,
@@ -216,11 +234,6 @@ export default {
     this.map.on('popupopen', (e) => {
       let nodeId = getIdFromPopup(e)
       this.selectedFacilityId = nodeId
-      let sidebarId = 'sidebar-' + nodeId
-      let sidebarItem = document.getElementById(sidebarId)
-      if (sidebarItem && sidebarItem.scrollIntoView) {
-        sidebarItem.scrollIntoView({behavior: 'smooth'})
-      }
     })
     this.map.on('popupclose', (e) => {
       this.clearSelected()
@@ -234,6 +247,9 @@ export default {
   computed: {
     map () {
       return this.$refs.map.mapObject
+    },
+    isMobile () {
+      return this.stacked || L.browser.mobile
     },
     iconUnRequested () {
       return this.config.imagePath + '/pin_0.svg'
@@ -272,7 +288,8 @@ export default {
     },
     mapOptions () {
       return {
-        scrollWheelZoom: !this.isMobile
+        scrollWheelZoom: !this.isMobile,
+        zoomControl: false
       }
     },
     dividerSwitchHeight () {
@@ -300,7 +317,7 @@ export default {
   methods: {
     locationChosen (latlng) {
       let center = L.latLng(latlng)
-      this.map.flyTo(center, DETAIL_ZOOM_LEVEL)
+      this.map.setView(center, DETAIL_ZOOM_LEVEL)
       this.search(center)
       this.map.on('zoomend', this.preventMapMoved)
     },
@@ -321,7 +338,7 @@ export default {
           ])
           let coords = geoRegion.centroid.coordinates
           let center = L.latLng([coords[1], coords[0]])
-          this.map.flyToBounds(bounds)
+          this.map.fitBounds(bounds)
           this.search(center, bounds)
           this.map.on('zoomend', this.preventMapMoved)
         })
@@ -433,6 +450,13 @@ export default {
       this.clearSelected()
       this.map.panTo(marker.position)
       this.selectedFacilityId = marker.id
+      if (window.innerWidth < 520) {
+        let sidebarId = 'sidebar-' + marker.id
+        let sidebarItem = document.getElementById(sidebarId)
+        if (sidebarItem && sidebarItem.scrollIntoView) {
+          sidebarItem.scrollIntoView({behavior: 'smooth'})
+        }
+      }
       Vue.set(marker, 'icon', this.getIcon(marker))
     },
     goToMap () {
@@ -500,6 +524,33 @@ export default {
   padding: 0;
 }
 
+.map-search {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2000;
+  width: 40%;
+  margin-top: 1rem;
+  margin-right: 1rem;
+
+  .btn {
+    background-color: #fff;
+  }
+}
+
+.redo-search {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+  width: 40%;
+  text-align: left;
+
+  margin-top: 1rem;
+  margin-left: 1rem;
+  
+}
+
 @media screen and (min-width: 768px){
   .searchbar-inner {
     padding: 0 15px;
@@ -528,6 +579,7 @@ export default {
   position: relative;
   overflow: hidden;
 }
+
 .sidebar {
   background-color: #fff;
 }
@@ -560,19 +612,6 @@ export default {
   .sidebar-column {
     padding-right: 0px;
     padding-left: 15px;
-  }
-}
-
-
-.redo-search {
-  position: absolute;
-  top: 0;
-  z-index: 2000;
-  width: 50%;
-  text-align: center;
-  left: 25%;
-  button {
-    margin-top: 0.5rem;
   }
 }
 

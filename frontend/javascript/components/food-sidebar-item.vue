@@ -19,7 +19,7 @@
               {{ data.name }}
             </h5>
             <p class="venue-address">{{ data.address }}</p>
-            <a v-if="!data.request_status" class="btn btn-primary" :href="requestUrl"  target="_blank">
+            <a v-if="!data.request_status" class="btn btn-primary btn-sm" :href="requestUrl"  target="_blank">
               Hygienekontrolle anfragen&nbsp;&rarr;
             </a>
             <a  v-else class="to-request-button" :href="data.request_url" target="_blank">
