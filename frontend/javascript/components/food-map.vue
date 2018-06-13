@@ -1,89 +1,91 @@
 <template>
-  <div class="food-map-container container-fluid" id="food-map-container" :class="{'is-embed': config.embed}">
-    <div class="searchbar" id="searchbar">
-      <div class="searchbar-inner">
-        <div class="input-group">
-          <input type="text" v-model="query" class="form-control" placeholder="Name"  @keydown.enter.prevent="userSearch">
-          <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button" @click="userSearch">
-              <i class="fa fa-search" aria-hidden="true"></i>
-              <span class="d-none d-sm-none d-md-inline">Suchen</span>
-            </button>
-          </div>
-          <div class="input-group-append">
-            <button class="btn btn-outline-secondary" @click="showLocator = true">
-              <i class="fa fa-location-arrow" aria-hidden="true"></i>
-              <span class="d-none d-sm-none d-md-inline">PLZ</span>
-            </button>
-          </div>
-          <div class="input-group-append">
-            <button class="btn btn-outline-secondary" :class="{'active': showFilter}" @click="openFilter">
-              <i class="fa fa-gears" aria-hidden="true"></i>
-              <span class="d-none d-sm-none d-md-inline">Filter</span>
-            </button>
+  <div :class="{'food-map-embed': config.embed}" v-scroll="handleSidebarScroll">
+    <div class="food-map-container container-fluid" id="food-map-container" :class="{'is-embed': config.embed}">
+      <div class="searchbar" id="searchbar">
+        <div class="searchbar-inner">
+          <div class="input-group">
+            <input type="text" v-model="query" class="form-control" placeholder="Name"  @keydown.enter.prevent="userSearch">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="button" @click="userSearch">
+                <i class="fa fa-search" aria-hidden="true"></i>
+                <span class="d-none d-sm-none d-md-inline">Suchen</span>
+              </button>
+            </div>
+            <div class="input-group-append mr-auto">
+              <button class="btn btn-outline-secondary" @click="showLocator = true">
+                <i class="fa fa-location-arrow" aria-hidden="true"></i>
+                <span class="d-none d-sm-none d-md-inline">PLZ</span>
+              </button>
+            </div>
+            <div class="input-group-append" v-if="false">
+              <button class="btn btn-outline-secondary" :class="{'active': showFilter}" @click="openFilter">
+                <i class="fa fa-gears" aria-hidden="true"></i>
+                <span class="d-none d-sm-none d-md-inline">Filter</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <slide-up-down :active="showFilter" :duration="300">
-      <food-filter :filters="filters" @change="filterChanged" @apply="applyFilter"></food-filter>
-    </slide-up-down>
-    <div class="row">
-      <div class="col-md-7 col-lg-8 order-md-2 map-column">
-        <div class="map-container" id="food-map">
-          <div v-if="mapMoved || searching" class="redo-search">
-            <button v-if="mapMoved" class="btn btn-secondary btn-sm" @click="searchArea">
-              Im aktuellen Bereich suchen
-            </button>
-            <button v-if="searching" class="btn btn-secondary btn-sm disabled">
-              <food-loader></food-loader>
-              Suche läuft&hellip;
-            </button>
+      <slide-up-down :active="showFilter" :duration="300">
+        <food-filter :filters="filters" @change="filterChanged" @apply="applyFilter"></food-filter>
+      </slide-up-down>
+      <div class="row">
+        <div class="col-md-7 col-lg-8 order-md-2 map-column">
+          <div class="map-container" id="food-map">
+            <div v-if="showRefresh || searching" class="redo-search">
+              <button v-if="showRefresh" class="btn btn-secondary btn-sm" @click="searchArea">
+                Im aktuellen Bereich suchen
+              </button>
+              <button v-if="searching" class="btn btn-secondary btn-sm disabled">
+                <food-loader></food-loader>
+                Suche läuft&hellip;
+              </button>
+            </div>
+
+            <l-map ref="map" :zoom="zoom" :center="center" :options="mapOptions" :maxBounds="maxBounds">
+              <l-tile-layer
+                layerType="base" :name="tileProvider.name" :visible="true"
+                :url="tileProvider.url" :attribution="tileProvider.attribution"/>
+
+              <l-marker v-for="marker in facilities" :key="marker.id" :lat-lng="marker.position" :title="marker.name" :draggable="false" :icon="marker.icon" :options="markerOptions"
+              @click="markerClick(marker)"
+              @touchstart.prevent="markerClick(marker)" v-focusmarker>
+                <l-tooltip :content="marker.name" v-if="!isMobile"/>
+                <l-popup :options="popupOptions" v-if="!isMobile">
+                  <food-popup :data="marker" :config="config" />
+                </l-popup>
+              </l-marker>
+            </l-map>
+            <food-mapoverlay :data="selectedFacility" :config="config" v-if="isMobile && selectedFacility" @close="clearSelected"></food-mapoverlay>
           </div>
+        </div>
 
-          <l-map ref="map" :zoom="zoom" :center="center" :options="mapOptions" :maxBounds="maxBounds">
-            <l-tile-layer
-              layerType="base" :name="tileProvider.name" :visible="true"
-              :url="tileProvider.url" :attribution="tileProvider.attribution"/>
+        <div class="col-12 d-block d-md-none divider-column" id="divider">
+          <p v-if="listShown" class="divider-button">
+            <a @click.prevent="goToMap" @touchstart.prevent="goToMap">zurück zur Karte</a>
+          </p>
+          <p v-else class="divider-button">
+            <a @click.prevent="goToList" @touchstart.prevent="goToList">zur Liste</a>
+          </p>
+        </div>
 
-            <l-marker v-for="marker in facilities" :key="marker.id" :lat-lng="marker.position" :title="marker.name" :draggable="false" :icon="marker.icon" :options="markerOptions"
-            @click="markerClick(marker)"
-            @touchstart.prevent="markerClick(marker)" v-focusmarker>
-              <l-tooltip :content="marker.name" v-if="!isMobile"/>
-              <l-popup :options="popupOptions" v-if="!isMobile">
-                <food-popup :data="marker" :config="config" />
-              </l-popup>
-            </l-marker>
-           </l-map>
-           <food-mapoverlay :data="selectedFacility" :config="config" v-if="isMobile && selectedFacility" @close="clearSelected"></food-mapoverlay>
-         </div>
-       </div>
+        <div class="col-md-5 col-lg-4 order-md-1 sidebar-column">
+          <div class="sidebar" id="food-list" v-scroll.window="handleSidebarScroll">
+            <div v-if="searching" class="loader"></div>
+            <food-sidebar-item v-else v-for="data in facilities"
+                :key="data.ident" :data="data"
+                :config="config"
+                :selectedFacilityId="selectedFacilityId"
+                @select="markerClick(data)"></food-sidebar-item>
+          </div>
+        </div>
 
-       <div class="col-12 d-block d-md-none divider-column" id="divider">
-         <p v-if="listShown" class="divider-button">
-           <a @click.prevent="goToMap" @touchstart.prevent="goToMap">zurück zur Karte</a>
-         </p>
-         <p v-else class="divider-button">
-           <a @click.prevent="goToList" @touchstart.prevent="goToList">zur Liste</a>
-         </p>
-       </div>
+      </div>
 
-       <div class="col-md-5 col-lg-4 order-md-1 sidebar-column">
-         <div class="sidebar" id="food-list" v-scroll="handleSidebarScroll">
-           <div v-if="searching" class="loader"></div>
-           <food-sidebar-item v-else v-for="data in facilities"
-              :key="data.ident" :data="data"
-               :config="config"
-              :selectedFacilityId="selectedFacilityId"
-              @select="markerClick(data)"></food-sidebar-item>
-         </div>
-       </div>
+      <food-locator v-if="showLocator" :defaultPostcode="postcode" @close="showLocator = false" @postcodeChosen="postcodeChosen" @locationChosen="locationChosen"></food-locator>
 
-     </div>
-
-     <food-locator v-if="showLocator" :defaultPostcode="postcode" @close="showLocator = false" @postcodeChosen="postcodeChosen" @locationChosen="locationChosen"></food-locator>
-
-   </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -112,12 +114,16 @@ var getIdFromPopup = (e) => {
 
 Vue.directive('scroll', {
   inserted: function (el, binding) {
+    let scrollElement = el
+    if (binding.modifiers.window) {
+      scrollElement = window
+    }
     let f = function (evt) {
       if (binding.value(evt, el)) {
-        window.removeEventListener('scroll', f)
+        scrollElement.removeEventListener('scroll', f)
       }
     }
-    window.addEventListener('scroll', f)
+    scrollElement.addEventListener('scroll', f)
   }
 })
 
@@ -197,6 +203,7 @@ export default {
     this.map.attributionControl.setPrefix('')
     this.map.on('zoomend', (e) => {
       this.mapMoved = true
+      this.zoom = this.map.getZoom()
       this.recordMapPosition()
     })
     this.map.on('moveend', (e) => {
@@ -282,6 +289,12 @@ export default {
         autoPanPaddingTopLeft: L.point([5, 85]),
         maxWidth: Math.round(window.innerWidth * 0.7)
       }
+    },
+    showRefresh () {
+      return this.mapMoved && this.zoom >= 10
+    },
+    scrollContainer () {
+      return this.config.embed ? document.querySelector('.food-map-embed') : document.documentElement
     }
   },
   methods: {
@@ -424,15 +437,15 @@ export default {
     },
     goToMap () {
       let y = document.getElementById('food-map-container').offsetTop
-      smoothScroll({x: 0, y: y}, 300)
+      smoothScroll({x: 0, y: y, el: this.scrollContainer}, 300)
     },
     goToList () {
       let y = document.getElementById('food-map-container').offsetTop
       let y2 = document.getElementById('food-map').getBoundingClientRect().height
-      smoothScroll({x: 0, y: y + y2 + 2}, 300)
+      smoothScroll({x: 0, y: y + y2 + 2, el: this.scrollContainer}, 300)
     },
     handleSidebarScroll (evt, el) {
-      let listTop = el.getBoundingClientRect().top
+      let listTop = document.getElementById('food-list').getBoundingClientRect().top
       if (listTop < this.dividerSwitchHeight) {
         if (!this.listShown) {
           this.showFilter = false
@@ -457,6 +470,19 @@ export default {
 
 <style lang="scss" scoped>
 
+.food-map-embed {
+  border: 1px solid #eee;
+  padding: 0 10px 10px;
+  height: 100vh;
+  overflow: scroll;
+}
+
+@media screen and (min-width: 768px){
+  .food-map-embed {
+    padding: 0;
+  }
+}
+
 .food-map-container {
   padding-bottom: 1rem;
 }
@@ -467,7 +493,6 @@ export default {
   top: 0;
   z-index: 2050;
   background-color: #fff;
-  padding: 15px 0 0;
   margin:0 -15px;
 }
 
@@ -484,7 +509,7 @@ export default {
 .map-column {
   position: -webkit-sticky;
   position: sticky;
-  top: 53px;
+  top: 38px;
 
   padding-right: 0;
   padding-left: 0;
@@ -558,11 +583,12 @@ export default {
   z-index: 2025;
   position: -webkit-sticky;
   position: sticky;
-  top: 52px;
+  top: 37px;
   padding: 8px 0 8px;
   text-align: center;
   cursor: pointer;
 }
+
 .divider-button {
   margin: 0;
   a {
@@ -570,6 +596,18 @@ export default {
     background: #eee;
     color: #333;
     border-radius: 5px;
+  }
+}
+
+.is-embed {
+  .searchbar {
+    padding: 15px 0 0;
+  }
+  .map-column {
+    top: 53px;
+  }
+  .divider-column {
+    top: 52px;
   }
 }
 

@@ -1,5 +1,5 @@
 /*
-
+Modified from
 https://github.com/bloodyowl/scroll
 Copyright (c) 2015 Matthias Le Brun
 
@@ -21,12 +21,13 @@ const createAnimation = (func, duration = 300) => new Promise((resolve) => {
 
 const smoothScroll = ({
   x = window.pageXOffset,
-  y = window.pageYOffset
+  y = window.pageYOffset,
+  el = document.documentElement
 }, duration) => {
-  const initialTop = window.pageYOffset
-  const initialLeft = window.pageXOffset
+  const initialTop = el.scrollTop
+  const initialLeft = el.scrollLeft
   return createAnimation((progress) => {
-    window.scrollTo(
+    el.scrollTo(
       (1 - progress) * initialLeft + x * progress,
       (1 - progress) * initialTop + y * progress
     )

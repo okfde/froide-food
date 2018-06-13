@@ -6,9 +6,6 @@
 
 
 {% block main %}
-{% if embed %}
-<div class="food-map-embed">
-{% endif %}
   <div id="food-map-wrapper">
     <food-map :config="config">
       <div class="text-center">
@@ -19,9 +16,6 @@
       </div>
     </food-map>
   </div>
-{% if embed %}
-  </div>
-{% endif %}
 
 {% addtoblock 'css' %}
   <link rel="stylesheet" href="{% static 'css/food.css' %}">
