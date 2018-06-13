@@ -27,7 +27,7 @@
                 <input type="text" pattern="\d*" class="form-control postcode-input" v-model="postcode" placeholder="PLZ" maxlength="5" @keydown.enter.prevent="postcodeLookup">
                 <div class="input-group-append">
                   <button class="btn" :class="{'btn-success': validPostcode, 'btn-outline-secondary': !validPostcode}" type="button" @click.prevent="postcodeLookup">
-                    Auf geht's!
+                    Auf geht’s!
                   </button>
                 </div>
               </div>
