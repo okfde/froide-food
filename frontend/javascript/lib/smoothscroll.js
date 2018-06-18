@@ -22,15 +22,26 @@ const createAnimation = (func, duration = 300) => new Promise((resolve) => {
 const smoothScroll = ({
   x = window.pageXOffset,
   y = window.pageYOffset,
-  el = document.documentElement
+  el = window
 }, duration) => {
-  const initialTop = el.scrollTop
-  const initialLeft = el.scrollLeft
+  let initialTop
+  let initialLeft
+  if (el === window) {
+    initialTop = window.pageYOffset
+    initialLeft = window.pageXOffset
+  } else {
+    initialTop = el.scrollTop
+    initialLeft = el.scrollLeft
+  }
   return createAnimation((progress) => {
-    el.scrollTo(
-      (1 - progress) * initialLeft + x * progress,
-      (1 - progress) * initialTop + y * progress
-    )
+    let offsetX = (1 - progress) * initialLeft + x * progress
+    let offsetY = (1 - progress) * initialTop + y * progress
+    if (el === window) {
+      window.scrollTo(offsetX, offsetY)
+    } else {
+      el.scrollLeft = offsetX
+      el.scrollTop = offsetY
+    }
   }, duration)
 }
 
