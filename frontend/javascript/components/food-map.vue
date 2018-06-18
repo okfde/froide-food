@@ -27,12 +27,12 @@
           </div>
         </div>
       </div>
-      <slide-up-down :active="showFilter" :duration="300">
+      <!-- <slide-up-down :active="showFilter" :duration="300">
         <food-filter :filters="filters" @change="filterChanged" @apply="applyFilter"></food-filter>
-      </slide-up-down>
+      </slide-up-down> -->
       <div class="row">
         <div class="col-md-7 col-lg-8 order-md-2 map-column">
-          <div class="map-container" id="food-map">
+          <div class="map-container" id="food-map" :class="mapContainerClass">
 
             <div v-if="showRefresh || searching" class="redo-search">
               <button v-if="showRefresh" class="btn btn-dark btn-sm" @click="searchArea">
@@ -63,9 +63,11 @@
 
               <l-control-zoom position="bottomright" v-if="!isTouch"/>
 
-              <l-marker v-for="marker in facilities" :key="marker.id" :lat-lng="marker.position" :title="marker.name" :draggable="false" :icon="marker.icon" :options="markerOptions"
-              @click="markerClick(marker)"
-              @touchstart.prevent="markerClick(marker)" v-focusmarker>
+              <l-marker v-for="marker in facilities" :key="marker.id"
+                  :lat-lng="marker.position" :title="marker.name"
+                  :draggable="false" :icon="marker.icon" :options="markerOptions"
+                  @click="markerClick(marker)"
+                  @touchstart.prevent="markerClick(marker)" v-focusmarker>
                 <l-tooltip :content="marker.name" v-if="!isMobile"/>
                 <l-popup :options="popupOptions" v-if="!isMobile">
                   <food-popup :data="marker" :config="config" />
@@ -73,7 +75,9 @@
               </l-marker>
 
             </l-map>
-            <food-mapoverlay :data="selectedFacility" :config="config" v-if="isMobile && selectedFacility" @close="clearSelected"></food-mapoverlay>
+            <food-mapoverlay :data="selectedFacility" :config="config" v-if="stacked && selectedFacility"
+              @close="clearSelected"
+              @detail="setDetail"></food-mapoverlay>
           </div>
         </div>
 
@@ -93,14 +97,15 @@
                 :key="data.ident" :data="data"
                 :config="config"
                 :selectedFacilityId="selectedFacilityId"
-                @select="markerClick(data)"></food-sidebar-item>
+                @select="markerClick(data)"
+                @detail="setDetail"></food-sidebar-item>
           </div>
         </div>
 
       </div>
 
       <food-locator v-if="showLocator" :defaultPostcode="postcode" @close="showLocator = false" @postcodeChosen="postcodeChosen" @locationChosen="locationChosen"></food-locator>
-
+      <food-detail v-if="showDetail" :data="showDetail" @close="showDetail = null" @detailfetched="detailFetched"></food-detail>
     </div>
   </div>
 </template>
@@ -122,6 +127,7 @@ import FoodSidebarItem from './food-sidebar-item'
 import FoodLocator from './food-locator'
 import FoodMapoverlay from './food-mapoverlay'
 import FoodFilter from './food-filter'
+import FoodDetail from './food-detail'
 import FoodLoader from './food-loader'
 
 var getIdFromPopup = (e) => {
@@ -154,7 +160,10 @@ const DEFAULT_ZOOM = 6
 export default {
   name: 'food-map',
   props: ['config'],
-  components: { LMap, LTileLayer, LControlLayers, LControlZoom, LMarker, LPopup, LTooltip, FoodPopup, FoodSidebarItem, FoodLocator, FoodMapoverlay, FoodFilter, FoodLoader, SlideUpDown
+  components: {
+    LMap, LTileLayer, LControlLayers, LControlZoom, LMarker, LPopup, LTooltip,
+    FoodPopup, FoodSidebarItem, FoodLocator, FoodMapoverlay, FoodLoader, FoodDetail,
+    FoodFilter, SlideUpDown
   },
   data () {
     let locationKnown = false
@@ -177,6 +186,7 @@ export default {
       locationKnown: locationKnown,
       showLocator: false,
       showFilter: false,
+      showDetail: null,
       filters: this.config.filters,
       maxBounds: L.latLngBounds(GERMANY_BOUNDS),
       postcode: '' + (postcode || this.config.city.postal_code || ''),
@@ -189,6 +199,7 @@ export default {
       facilities: [],
       searching: false,
       stacked: (window.innerWidth < 768),
+      isMapTop: false,
       isTouch: L.Browser.touch,
       listShown: false,
       query: '',
@@ -249,7 +260,7 @@ export default {
       return this.$refs.map.mapObject
     },
     isMobile () {
-      return this.stacked || L.browser.mobile
+      return this.stacked || L.Browser.mobile
     },
     iconUnRequested () {
       return this.config.imagePath + '/pin_0.svg'
@@ -311,7 +322,12 @@ export default {
       return this.mapMoved && this.zoom >= 10
     },
     scrollContainer () {
-      return this.config.embed ? document.querySelector('.food-map-embed') : document.documentElement
+      return this.config.embed ? document.querySelector('.food-map-embed') : window
+    },
+    mapContainerClass () {
+      if (this.isMapTop && !this.stacked) {
+        return 'map-full-height'
+      }
     }
   },
   methods: {
@@ -383,6 +399,7 @@ export default {
       this.searching = true
       this.clearSelected()
       this.facilities = []
+
       if (!latlng) {
         latlng = this.map.getCenter()
       }
@@ -416,6 +433,7 @@ export default {
             let d = {
               position: [r.lat, r.lng],
               id: r.ident.replace(/:/g, '-'),
+              full: false,
               ...r
             }
             d.icon = this.getIcon(d)
@@ -425,9 +443,9 @@ export default {
         })
     },
     getIcon (r) {
-      let iconUrl = r.request_url ? this.iconRequested : this.iconUnRequested
+      let iconUrl = r.requests.length > 0 ? this.iconRequested : this.iconUnRequested
       if (this.selectedFacilityId === r.id) {
-        iconUrl = r.request_url ? this.iconSelectedRequested : this.iconSelectedUnRequested
+        iconUrl = r.requests.length > 0 ? this.iconSelectedRequested : this.iconSelectedUnRequested
       }
       return L.icon.glyph({
         className: 'food-marker-icon ',
@@ -450,12 +468,14 @@ export default {
       this.clearSelected()
       this.map.panTo(marker.position)
       this.selectedFacilityId = marker.id
-      if (window.innerWidth < 520) {
+      if (!this.stacked) {
         let sidebarId = 'sidebar-' + marker.id
         let sidebarItem = document.getElementById(sidebarId)
         if (sidebarItem && sidebarItem.scrollIntoView) {
           sidebarItem.scrollIntoView({behavior: 'smooth'})
         }
+      } else {
+        this.goToMap()
       }
       Vue.set(marker, 'icon', this.getIcon(marker))
     },
@@ -478,6 +498,12 @@ export default {
       } else {
         this.listShown = false
       }
+      let mapTop = document.getElementById('food-map').getBoundingClientRect().top
+      let isMapTop = mapTop <= 0
+      if (isMapTop !== this.isMapTop) {
+        this.map.invalidateSize()
+      }
+      this.isMapTop = isMapTop
     },
     recordMapPosition () {
       let latlng = this.map.getCenter()
@@ -487,6 +513,19 @@ export default {
       }
       window.localStorage.setItem('froide-food:zoom', zoom)
       window.localStorage.setItem('froide-food:center', JSON.stringify(latlng))
+    },
+    setDetail (data) {
+      this.showDetail = data
+    },
+    detailFetched (data) {
+      this.facilities = this.facilities.map((f) => {
+        if (f.ident === data.ident) {
+          f.requests = data.requests
+          f.full = true
+          return f
+        }
+        return f
+      })
     }
   }
 }
@@ -540,15 +579,25 @@ export default {
 
 .redo-search {
   position: absolute;
+  z-index: 2000;
+  width: auto;
+
   top: 0;
   left: 0;
-  z-index: 2000;
-  width: 40%;
-  text-align: left;
-
+  right: 0;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 1rem;
-  margin-left: 1rem;
-  
+}
+
+@media screen and (min-width: 768px){
+  .redo-search {
+    left: 0;
+    width: 40%;
+    text-align: left;
+    margin-left: 1rem;
+  }
 }
 
 @media screen and (min-width: 768px){
@@ -575,7 +624,7 @@ export default {
 
 .map-container {
   width: 100%;
-  height: 50vh;
+  height: 60vh;
   position: relative;
   overflow: hidden;
 }
@@ -587,17 +636,20 @@ export default {
 @media screen and (min-width: 768px){
   .map-container {
     height: 80vh;
+    position: sticky;
+    top: 0;
   }
   .is-embed .map-container {
     height: 90vh;
   }
-  .sidebar {
-    height: 80vh;
-    overflow-y: scroll;
-  }
   .is-embed .sidebar {
     height: 90vh;
   }
+}
+
+.map-full-height {
+  transition: height 1s;
+  height: 100vh;
 }
 
 .sidebar-column {

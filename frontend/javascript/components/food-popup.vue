@@ -4,17 +4,31 @@
       <div class="col-12">
         <h4>{{ data.name }}</h4>
         <p class="venue-address">{{ data.address }}</p>
-        <a :href="data.url" class="provider-logo" target="_blank" rel="noopener"></a>
       </div>
     </div>
     <div class="row">
       <div class="col-12">
-        <a v-if="!data.request_status" class="request-button" :href="requestUrl"  target="_blank">
-          Hygienekontrolle anfragen&nbsp;&rarr;
-        </a>
-        <a v-else class="to-request-button" :href="data.request_url" target="_blank">
-          zur Anfrage&nbsp;&rarr;
-        </a>
+        <p v-if="canRequest">
+          <a class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
+            Hygienekontrolle<br class="d-block d-sm-none"/>
+            anfragen&nbsp;&rarr;
+          </a>
+        </p>
+        <div v-else class="request-status">
+          <p :class="requestColor">
+            {{ requestStatus }}
+          </p>
+          <p v-if="requestComplete">
+            <a :href="requestUrl" target="_blank" @click.prevent="setDetail">
+              zu den Berichten&nbsp;&rarr;
+            </a>
+          </p>
+          <p v-else>
+            <a :href="requestUrl" target="_blank">
+              zur Anfrage&nbsp;&rarr;
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -61,27 +75,19 @@ export default {
   white-space: pre-line;
 }
 
-.request-button {
-  display: block;
-  font-size: 1rem;
-}
-
 .to-request-button {
   display: block;
   font-size: 1rem;
   color: #28a745;
 }
 
-.provider-logo {
-  background-image: url('/static/food/images/yelp_logo.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  display: inline-block;
-  float: right;
-  width: 65px;
-  height: 40px;
-  margin: 0.5rem 0 0 0.25rem;
+.make-request-btn {
+  color: white;
+  white-space: normal !important;
 }
 
+.request-status {
+  font-size: 0.9rem;
+}
 
 </style>

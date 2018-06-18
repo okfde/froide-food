@@ -14,17 +14,32 @@
               </div>
             </a>
           </div>
-          <div class="col col-md-8 info-column">
+          <div class="col info-column">
             <h5 class="venue-name">
               {{ data.name }}
             </h5>
             <p class="venue-address">{{ data.address }}</p>
-            <a v-if="!data.request_status" class="btn btn-primary btn-sm" :href="requestUrl"  target="_blank">
-              Hygienekontrolle anfragen&nbsp;&rarr;
-            </a>
-            <a  v-else class="to-request-button" :href="data.request_url" target="_blank">
-              zur Anfrage&nbsp;&rarr;
-            </a>
+            <p v-if="canRequest">
+              <a class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
+                Hygienekontrolle<br class="d-block d-sm-none"/>
+                anfragen&nbsp;&rarr;
+              </a>
+            </p>
+            <div v-else class="request-status">
+              <p :class="requestColor">
+                {{ requestStatus }}
+              </p>
+              <p v-if="requestComplete">
+                <a :href="requestUrl" target="_blank" @click.prevent.stop="setDetail">
+                  zu den Berichten&nbsp;&rarr;
+                </a>
+              </p>
+              <p v-else>
+                <a :href="requestUrl" target="_blank">
+                  zur Anfrage&nbsp;&rarr;
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -115,7 +130,7 @@ export default {
 
 .info-column {
   padding-left: 15px;
-  padding-right: 0;
+  padding-right: 10px;
 }
 
 .venue-address {
@@ -123,10 +138,6 @@ export default {
   color: #687683;
   display: inline-block;
   white-space: pre-line;
-}
-
-.requested {
-
 }
 
 .highlighted {
@@ -145,9 +156,12 @@ export default {
   background-color: #aaa;
 }
 
-.to-request-button {
-  display: block;
-  color: #28a745;
+.make-request-btn {
+  white-space: normal !important;
+}
+
+.request-status {
+  font-size: 0.9rem;
 }
 
 .image-column-provider {
