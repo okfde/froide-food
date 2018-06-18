@@ -2,23 +2,38 @@ from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from .venue_providers import venue_provider, VenueProviderException
+from .venue_providers import (
+    venue_provider, venue_providers, VenueProviderException
+)
+
+
+class VenueRequestDocumentSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    url = serializers.CharField()
+
+
+class VenueRequestSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    url = serializers.CharField()
+    status = serializers.CharField()
+    resolution = serializers.CharField()
+    timestamp = serializers.DateTimeField()
+    documents = VenueRequestDocumentSerializer(many=True)
 
 
 class VenueSerializer(serializers.Serializer):
     ident = serializers.CharField()
-    lat = serializers.FloatField()
-    lng = serializers.FloatField()
-    name = serializers.CharField()
-    address = serializers.CharField()
-    image = serializers.CharField()
-    url = serializers.CharField()
-    rating = serializers.FloatField()
-    review_count = serializers.FloatField()
-    category = serializers.CharField()
-    request_url = serializers.CharField()
-    request_status = serializers.CharField()
-    request_timestamp = serializers.DateTimeField()
+    lat = serializers.FloatField(required=False)
+    lng = serializers.FloatField(required=False)
+    name = serializers.CharField(required=False)
+    address = serializers.CharField(required=False)
+    image = serializers.CharField(required=False)
+    url = serializers.CharField(required=False)
+    rating = serializers.FloatField(required=False)
+    review_count = serializers.FloatField(required=False)
+    category = serializers.CharField(required=False)
+
+    requests = VenueRequestSerializer(many=True)
 
 
 class VenueViewSet(viewsets.ViewSet):
@@ -53,3 +68,14 @@ class VenueViewSet(viewsets.ViewSet):
         serializer = VenueSerializer(places, many=True)
 
         return Response({'results': serializer.data, 'error': False})
+
+    def retrieve(self, request, pk=None):
+        if pk is None:
+            return Response({'result': None, 'error': True})
+        if ':' not in pk:
+            return Response({'result': None, 'error': True})
+        provider, ident = pk.split(':', 1)
+        provider = venue_providers[provider]
+        place = provider.get_detail(ident)
+        serializer = VenueSerializer(place)
+        return Response({'result': serializer.data, 'error': False})

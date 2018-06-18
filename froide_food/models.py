@@ -27,7 +27,7 @@ class VenueRequest(models.Model):
 
 
 class VenueRequestItem(models.Model):
-    venue = models.ForeignKey(VenueRequest)
+    venue = models.ForeignKey(VenueRequest, related_name='request_items')
 
     timestamp = models.DateTimeField(default=timezone.now)
     foirequest = models.ForeignKey(FoiRequest, null=True, blank=True,
@@ -36,6 +36,7 @@ class VenueRequestItem(models.Model):
                                    on_delete=models.SET_NULL)
 
     class Meta:
+        ordering = ('-timestamp',)
         verbose_name = _('Venue Request Item')
         verbose_name_plural = _('Venue Requests Items')
 

@@ -22,6 +22,8 @@ RELEVANT_TYPES = [
 
 
 class GoogleVenueProvider(BaseVenueProvider):
+    name = 'google'
+
     def get_places(self, latlng, q=None, categories=None, **kwargs):
         params = {
             'key': API_KEY,

@@ -23,7 +23,7 @@ def get_hygiene_publicbody(lat, lng):
         geom__covers=point,
     ).order_by('kind')
     if not regions:
-        raise ValueError('Nicht in DE')
+        raise ValueError('Dieser Ort scheint nicht in Deutschland zu sein!')
 
     pbs = PublicBody.objects.filter(
         categories__name='Lebensmittelüberwachung',

@@ -26,13 +26,13 @@ DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'categories.json')
 FILTERS = [
     {
       'name': 'Fleischerei/Metzgerei',
-      'icon': 'fa-tree',
+      'icon': 'fa-paw',
       'active': False,
       'categories': ['meats', 'butcher']
     },
     {
       'name': 'Bäckerei/Konditorei',
-      'icon': 'fa-asterisk',
+      'icon': 'fa-pie-chart',
       'active': False,
       'categories': ['bakeries']
     },
@@ -56,49 +56,49 @@ FILTERS = [
     },
     {
       'name': 'Kiosk/Spätkauf',
-      'icon': 'fa-anchor',
+      'icon': 'fa-beer',
       'active': False,
       'categories': ['kiosk']
     },
     {
       'name': 'Diskothek/Club',
-      'icon': 'fa-anchor',
+      'icon': 'fa-diamond',
       'active': False,
       'categories': ['danceclubs']
     },
     {
       'name': 'Imbiss',
-      'icon': 'fa-anchor',
+      'icon': 'fa-soccer-ball-o',
       'active': False,
       'categories': ['foodtrucks', 'foodstands']
     },
     {
       'name': 'Systemgastronomie',
-      'icon': 'fa-anchor',
+      'icon': 'fa-bars',
       'active': False,
       'categories': ['hotdogs']
     },
     {
       'name': 'Hotel/Pension',
-      'icon': 'fa-anchor',
+      'icon': 'fa-bed',
       'active': False,
       'categories': ['hotels', 'hostels']
     },
     {
       'name': 'Supermarkt/Discounter',
-      'icon': 'fa-anchor',
+      'icon': 'fa-shopping-cart',
       'active': False,
       'categories': ['discountstore']
     },
     {
       'name': 'Einzelhandel',
-      'icon': 'fa-anchor',
+      'icon': 'fa-shopping-basket',
       'active': False,
       'categories': ['grocery']
     },
     {
       'name': 'Tankstelle',
-      'icon': 'fa-anchor',
+      'icon': 'fa-car',
       'active': False,
       'categories': ['servicestations']
     }
@@ -145,6 +145,7 @@ CATEGORY_MAPPING = make_mapping(DATA_PATH, FILTERS)
 
 
 class YelpVenueProvider(BaseVenueProvider):
+    name = 'yelp'
     FILTERS = FILTERS
 
     def get_places(self, latlng, q=None, categories=None, radius=None):
@@ -196,7 +197,7 @@ class YelpVenueProvider(BaseVenueProvider):
             category = category[0]
 
         return {
-            'ident': 'yelp:%s' % r['id'],
+            'ident': '%s:%s' % (self.name, r['id']),
             'lat': r['coordinates']['latitude'],
             'lng': r['coordinates']['longitude'],
             'name': r['name'],
@@ -221,6 +222,11 @@ class YelpVenueProvider(BaseVenueProvider):
                 'Authorization': 'Bearer %s' % API_KEY
             }
         )
+        if response.status_code != 200:
+            logger.warn('API response: %s - %s',
+                        response.status_code, response.text)
+            raise VenueProviderException()
+
         logger.info('API Request: %s (%s)',
                     response.request.url, response.status_code)
         result = response.json()
