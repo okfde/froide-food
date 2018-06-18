@@ -27,11 +27,14 @@ def connect_request_object(sender, **kwargs):
 
 
 def connect_request_status_changed(sender, **kwargs):
+    if not sender.reference.startswith('food:'):
+        return
+
     data = kwargs.pop('data', None)
     if data is None:
         return
-    status = data['status']
 
+    status = kwargs['status']
     vris = VenueRequestItem.objects.filter(foirequest=sender).select_related()
     for vri in vris:
         venue = vri.venue
