@@ -4,8 +4,8 @@
       <div class="container-fluid">
         <div class="row ">
           <div class="col-3 col-md-4 image-column">
-            <a class="image-column-inner" :href="data.url" target="_blank" rel="noopener">
-              <img v-if="data.image" :src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
+            <a class="image-column-inner" :href="data.url" target="_blank" rel="noopener" v-lazy-container="{ selector: 'img' }">
+              <img v-if="data.image" :data-src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
               <div v-else class="dummy-image"></div>
               <div class="image-column-provider">
                 <div class="provider-logo"></div>

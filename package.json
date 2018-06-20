@@ -1,42 +1,43 @@
 {
-    "name": "froide_food",
-    "version": "1.0.0",
-    "description": "Froide food",
-    "main": "index.js",
-    "directories": {
-      "doc": "docs"
-    },
-    "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1",
-      "lint": "eslint --ext .js,.vue frontend"
-    },
-    "repository": {
-      "type": "git",
-      "url": "git+https://github.com/okfde/froide-food.git"
-    },
-    "author": "Stefan Wehrmeyer",
-    "license": "ISC",
-    "bugs": {
-      "url": "https://github.com/okfde/froide-food/issues"
-    },
-    "homepage": "https://github.com/okfde/froide-food#readme",
-    "devDependencies": {
-      "eslint": "^4.7.1",
-      "eslint-config-standard": "^11.0.0-beta.0",
-      "eslint-plugin-html": "^4.0.1",
-      "eslint-plugin-import": "^2.7.0",
-      "eslint-plugin-node": "^5.1.1",
-      "eslint-plugin-promise": "^3.5.0",
-      "eslint-plugin-standard": "^3.0.1"
-    },
-    "dependencies": {
-      "@turf/bbox": "^6.0.1",
-      "leaflet": "^1.3.1",
-      "leaflet.icon.glyph": "^0.2.0",
-      "vue": "^2.5.16",
-      "vue-slide-up-down": "^1.3.0",
-      "vue2-leaflet": "^1.0.2",
-      "whatwg-fetch": "^2.0.4"
-    }
+  "name": "froide_food",
+  "version": "1.0.0",
+  "description": "Froide food",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --ext .js,.vue frontend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/okfde/froide-food.git"
+  },
+  "author": "Stefan Wehrmeyer",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/okfde/froide-food/issues"
+  },
+  "homepage": "https://github.com/okfde/froide-food#readme",
+  "devDependencies": {
+    "eslint": "^4.7.1",
+    "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-plugin-html": "^4.0.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1"
+  },
+  "dependencies": {
+    "@turf/bbox": "^6.0.1",
+    "babel-eslint": "^8.2.3",
+    "leaflet": "^1.3.1",
+    "leaflet.icon.glyph": "^0.2.0",
+    "vue": "^2.5.16",
+    "vue-lazyload": "^1.2.6",
+    "vue-slide-up-down": "^1.3.0",
+    "vue2-leaflet": "^1.0.2",
+    "whatwg-fetch": "^2.0.4"
   }
-  
+}
