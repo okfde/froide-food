@@ -148,14 +148,20 @@ class YelpVenueProvider(BaseVenueProvider):
     name = 'yelp'
     FILTERS = FILTERS
 
-    def get_places(self, latlng, q=None, categories=None, radius=None):
+    def get_places(self, location=None, coordinates=None,
+                   q=None, categories=None, radius=None):
         params = {
-            'latitude': latlng[0],
-            'longitude': latlng[1],
             'radius': 10000,
             'limit': 50,
             'locale': 'de_DE'
         }
+        if location is not None:
+            params['location'] = location
+        else:
+            params.update({
+                'latitude': coordinates[0],
+                'longitude': coordinates[1],
+            })
         if q:
             params['term'] = q
         if categories:

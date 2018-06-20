@@ -38,14 +38,20 @@ class VenueSerializer(serializers.Serializer):
 
 class VenueViewSet(viewsets.ViewSet):
     def list(self, request):
-        try:
-            lat = float(request.GET.get('lat'))
-        except (ValueError, TypeError):
-            return Response([])
-        try:
-            lng = float(request.GET.get('lng'))
-        except (ValueError, TypeError):
-            return Response([])
+        location = request.GET.get('location')
+        if location:
+            location_kwargs = {'location': location}
+        else:
+            try:
+                lat = float(request.GET.get('lat'))
+            except (ValueError, TypeError):
+                return Response([])
+            try:
+                lng = float(request.GET.get('lng'))
+            except (ValueError, TypeError):
+                return Response([])
+
+            location_kwargs = {'coordinates': (lat, lng)}
 
         try:
             radius = int(request.GET.get('radius'))
@@ -57,10 +63,10 @@ class VenueViewSet(viewsets.ViewSet):
 
         try:
             places = venue_provider.search_places(
-                (lat, lng),
                 q=query,
                 radius=radius,
-                categories=categories
+                categories=categories,
+                **location_kwargs
             )
         except VenueProviderException:
             return Response({'results': [], 'error': True})

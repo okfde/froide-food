@@ -24,10 +24,11 @@ RELEVANT_TYPES = [
 class GoogleVenueProvider(BaseVenueProvider):
     name = 'google'
 
-    def get_places(self, latlng, q=None, categories=None, **kwargs):
+    def get_places(self, coordinates=None, location=None, q=None,
+                   categories=None, **kwargs):
         params = {
             'key': API_KEY,
-            'location': '%s,%s' % latlng,
+            'location': '%s,%s' % coordinates,
             'radius': 10000
         }
         if q is not None:
