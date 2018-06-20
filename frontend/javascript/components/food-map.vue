@@ -5,7 +5,10 @@
       <div class="searchbar d-block d-md-none" id="searchbar">
         <div class="searchbar-inner">
           <div class="input-group">
-            <input type="text" v-model="query" class="form-control" placeholder="Name"  @keydown.enter.prevent="userSearch">
+            <div class="clearable-input">
+              <input type="text" v-model="query" class="form-control" placeholder="Name" @keydown.enter.prevent="userSearch">
+              <span class="clearer fa fa-close" v-if="query.length > 0" @click.stop="query = ''"></span>
+            </div>
             <div class="input-group-append">
               <button class="btn btn-outline-secondary" type="button" @click="userSearch">
                 <i class="fa fa-search" aria-hidden="true"></i>
@@ -46,7 +49,10 @@
 
             <div class="map-search d-none d-md-block">
               <div class="input-group">
-                <input type="text" v-model="query" class="form-control" placeholder="Restaurant"  @keydown.enter.prevent="userSearch">
+                <div class="clearable-input">
+                  <input type="text" v-model="query" class="form-control" placeholder="Restaurant"  @keydown.enter.prevent="userSearch">
+                  <span class="clearer fa fa-close" v-if="query.length > 0" @click.stop="query = ''"></span>
+                </div>
                 <div class="input-group-append">
                   <button class="btn btn-outline-secondary" type="button" @click="userSearch">
                     <i class="fa fa-search" aria-hidden="true"></i>
@@ -773,4 +779,21 @@ export default {
     border-radius: 5px;
   }
 }
+
+.clearable-input {
+  position: relative;
+  flex: 1 1 auto;
+  width: 1%;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-bottom: 0;
+}
+.clearer {
+  position: absolute;
+  right: 10px;
+  top: 30%;
+  color: #999;
+  cursor: pointer;
+}
+
 </style>

@@ -36,7 +36,10 @@
                 </div>
               </div>
               <div class="input-group">
-                <input type="text" class="form-control" v-model="location" placeholder="Ort oder PLZ" @keydown.enter.prevent="locationLookup" autofocus>
+                <div class="clearable-input">
+                  <input type="text" class="form-control" v-model="location" placeholder="Ort oder PLZ" @keydown.enter.prevent="locationLookup" autofocus>
+                  <span class="clearer fa fa-close" v-if="location.length > 0" @click.stop="location = ''"></span>
+                </div>
                 <div class="input-group-append">
                   <button class="btn" :class="{'btn-success': validLocation, 'btn-outline-secondary': !validLocation}" type="button" @click.prevent="locationLookup" :disabled="!validLocation">
                     Auf geht’s!
@@ -193,5 +196,22 @@ export default {
     display: table;
     transition: opacity .3s ease;
   }
+
+  .clearable-input {
+    position: relative;
+    flex: 1 1 auto;
+    width: 1%;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: 0;
+  }
+  .clearer {
+    position: absolute;
+    right: 10px;
+    top: 30%;
+    color: #999;
+    cursor: pointer;
+  }
+
 
 </style>
