@@ -1,12 +1,12 @@
 <template>
-  <div class="modal-mask" @click.self="$emit('close')">
+  <div class="modal-mask" @click.self="close">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">
             Wo wollen Sie suchen?
           </h5>
-          <button type="button" class="close" aria-label="Close" @click="$emit('close')">
+          <button type="button" class="close" aria-label="Close" @click="close" v-if="locationKnown">
              <span aria-hidden="true">&times;</span>
            </button>
         </div>
@@ -91,6 +91,10 @@ export default {
       type: String,
       default: ''
     },
+    'locationKnown': {
+      type: Boolean,
+      default: false
+    },
     'error': {
       type: Boolean,
       default: false
@@ -151,11 +155,16 @@ export default {
         this.geolocationError
       )
     },
+    close () {
+      if (this.locationKnown) {
+        this.$emit('close')
+      }
+    },
     geolocationSuccess (pos) {
       this.determiningGeolocation = false
       this.geolocationDetermined = true
       var crd = pos.coords
-      this.$emit('locationChosen', [crd.latitude, crd.longitude])
+      this.$emit('coordinatesChosen', [crd.latitude, crd.longitude])
       if (!this.autoGeolocation) {
         this.$emit('close')
       }

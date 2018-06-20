@@ -121,7 +121,8 @@
 
       <food-locator v-if="showLocator"
         :defaultPostcode="postcode"
-        :defaultLocation="location"
+        :defaultLocation="locationName"
+        :locationKnown="locationKnown"
         :error="error"
         @close="showLocator = false"
         @postcodeChosen="postcodeChosen"
@@ -213,7 +214,7 @@ export default {
       filters: this.config.filters,
       maxBounds: L.latLngBounds(GERMANY_BOUNDS),
       postcode: '' + (postcode || this.config.city.postal_code || ''),
-      location: '',
+      locationName: '',
       center: center || [
         this.config.city.latitude || 51.00289959043832,
         this.config.city.longitude || 10.245523452758789
@@ -225,7 +226,7 @@ export default {
       error: false,
       stacked: (window.innerWidth < 768),
       isMapTop: false,
-      isTouch: L.Browser.touch,
+      isTouch: L.Browser.touch && L.Browser.mobile,
       listShown: false,
       query: '',
       mapMoved: false,
@@ -366,12 +367,13 @@ export default {
   methods: {
     coordinatesChosen (latlng) {
       let center = L.latLng(latlng)
+      this.locationKnown = true
       this.map.setView(center, DETAIL_ZOOM_LEVEL)
       this.search({coordinates: center})
-      this.map.on('zoomend', this.preventMapMoved)
+      this.preventMapMoved()
     },
     locationChosen (location) {
-      this.location = location
+      this.locationName = location
       this.search({location: location})
     },
     postcodeChosen (postcode) {
@@ -383,6 +385,7 @@ export default {
           if (data['meta']['total_count'] === 0) {
             return
           }
+          this.locationKnown = true
           let geoRegion = data.objects[0]
           let bounds = bbox(geoRegion.geom)
           bounds = L.latLngBounds([
@@ -393,7 +396,7 @@ export default {
           let center = L.latLng([coords[1], coords[0]])
           this.map.fitBounds(bounds)
           this.search({coordinates: center, bounds})
-          this.map.on('zoomend', this.preventMapMoved)
+          this.preventMapMoved()
         })
     },
     filterChanged (filter) {
@@ -418,7 +421,15 @@ export default {
       window.requestAnimationFrame(() => {
         this.mapMoved = false
       })
-      this.map.off('zoomend', this.preventMapMoved)
+      this.map.on('zoomend', this.preventMapMovedCallback)
+      this.map.on('viewreset', this.preventMapMovedCallback)
+    },
+    preventMapMovedCallback () {
+      window.requestAnimationFrame(() => {
+        this.mapMoved = false
+      })
+      this.map.off('zoomend', this.preventMapMovedCallback)
+      this.map.off('viewreset', this.preventMapMovedCallback)
     },
     userSearch () {
       if (this.query.match(/^\d{5}$/)) {
@@ -479,6 +490,7 @@ export default {
             this.showLocator = true
             return
           }
+          this.locationKnown = true
           this.facilityMap = {}
           this.facilities = data.results.map((r, i) => {
             let d = {
@@ -497,8 +509,8 @@ export default {
             })
             let bounds = L.latLngBounds(facilityLocations)
             this.map.fitBounds(bounds)
-            this.map.on('zoomend', this.preventMapMoved)
           }
+          this.preventMapMoved()
           this.searching = false
         })
     },
