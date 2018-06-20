@@ -78,7 +78,7 @@ def make_request(request):
         return render(request, 'froide_food/recommend.html', {
             'publicbody': pb,
             'request_count': request_count,
-            'days': TIME_PERIOD,
+            'days': TIME_PERIOD.days,
             'max_count': MAX_REQUEST_COUNT,
             'url': url,
             'place': place
