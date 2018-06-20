@@ -198,7 +198,6 @@ export default {
   background-image: url('/static/food/images/yelp_logo.png');
   background-repeat: no-repeat;
   background-size: contain;
-  display: inline-block;
   float: right;
   width: 65px;
   height: 40px;

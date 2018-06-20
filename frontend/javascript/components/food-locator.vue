@@ -13,6 +13,10 @@
         <div class="modal-body">
           <div class="row">
             <div class="col-12">
+              <div v-if="error" class="alert alert-danger">
+                Es wurde nichts gefunden.
+              </div>
+
               <p v-if="geolocationAvailable">
                 Suchen Sie in einem PLZ-Bereich oder in Ihrer Umgebung.
               </p>
@@ -23,10 +27,18 @@
           </div>
           <div class="row justify-content-lg-center">
             <div :class="{'col-lg-5': geolocationAvailable, 'col-lg-8': !geolocationAvailable}">
-              <div class="input-group">
+              <div class="input-group" v-if="false">
                 <input type="text" pattern="\d*" class="form-control postcode-input" v-model="postcode" placeholder="PLZ" maxlength="5" @keydown.enter.prevent="postcodeLookup">
                 <div class="input-group-append">
                   <button class="btn" :class="{'btn-success': validPostcode, 'btn-outline-secondary': !validPostcode}" type="button" @click.prevent="postcodeLookup">
+                    Auf geht’s!
+                  </button>
+                </div>
+              </div>
+              <div class="input-group">
+                <input type="text" class="form-control" v-model="location" placeholder="Ort oder PLZ" @keydown.enter.prevent="locationLookup" autofocus>
+                <div class="input-group-append">
+                  <button class="btn" :class="{'btn-success': validLocation, 'btn-outline-secondary': !validLocation}" type="button" @click.prevent="locationLookup" :disabled="!validLocation">
                     Auf geht’s!
                   </button>
                 </div>
@@ -71,6 +83,14 @@ export default {
     'defaultPostcode': {
       type: String,
       default: ''
+    },
+    'defaultLocation': {
+      type: String,
+      default: ''
+    },
+    'error': {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -87,6 +107,7 @@ export default {
     }
     return {
       postcode: this.defaultPostcode,
+      location: this.defaultLocation,
       geolocationAllowed: true,
       determiningGeolocation: false,
       geolocationDetermined: false,
@@ -98,6 +119,9 @@ export default {
     validPostcode () {
       return !!this.postcode.match(/^\d{5}$/)
     },
+    validLocation () {
+      return this.location.length > 0
+    },
     geolocationAvailable () {
       return !!window.navigator.geolocation && this.geolocationAllowed
     }
@@ -106,6 +130,12 @@ export default {
     postcodeLookup () {
       this.$emit('postcodeChosen', '' + this.postcode)
       this.$emit('close')
+    },
+    locationLookup () {
+      if (this.validLocation) {
+        this.$emit('locationChosen', '' + this.location)
+        this.$emit('close')
+      }
     },
     requestGeolocation () {
       if (this.geolocationDetermined) {

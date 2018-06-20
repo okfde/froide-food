@@ -15,7 +15,7 @@
             <div class="input-group-append mr-auto">
               <button class="btn btn-outline-secondary" @click="showLocator = true">
                 <i class="fa fa-location-arrow" aria-hidden="true"></i>
-                <span class="d-none d-sm-none d-md-inline">PLZ</span>
+                <span class="d-none d-sm-none d-md-inline">Ort</span>
               </button>
             </div>
             <div class="input-group-append" v-if="false">
@@ -35,7 +35,7 @@
           <div class="map-container" id="food-map" :class="mapContainerClass">
 
             <div v-if="showRefresh || searching" class="redo-search">
-              <button v-if="showRefresh" class="btn btn-dark btn-sm" @click="searchArea">
+              <button v-if="showRefresh" class="btn btn-dark" @click="searchArea">
                 Im aktuellen Bereich suchen
               </button>
               <button v-if="searching" class="btn btn-secondary btn-sm disabled">
@@ -56,7 +56,7 @@
                 <div class="input-group-append">
                   <button class="btn btn-outline-secondary" @click="showLocator = true">
                     <i class="fa fa-location-arrow" aria-hidden="true"></i>
-                    <span class="d-none d-lg-inline">PLZ</span>
+                    <span class="d-none d-lg-inline">Ort</span>
                   </button>
                 </div>
               </div>
@@ -113,7 +113,15 @@
 
       </div>
 
-      <food-locator v-if="showLocator" :defaultPostcode="postcode" @close="showLocator = false" @postcodeChosen="postcodeChosen" @locationChosen="locationChosen"></food-locator>
+      <food-locator v-if="showLocator"
+        :defaultPostcode="postcode"
+        :defaultLocation="location"
+        :error="error"
+        @close="showLocator = false"
+        @postcodeChosen="postcodeChosen"
+        @coordinatesChosen="coordinatesChosen"
+        @locationChosen="locationChosen"
+        ></food-locator>
       <food-detail v-if="showDetail" :data="showDetail" @close="showDetail = null" @detailfetched="detailFetched"></food-detail>
     </div>
   </div>
@@ -199,6 +207,7 @@ export default {
       filters: this.config.filters,
       maxBounds: L.latLngBounds(GERMANY_BOUNDS),
       postcode: '' + (postcode || this.config.city.postal_code || ''),
+      location: '',
       center: center || [
         this.config.city.latitude || 51.00289959043832,
         this.config.city.longitude || 10.245523452758789
@@ -207,6 +216,7 @@ export default {
       facilityMap: {},
       facilities: [],
       searching: false,
+      error: false,
       stacked: (window.innerWidth < 768),
       isMapTop: false,
       isTouch: L.Browser.touch,
@@ -348,11 +358,15 @@ export default {
     }
   },
   methods: {
-    locationChosen (latlng) {
+    coordinatesChosen (latlng) {
       let center = L.latLng(latlng)
       this.map.setView(center, DETAIL_ZOOM_LEVEL)
-      this.search(center)
+      this.search({coordinates: center})
       this.map.on('zoomend', this.preventMapMoved)
+    },
+    locationChosen (location) {
+      this.location = location
+      this.search({location: location})
     },
     postcodeChosen (postcode) {
       window.localStorage.setItem('froide-food:postcode', postcode)
@@ -372,7 +386,7 @@ export default {
           let coords = geoRegion.centroid.coordinates
           let center = L.latLng([coords[1], coords[0]])
           this.map.fitBounds(bounds)
-          this.search(center, bounds)
+          this.search({coordinates: center, bounds})
           this.map.on('zoomend', this.preventMapMoved)
         })
     },
@@ -411,38 +425,53 @@ export default {
     searchArea () {
       this.search()
     },
-    search (latlng, bounds) {
+    search (options = {}) {
       this.mapMoved = false
+      this.error = false
       this.searching = true
       this.clearSelected()
       this.facilities = []
       this.goToMap()
-      if (!latlng) {
-        latlng = this.map.getCenter()
-      }
-      if (!bounds) {
-        bounds = this.map.getBounds()
-      }
-      let radius = Math.min(
-        this.map.distance(
-          bounds.getNorthEast(),
-          bounds.getNorthWest()
-        ),
-        this.map.distance(
-          bounds.getNorthEast(),
-          bounds.getSouthEast()
+      let locationParam
+      if (options.location) {
+        locationParam = `location=${options.location}`
+      } else {
+        let coordinates = options.coordinates
+        if (!coordinates) {
+          coordinates = this.map.getCenter()
+        }
+        let bounds = options.bounds
+        if (!bounds) {
+          bounds = this.map.getBounds()
+        }
+        let radius = Math.min(
+          this.map.distance(
+            bounds.getNorthEast(),
+            bounds.getNorthWest()
+          ),
+          this.map.distance(
+            bounds.getNorthEast(),
+            bounds.getSouthEast()
+          )
         )
-      )
-      radius = Math.round(Math.min(radius, 40000))
+        radius = Math.round(Math.min(radius, 40000))
+        locationParam = `lat=${coordinates.lat}&lng=${coordinates.lng}&radius=${radius}`
+      }
       let categories = this.filterCategories
       let cats = categories.map((c) => `categories=${encodeURIComponent(c)}`)
       cats = cats.join('&')
-      window.fetch(`/api/v1/venue/?lat=${latlng.lat}&lng=${latlng.lng}&radius=${radius}&q=${encodeURIComponent(this.query)}&${cats}`)
+      window.fetch(`/api/v1/venue/?q=${encodeURIComponent(this.query)}&${cats}&${locationParam}`)
         .then((response) => {
           return response.json()
         }).then((data) => {
           if (data.error) {
             console.warn('Error requesting the API')
+            this.goToMap()
+            this.location = ''
+            this.searching = false
+            this.error = true
+            this.showLocator = true
+            return
           }
           this.facilityMap = {}
           this.facilities = data.results.map((r, i) => {
@@ -456,6 +485,14 @@ export default {
             this.facilityMap[d.id] = i
             return d
           })
+          if (options.location) {
+            let facilityLocations = this.facilities.map((r) => {
+              return L.latLng(r.position[0], r.position[1])
+            })
+            let bounds = L.latLngBounds(facilityLocations)
+            this.map.fitBounds(bounds)
+            this.map.on('zoomend', this.preventMapMoved)
+          }
           this.searching = false
         })
     },
@@ -597,6 +634,12 @@ export default {
   }
   .btn:hover, .btn:active {
     background-color: #666;
+  }
+}
+
+@media screen and (max-width: 960px){
+  .map-search {
+    width: 40%;
   }
 }
 
