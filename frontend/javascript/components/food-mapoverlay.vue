@@ -12,12 +12,7 @@
           <p class="venue-address">{{ data.address }}</p>
           <a :href="data.url" class="provider-logo" target="_blank" rel="noopener"></a>
           <div class="clearfix mt-3">
-            <p v-if="canRequest">
-              <a class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
-                Hygienekontrolle anfragen&nbsp;&rarr;
-              </a>
-            </p>
-            <div v-else class="request-status">
+            <div v-if="hasRequest" class="request-status">
               <p :class="requestColor">
                 {{ requestStatus }}
               </p>
@@ -32,6 +27,11 @@
                 </a>
               </p>
             </div>
+            <p v-if="canRequest">
+              <a class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
+                Hygienekontrolle anfragen&nbsp;&rarr;
+              </a>
+            </p>
           </div>
         </div>
       </div>

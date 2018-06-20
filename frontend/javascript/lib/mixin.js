@@ -29,7 +29,7 @@ var FoodItemMixin = {
       return `Bewertung ${this.data.rating} Sterne`
     },
     lastRequest () {
-      if (this.data.requests.length > 0) {
+      if (this.data.requests && this.data.requests.length > 0) {
         return this.data.requests[0]
       }
       return null

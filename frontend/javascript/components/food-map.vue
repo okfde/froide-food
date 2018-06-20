@@ -53,6 +53,12 @@
                     <span class="d-none d-sm-none d-lg-inline">Suchen</span>
                   </button>
                 </div>
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" @click="showLocator = true">
+                    <i class="fa fa-location-arrow" aria-hidden="true"></i>
+                    <span class="d-none d-lg-inline">PLZ</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -66,11 +72,11 @@
               <l-marker v-for="marker in facilities" :key="marker.id"
                   :lat-lng="marker.position" :title="marker.name"
                   :draggable="false" :icon="marker.icon" :options="markerOptions"
-                  @click="markerClick(marker)"
-                  @touchstart.prevent="markerClick(marker)" v-focusmarker>
+                  @click="markerClick(marker, false)"
+                  @touchstart.prevent="markerClick(marker, false)" v-focusmarker>
                 <l-tooltip :content="marker.name" v-if="!isMobile"/>
                 <l-popup :options="popupOptions" v-if="!isMobile">
-                  <food-popup :data="marker" :config="config" />
+                  <food-popup :data="marker" :config="config" @detail="setDetail"/>
                 </l-popup>
               </l-marker>
 
@@ -83,21 +89,24 @@
 
         <div class="col-12 d-block d-md-none divider-column" id="divider">
           <p v-if="listShown" class="divider-button">
-            <a @click.prevent="goToMap" @touchstart.prevent="goToMap">zurück zur Karte</a>
+            <a @click.prevent="goToMap" @touchend.prevent="goToMap">zurück zur Karte</a>
           </p>
           <p v-else class="divider-button">
-            <a @click.prevent="goToList" @touchstart.prevent="goToList">zur Liste</a>
+            <a @click.prevent="goToList" @touchend.prevent="goToList">zur Liste</a>
           </p>
         </div>
 
         <div class="col-md-5 col-lg-4 order-md-1 sidebar-column">
           <div class="sidebar" id="food-list" v-scroll.window="handleSidebarScroll">
-            <div v-if="searching" class="loader"></div>
-            <food-sidebar-item v-else v-for="data in facilities"
+            <food-sidebar-item v-if="searching" v-for="data in fakeFacilities"
+              :key="data.id"
+              :data="data">
+            </food-sidebar-item>
+            <food-sidebar-item v-for="data in facilities"
                 :key="data.ident" :data="data"
                 :config="config"
                 :selectedFacilityId="selectedFacilityId"
-                @select="markerClick(data)"
+                @select="markerClick(data, true)"
                 @detail="setDetail"></food-sidebar-item>
           </div>
         </div>
@@ -300,6 +309,7 @@ export default {
     mapOptions () {
       return {
         scrollWheelZoom: !this.isMobile,
+        doubleClickZoom: true,
         zoomControl: false
       }
     },
@@ -328,6 +338,13 @@ export default {
       if (this.isMapTop && !this.stacked) {
         return 'map-full-height'
       }
+    },
+    fakeFacilities () {
+      let a = []
+      for (let i = 0; i < 50; i += 1) {
+        a.push({id: 'fake-' + i});
+      }
+      return a
     }
   },
   methods: {
@@ -399,7 +416,7 @@ export default {
       this.searching = true
       this.clearSelected()
       this.facilities = []
-
+      this.goToMap()
       if (!latlng) {
         latlng = this.map.getCenter()
       }
@@ -427,7 +444,6 @@ export default {
           if (data.error) {
             console.warn('Error requesting the API')
           }
-          this.searching = false
           this.facilityMap = {}
           this.facilities = data.results.map((r, i) => {
             let d = {
@@ -440,6 +456,7 @@ export default {
             this.facilityMap[d.id] = i
             return d
           })
+          this.searching = false
         })
     },
     getIcon (r) {
@@ -461,12 +478,15 @@ export default {
       let marker = this.facilities[this.facilityMap[this.selectedFacilityId]]
       this.selectedFacilityId = null
       if (marker) {
+        this.map.closePopup()
         Vue.set(marker, 'icon', this.getIcon(marker))
       }
     },
-    markerClick (marker) {
+    markerClick (marker, pan) {
       this.clearSelected()
-      this.map.panTo(marker.position)
+      if (pan) {
+        this.map.panTo(marker.position)
+      }
       this.selectedFacilityId = marker.id
       if (!this.stacked) {
         let sidebarId = 'sidebar-' + marker.id
@@ -568,12 +588,15 @@ export default {
   top: 0;
   right: 0;
   z-index: 2000;
-  width: 40%;
+  width: 50%;
   margin-top: 1rem;
   margin-right: 1rem;
 
   .btn {
     background-color: #fff;
+  }
+  .btn:hover, .btn:active {
+    background-color: #666;
   }
 }
 
@@ -633,17 +656,35 @@ export default {
   background-color: #fff;
 }
 
+.is-embed {
+  .searchbar {
+    padding: 10px 0 0;
+  }
+  .map-column {
+    top: 53px;
+  }
+  .divider-column {
+    top: 47px;
+  }
+}
+
+
 @media screen and (min-width: 768px){
   .map-container {
     height: 80vh;
     position: sticky;
     top: 0;
   }
-  .is-embed .map-container {
-    height: 90vh;
-  }
-  .is-embed .sidebar {
-    height: 90vh;
+
+  .is-embed {
+    .map-container {
+      margin-top: 1rem;
+      height: calc(100vh - 2em - 2px);
+    }
+    .sidebar {
+      height: calc(100vh - 2em - 2px);
+      overflow: scroll;
+    }
   }
 }
 
@@ -689,17 +730,4 @@ export default {
     border-radius: 5px;
   }
 }
-
-.is-embed {
-  .searchbar {
-    padding: 15px 0 0;
-  }
-  .map-column {
-    top: 53px;
-  }
-  .divider-column {
-    top: 52px;
-  }
-}
-
 </style>

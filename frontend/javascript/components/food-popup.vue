@@ -2,19 +2,13 @@
   <div class="food-popup" :id="'popup-' + itemId">
     <div class="row">
       <div class="col-12">
-        <h4>{{ data.name }}</h4>
+        <h4 class="venue-name">{{ data.name }}</h4>
         <p class="venue-address">{{ data.address }}</p>
       </div>
     </div>
     <div class="row">
       <div class="col-12">
-        <p v-if="canRequest">
-          <a class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
-            Hygienekontrolle<br class="d-block d-sm-none"/>
-            anfragen&nbsp;&rarr;
-          </a>
-        </p>
-        <div v-else class="request-status">
+        <div v-if="hasRequest" class="request-status">
           <p :class="requestColor">
             {{ requestStatus }}
           </p>
@@ -29,6 +23,12 @@
             </a>
           </p>
         </div>
+        <p v-if="canRequest">
+          <a class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
+            Hygienekontrolle<br class="d-block d-sm-none"/>
+            anfragen&nbsp;&rarr;
+          </a>
+        </p>
       </div>
     </div>
   </div>
@@ -52,6 +52,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+.venue-name {
+  min-width: 240px;
+}
 
 .image-column {
   padding: 0 5px;

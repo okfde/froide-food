@@ -2,9 +2,9 @@
   <div class="sidebar-item" :id="'sidebar-' + itemId">
     <div class="sidebar-item-inner" :class="{requested: hasRequest, highlighted: isSelected}" @click="$emit('select', data)">
       <div class="container-fluid">
-        <div class="row ">
+        <div class="row">
           <div class="col-3 col-md-4 image-column">
-            <a class="image-column-inner" :href="data.url" target="_blank" rel="noopener" v-lazy-container="{ selector: 'img' }">
+            <a v-if="data.url" class="image-column-inner" :href="data.url" target="_blank" rel="noopener" v-lazy-container="{ selector: 'img' }">
               <img v-if="data.image" :data-src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
               <div v-else class="dummy-image"></div>
               <div class="image-column-provider">
@@ -13,32 +13,42 @@
                 <small class="review-count">{{ data.review_count }} Beiträge</small>
               </div>
             </a>
+            <div v-else class="image-column-inner" >
+              <div class="dummy-provider dummy"></div>
+            </div>
           </div>
           <div class="col info-column">
-            <h5 class="venue-name">
+            <h5 v-if="data.name" class="venue-name">
               {{ data.name }}
             </h5>
-            <p class="venue-address">{{ data.address }}</p>
-            <p v-if="canRequest">
-              <a class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
-                Hygienekontrolle<br class="d-block d-sm-none"/>
-                anfragen&nbsp;&rarr;
-              </a>
-            </p>
-            <div v-else class="request-status">
-              <p :class="requestColor">
-                {{ requestStatus }}
-              </p>
-              <p v-if="requestComplete">
-                <a :href="requestUrl" target="_blank" @click.prevent.stop="setDetail">
-                  zu den Berichten&nbsp;&rarr;
+            <div v-else class="venue-name-dummy dummy"></div>
+
+            <p v-if="data.address" class="venue-address">{{ data.address }}</p>
+            <div v-else class="venue-address-dummy dummy"></div>
+            <template v-if="data.url">
+              <div v-if="hasRequest" class="request-status">
+                <p :class="requestColor">
+                  {{ requestStatus }}
+                </p>
+                <p v-if="requestComplete">
+                  <a :href="requestUrl" target="_blank" @click.prevent.stop="setDetail">
+                    zu den Berichten&nbsp;&rarr;
+                  </a>
+                </p>
+                <p v-else>
+                  <a :href="requestUrl" target="_blank">
+                    zur Anfrage&nbsp;&rarr;
+                  </a>
+                </p>
+              </div>
+              <p v-if="canRequest">
+                <a class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
+                  Hygienekontrolle<br class="d-block d-sm-none"/>
+                  anfragen&nbsp;&rarr;
                 </a>
               </p>
-              <p v-else>
-                <a :href="requestUrl" target="_blank">
-                  zur Anfrage&nbsp;&rarr;
-                </a>
-              </p>
+            </template>
+            <div v-else class="dummy-actions dummy">
             </div>
           </div>
         </div>
@@ -138,6 +148,40 @@ export default {
   color: #687683;
   display: inline-block;
   white-space: pre-line;
+}
+
+.dummy {
+  background-color: #ddd;
+  display: block;
+  animation: blinker 0.8s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.dummy-provider {
+  height: 9.5rem;
+  width: 100%;
+}
+
+.venue-name-dummy {
+  height: 2rem;
+  width: 80%;
+}
+
+.venue-address-dummy {
+  margin-top: 1rem;
+  height: 3rem;
+  width: 40%;
+}
+
+.dummy-actions {
+  margin-top: 1rem;
+  height: 2rem;
+  width: 80%;
 }
 
 .highlighted {
