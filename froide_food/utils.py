@@ -4,6 +4,7 @@ except ImportError:
     from urllib import urlencode
 
 from django.urls import reverse
+from django.conf import settings
 
 try:
     from django.contrib.gis.geoip2 import GeoIP2
@@ -79,3 +80,19 @@ def get_city_from_request(request):
     result = g.city(ip)
     if result and result.get('latitude'):
         return result
+
+
+def get_social_url(ident):
+    return '%s%s?%s' % (
+        settings.SITE_URL,
+        reverse('food-make_request'),
+        urlencode({
+            'ident': ident.encode('utf-8'),
+            'social': b'1'
+        }))
+
+
+def get_social_text(ident, place):
+    return 'Bitte frag nach dem Kontrollbericht von „%s“:\n\n%s' % (
+        place['name'], get_social_url(ident)
+    )

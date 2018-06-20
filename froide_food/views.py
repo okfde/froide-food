@@ -10,7 +10,8 @@ from froide.foirequest.models import FoiRequest
 
 from .venue_providers import venue_providers, venue_provider
 from .utils import (
-    get_hygiene_publicbody, make_request_url, get_city_from_request
+    get_hygiene_publicbody, make_request_url, get_city_from_request,
+    get_social_url, get_social_text
 )
 
 
@@ -64,7 +65,7 @@ def make_request(request):
     url = make_request_url(place, pb)
 
     stopper = False
-
+    request_count = 0
     if request.user.is_authenticated:
         request_count = FoiRequest.objects.filter(
             public_body=pb,
@@ -74,12 +75,17 @@ def make_request(request):
         if request_count >= MAX_REQUEST_COUNT:
             stopper = True
 
-    if stopper or request.GET.get('stopper'):
+    social_url = get_social_url(ident)
+    social_text = get_social_text(ident, place)
+
+    if stopper or request.GET.get('stopper') is not None:
         return render(request, 'froide_food/recommend.html', {
             'publicbody': pb,
             'request_count': request_count,
             'days': TIME_PERIOD.days,
             'max_count': MAX_REQUEST_COUNT,
+            'social_url': social_url,
+            'social_text': social_text,
             'url': url,
             'place': place
         })

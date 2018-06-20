@@ -29,28 +29,28 @@
 <div class="row justify-content-center">
 
   <div class="col mt-3 text-center ios">
-    <a href="sms://;&amp;body={{ 'Bitte frag nach dem Kontrollbericht von „' | urlencode }}{{ place.name |urlencode }}{{ '“: ' |urlencode }}{{ SITE_URL | urlencode }}{{ request.get_full_path | urlencode }}" class="btn btn-primary">
+    <a href="sms://;&amp;body={{ social_text | urlencode }}" class="btn btn-primary">
       <span class="fa fa-comments-o" aria-hidden="true"></span>
       &nbsp;per Textnachricht verschicken
     </a>
   </div>
 
   <div class="col mt-3 text-center android">
-    <a href="sms://?body={{ 'Bitte frag nach dem Kontrollbericht von „' | urlencode }}{{ place.name |urlencode }}{{ '“: ' |urlencode }}{{ SITE_URL | urlencode }}{{ request.get_full_path | urlencode }}" class="btn btn-primary">
+    <a href="sms://?body={{ social_text | urlencode }}" class="btn btn-primary">
       <span class="fa fa-comments-o" aria-hidden="true"></span>
       &nbsp;per Textnachricht verschicken
     </a>
   </div>
 
   <div class="col mt-3 text-center">
-      <a href="whatsapp://send?text={{ 'Bitte frag nach dem Kontrollbericht von „' | urlencode }}{{ place.name |urlencode }}{{ '“: ' |urlencode }}{{ SITE_URL | urlencode }}{{ request.get_full_path | urlencode }}" class="btn btn-success">
+      <a href="whatsapp://send?text={{ social_text | urlencode }}" class="btn btn-success">
         <span class="fa fa-whatsapp" aria-hidden="true"></span>
         &nbsp;mit WhatsApp teilen
       </a>
     </div>
 
   <div class="col mt-3 text-center">
-    <a href="mailto:?Subject={{ 'Bitte frag nach dem Kontrollbericht von ' | urlencode }}{{ place.name |urlencode }}&amp;Body={{ SITE_URL | urlencode }}{{ request.get_full_path | urlencode }}" class="btn btn-secondary">
+    <a href="mailto:?Subject={{ 'Kontrollbericht ' | urlencode }}{{ place.name |urlencode }}&amp;Body={{ social_text | urlencode }}" class="btn btn-secondary">
       <span class="fa fa-envelope" aria-hidden="true"></span>
       &nbsp;per Mail verschicken
     </a>
