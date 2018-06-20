@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block navbar %}{% endblock %}
+
+{% block app_body %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-8">
+    <h1 class="text-center">
+      Einen Moment, {{ request.user.get_full_name }}!
+    </h1>
+
+    <p class="lead">
+      Sie haben in den letzten {{ days }} Tagen schon <strong>{{ request_count }}
+      Anfragen</strong> an die Behörde „{{ publicbody.name }}“ gestellt.
+    </p>
+
+    <p>
+      Es könnte sein, dass die Behörde Ihre Anfragen zu einer großen Anfrage zusammenfasst und für den erhöhten Aufwand Gebühren in Rechnung stellt.
+    </p>
+
+    <h3>Holen Sie sich Unterstützung!</h3>
+
+    <p>
+      Wir empfehlen Ihnen, <strong>eine Freundin oder einen Bekannten</strong> dazu zu bringen, die Anfrage bezüglich des Kontrollbereichts für „{{ place.name }}“ zu stellen.
+    </p>
+
+  </div>
+</div>
+<div class="row justify-content-center">
+
+  <div class="col mt-3 text-center ios">
+    <a href="sms://;&amp;body={{ 'Bitte frag nach dem Kontrollbericht von „' | urlencode }}{{ place.name |urlencode }}{{ '“: ' |urlencode }}{{ SITE_URL | urlencode }}{{ request.get_full_path | urlencode }}" class="btn btn-primary">
+      <span class="fa fa-comments-o" aria-hidden="true"></span>
+      &nbsp;per Textnachricht verschicken
+    </a>
+  </div>
+
+  <div class="col mt-3 text-center android">
+    <a href="sms://?body={{ 'Bitte frag nach dem Kontrollbericht von „' | urlencode }}{{ place.name |urlencode }}{{ '“: ' |urlencode }}{{ SITE_URL | urlencode }}{{ request.get_full_path | urlencode }}" class="btn btn-primary">
+      <span class="fa fa-comments-o" aria-hidden="true"></span>
+      &nbsp;per Textnachricht verschicken
+    </a>
+  </div>
+
+  <div class="col mt-3 text-center">
+      <a href="whatsapp://send?text={{ 'Bitte frag nach dem Kontrollbericht von „' | urlencode }}{{ place.name |urlencode }}{{ '“: ' |urlencode }}{{ SITE_URL | urlencode }}{{ request.get_full_path | urlencode }}" class="btn btn-success">
+        <span class="fa fa-whatsapp" aria-hidden="true"></span>
+        &nbsp;mit WhatsApp teilen
+      </a>
+    </div>
+
+  <div class="col mt-3 text-center">
+    <a href="mailto:?Subject={{ 'Bitte frag nach dem Kontrollbericht von ' | urlencode }}{{ place.name |urlencode }}&amp;Body={{ SITE_URL | urlencode }}{{ request.get_full_path | urlencode }}" class="btn btn-secondary">
+      <span class="fa fa-envelope" aria-hidden="true"></span>
+      &nbsp;per Mail verschicken
+    </a>
+  </div>
+</div>
+<hr/>
+
+<div class="row justify-content-center mt-5">
+  <div class="col-md-8">
+    <p>
+      Sie wissen was Sie tun und möchten diese Anfrage dennoch stellen?
+      <a href="{{ url }}" class="btn btn-sm btn-light mt-3">
+        Weiter zum Formular &rarr;
+      </a>
+    </p>
+  </div>
+</div>
+
+<script>
+  (function(){
+    function getMobileOperatingSystem() {
+      var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    
+      if ( userAgent.match( /iPad/i ) || userAgent.match( /iPhone/i ) || userAgent.match( /iPod/i ) ) { return 'iOS'; }
+            
+      else if ( userAgent.match( /Android/i ) ) { return 'Android'; }
+    
+      else { return 'unknown'; }
+    }
+    var os = getMobileOperatingSystem()
+    if (os === 'iOS') {
+      document.querySelector('.android').style.display = 'none'
+    } else if (os === 'Android') {
+      document.querySelector('.ios').style.display = 'none'
+    } else {
+      document.querySelector('.android').style.display = 'none'
+    }
+  }())
+</script>
+
+{% endblock %}
