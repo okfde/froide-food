@@ -124,6 +124,7 @@
         :exampleCity="city"
         :locationKnown="locationKnown"
         :error="error"
+        :isMobile="isMobile"
         @close="showLocator = false"
         @postcodeChosen="postcodeChosen"
         @coordinatesChosen="coordinatesChosen"
@@ -229,7 +230,7 @@ export default {
       facilities: [],
       searching: false,
       error: false,
-      stacked: (window.innerWidth < 768),
+      stacked: this.isStacked(),
       isMapTop: false,
       mapHeight: null,
       isTouch: L.Browser.touch && L.Browser.mobile,
@@ -280,6 +281,9 @@ export default {
     })
     this.map.on('popupclose', (e) => {
       this.clearSelected()
+    })
+    window.addEventListener('resize', () => {
+      this.isStacked()
     })
     if (!this.locationKnown) {
       this.showLocator = true
@@ -436,14 +440,12 @@ export default {
       window.requestAnimationFrame(() => {
         this.mapMoved = false
       })
-      this.map.on('zoomend', this.preventMapMovedCallback)
       this.map.on('viewreset', this.preventMapMovedCallback)
     },
     preventMapMovedCallback () {
       window.requestAnimationFrame(() => {
         this.mapMoved = false
       })
-      this.map.off('zoomend', this.preventMapMovedCallback)
       this.map.off('viewreset', this.preventMapMovedCallback)
     },
     userSearch () {
@@ -581,6 +583,9 @@ export default {
       let y = document.getElementById('food-map-container').offsetTop
       let y2 = document.getElementById('food-map').getBoundingClientRect().height
       smoothScroll({x: 0, y: y + y2 + 2, el: this.scrollContainer}, 300)
+    },
+    isStacked () {
+      return this.stacked = (window.innerWidth < 768)
     },
     handleSidebarScroll (evt, el) {
       if (this.modalActive) {
@@ -780,6 +785,7 @@ export default {
     height: 80vh;
     position: sticky;
     top: 0;
+    transition: height 0.8s;
   }
 
   .is-embed {
