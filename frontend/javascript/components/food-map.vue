@@ -591,6 +591,13 @@ export default {
       if (this.modalActive) {
         return
       }
+      if (L.Browser.safari) {
+        /* FIXME: Ugly workaround for render bug in latest safari */
+        document.getElementById('food-map').style.top = 'unset'
+        window.requestAnimationFrame(() => {
+          document.getElementById('food-map').style.top = 0
+        })
+      }
       let listTop = document.getElementById('food-list').getBoundingClientRect().top
       if (listTop < this.dividerSwitchHeight) {
         if (!this.listShown) {
