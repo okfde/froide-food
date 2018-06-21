@@ -150,7 +150,7 @@ export default {
         return examples
       }
       examples = examples.filter((c) => c !== this.exampleCity)
-      return [exampleCity].concat(examples)
+      return [this.exampleCity].concat(examples)
     }
   },
   methods: {
