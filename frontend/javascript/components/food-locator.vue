@@ -46,6 +46,14 @@
                   </button>
                 </div>
               </div>
+              <div>
+                <small>
+                  Beispiel: 
+                  <template v-for="city in exampleCities">
+                    <a href="#" :key="city" @click.prevent="setLocation(city)" class="example-city">{{ city }}</a>
+                  </template>
+                </small>
+              </div>
             </div>
             <template v-if="geolocationAvailable">
               <div class="col-lg-2 or-column">
@@ -91,6 +99,10 @@ export default {
       type: String,
       default: ''
     },
+    'exampleCity': {
+      type: String,
+      default: ''
+    },
     'locationKnown': {
       type: Boolean,
       default: false
@@ -131,6 +143,14 @@ export default {
     },
     geolocationAvailable () {
       return !!window.navigator.geolocation && this.geolocationAllowed
+    },
+    exampleCities () {
+      let examples = ['Berlin', 'Hamburg', 'München']
+      if (this.exampleCity === '') {
+        return examples
+      }
+      examples = examples.filter((c) => c !== this.exampleCity)
+      return [exampleCity].concat(examples)
     }
   },
   methods: {
@@ -143,6 +163,10 @@ export default {
         this.$emit('locationChosen', '' + this.location)
         this.$emit('close')
       }
+    },
+    setLocation (city) {
+      this.location = city
+      this.locationLookup()
     },
     requestGeolocation () {
       if (this.geolocationDetermined) {
@@ -220,6 +244,14 @@ export default {
     top: 30%;
     color: #999;
     cursor: pointer;
+  }
+
+  .example-city {
+    text-decoration: underline;
+  }
+
+  .example-city:not(:last-child) {
+    margin-right: 0.5rem;
   }
 
 

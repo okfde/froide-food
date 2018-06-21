@@ -118,10 +118,10 @@
         </div>
 
       </div>
-
       <food-locator v-if="showLocator"
         :defaultPostcode="postcode"
         :defaultLocation="locationName"
+        :exampleCity="city"
         :locationKnown="locationKnown"
         :error="error"
         @close="showLocator = false"
@@ -204,20 +204,25 @@ export default {
     if (zoom && zoom !== DEFAULT_ZOOM) {
       locationKnown = true
     }
+    let city = this.config.city
+    if (city.country_code && city.country_code !== 'DE') {
+      city = {}
+    }
 
     return {
-      zoom: zoom || (this.config.city.latitude ? DETAIL_ZOOM_LEVEL : DEFAULT_ZOOM),
+      zoom: zoom || (city.latitude ? DETAIL_ZOOM_LEVEL : DEFAULT_ZOOM),
       locationKnown: locationKnown,
       showLocator: false,
       showFilter: false,
       showDetail: null,
       filters: this.config.filters,
       maxBounds: L.latLngBounds(GERMANY_BOUNDS),
-      postcode: '' + (postcode || this.config.city.postal_code || ''),
+      city: city.city,
+      postcode: '' + (postcode || city.postal_code || ''),
       locationName: '',
       center: center || [
-        this.config.city.latitude || 51.00289959043832,
-        this.config.city.longitude || 10.245523452758789
+        city.latitude || 51.00289959043832,
+        city.longitude || 10.245523452758789
       ],
       selectedFacilityId: null,
       facilityMap: {},
