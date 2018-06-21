@@ -1,12 +1,12 @@
 <template>
-  <div :class="{'food-map-embed': config.embed}" v-scroll="handleSidebarScroll">
+  <div :class="{'food-map-embed': config.embed, 'modal-active': modalActive}" v-scroll="handleSidebarScroll">
     <div class="food-map-container container-fluid" id="food-map-container" :class="{'is-embed': config.embed}">
 
       <div class="searchbar d-block d-md-none" id="searchbar">
         <div class="searchbar-inner">
           <div class="input-group">
             <div class="clearable-input">
-              <input type="text" v-model="query" class="form-control" placeholder="Name" @keydown.enter.prevent="userSearch">
+              <input type="text" v-model="query" class="form-control" placeholder="Restaurant, Fleischer, etc." @keydown.enter.prevent="userSearch">
               <span class="clearer fa fa-close" v-if="query.length > 0" @click.stop="query = ''"></span>
             </div>
             <div class="input-group-append">
@@ -35,7 +35,7 @@
       </slide-up-down> -->
       <div class="row">
         <div class="col-md-7 col-lg-8 order-md-2 map-column">
-          <div class="map-container" id="food-map" :class="mapContainerClass">
+          <div class="map-container" id="food-map" :class="mapContainerClass" :style="mapContainerStyle">
 
             <div v-if="showRefresh || searching" class="redo-search">
               <button v-if="showRefresh" class="btn btn-dark" @click="searchArea">
@@ -103,7 +103,7 @@
         </div>
 
         <div class="col-md-5 col-lg-4 order-md-1 sidebar-column">
-          <div class="sidebar" id="food-list" v-scroll.window="handleSidebarScroll">
+          <div class="sidebar" :class="{'modal-active': modalActive}" id="food-list" v-scroll.window="handleSidebarScroll">
             <food-sidebar-item v-if="searching" v-for="data in fakeFacilities"
               :key="data.id"
               :data="data">
@@ -231,6 +231,7 @@ export default {
       error: false,
       stacked: (window.innerWidth < 768),
       isMapTop: false,
+      mapHeight: null,
       isTouch: L.Browser.touch && L.Browser.mobile,
       listShown: false,
       query: '',
@@ -361,12 +362,21 @@ export default {
         return 'map-full-height'
       }
     },
+    mapContainerStyle () {
+      if (this.mapHeight === null) {
+        return ''
+      }
+      return `height: ${this.mapHeight}px`
+    },
     fakeFacilities () {
       let a = []
       for (let i = 0; i < 50; i += 1) {
         a.push({id: 'fake-' + i});
       }
       return a
+    },
+    modalActive () {
+      return this.showLocator || this.showDetail
     }
   },
   methods: {
@@ -569,6 +579,9 @@ export default {
       smoothScroll({x: 0, y: y + y2 + 2, el: this.scrollContainer}, 300)
     },
     handleSidebarScroll (evt, el) {
+      if (this.modalActive) {
+        return
+      }
       let listTop = document.getElementById('food-list').getBoundingClientRect().top
       if (listTop < this.dividerSwitchHeight) {
         if (!this.listShown) {
@@ -578,12 +591,21 @@ export default {
       } else {
         this.listShown = false
       }
-      let mapTop = document.getElementById('food-map').getBoundingClientRect().top
+      let mapRect = document.getElementById('food-map').getBoundingClientRect()
+      let mapTop = mapRect.top
       let isMapTop = mapTop <= 0
       if (isMapTop !== this.isMapTop) {
         this.map.invalidateSize()
+        this.preventMapMoved()
       }
       this.isMapTop = isMapTop
+      if (!this.stacked) {
+        if (!isMapTop) {
+          this.mapHeight = window.innerHeight - mapTop
+        } else {
+          this.mapHeight = null
+        }
+      }
     },
     recordMapPosition () {
       let latlng = this.map.getCenter()
@@ -613,11 +635,19 @@ export default {
 
 <style lang="scss" scoped>
 
+.food-wrapper {
+  position: relative;
+}
+
 .food-map-embed {
   border: 1px solid #eee;
   padding: 0 10px 10px;
   height: 100vh;
   overflow: scroll;
+
+  &.modal-active {
+    overflow: hidden;  
+  }
 }
 
 @media screen and (min-width: 768px){
@@ -627,6 +657,7 @@ export default {
 }
 
 .food-map-container {
+  position: relative;
   padding-bottom: 1rem;
 }
 
@@ -722,6 +753,11 @@ export default {
   background-color: #fff;
 }
 
+.sidebar.modal-active {
+  height: 90vh;
+  overflow: hidden;
+}
+
 .is-embed {
   .searchbar {
     padding: 10px 0 0;
@@ -755,7 +791,6 @@ export default {
 }
 
 .map-full-height {
-  transition: height 1s;
   height: 100vh;
 }
 
@@ -782,7 +817,8 @@ export default {
   position: -webkit-sticky;
   position: sticky;
   top: 37px;
-  padding: 8px 0 8px;
+  padding: 6px 0 6px;
+  margin-top: 4px;
   text-align: center;
   cursor: pointer;
 }

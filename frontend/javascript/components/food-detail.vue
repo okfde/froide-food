@@ -115,15 +115,18 @@ export default {
   }
 
   .modal-mask {
-    position: fixed;
+    position: absolute;
     z-index: 9998;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, .5);
-    display: table;
+    display: flex;
     transition: opacity .3s ease;
+  }
+  .is-embed .modal-mask {
+    top: 10px;
   }
 
 </style>
