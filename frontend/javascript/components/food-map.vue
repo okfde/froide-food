@@ -570,7 +570,11 @@ export default {
       Vue.set(marker, 'icon', this.getIcon(marker))
     },
     goToMap () {
-      let y = document.getElementById('food-map-container').offsetTop
+      let fmc = document.getElementById('food-map-container')
+      if (fmc.getBoundingClientRect().top > 0) {
+        return
+      }
+      let y = fmc.offsetTop
       smoothScroll({x: 0, y: y, el: this.scrollContainer}, 300)
     },
     goToList () {
