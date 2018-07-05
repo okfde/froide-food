@@ -4,8 +4,11 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-3 col-md-4 image-column">
-            <a v-if="data.url" class="image-column-inner" :href="data.url" target="_blank" rel="noopener" v-lazy-container="{ selector: 'img' }">
-              <img v-if="data.image" :data-src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
+            <a v-if="data.url" class="image-column-inner" :href="data.url" target="_blank" rel="noopener" v-lazy-container="{ selector: 'img.img-loading' }">
+              <template v-if="data.image">
+                <img v-if="data.imageLoaded" :src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
+                <img v-else :data-src="data.image" @load="$emit('imageLoaded', data)" alt="Yelp venue image" class="venue-img img-fluid img-loading"/>
+              </template>
               <div v-else class="dummy-image"></div>
               <div class="image-column-provider">
                 <div class="provider-logo"></div>

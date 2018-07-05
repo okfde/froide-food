@@ -113,7 +113,8 @@
                 :config="config"
                 :selectedFacilityId="selectedFacilityId"
                 @select="markerClick(data, true)"
-                @detail="setDetail"></food-sidebar-item>
+                @detail="setDetail"
+                @imageLoaded="imageLoaded"></food-sidebar-item>
           </div>
         </div>
 
@@ -570,6 +571,9 @@ export default {
         this.goToMap()
       }
       Vue.set(marker, 'icon', this.getIcon(marker))
+    },
+    imageLoaded (data) {
+      Vue.set(data, 'imageLoaded', true)
     },
     goToMap () {
       let fmc = this.$refs.foodMapContainer
