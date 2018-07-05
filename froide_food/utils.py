@@ -42,13 +42,14 @@ def make_request_url(place, publicbody):
     url = reverse('foirequest-make_request', kwargs={
         'publicbody_slug': pb_slug
     })
-    subject = 'Letzter Kontrollbericht für {name}, {city}'.format(
+
+    subject = 'Kontrollbericht zu {name}, {city}'.format(
         name=place['name'],
         city=place['city']
     )
     if len(subject) > 250:
         subject = subject[:250] + '...'
-    body = '''Letzten Kontrollbericht für die Einrichtung
+    body = '''Den letzten, aktuellen Kontrollbericht der Betriebsüberprüfung von
 {name}
 {address}'''.format(**place)
     ref = ('food:%s' % place['ident']).encode('utf-8')
