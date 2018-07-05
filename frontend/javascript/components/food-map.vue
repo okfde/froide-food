@@ -1,6 +1,6 @@
 <template>
   <div :class="{'food-map-embed': config.embed, 'modal-active': modalActive}" v-scroll="handleSidebarScroll">
-    <div class="food-map-container container-fluid" id="food-map-container" :class="{'is-embed': config.embed}">
+    <div class="food-map-container container-fluid" ref="foodMapContainer" id="food-map-container" :class="{'is-embed': config.embed}">
 
       <div class="searchbar d-block d-md-none" id="searchbar">
         <div class="searchbar-inner">
@@ -35,7 +35,7 @@
       </slide-up-down> -->
       <div class="row">
         <div class="col-md-7 col-lg-8 order-md-2 map-column">
-          <div class="map-container" id="food-map" :class="mapContainerClass" :style="mapContainerStyle">
+          <div class="map-container" ref="foodMap" id="food-map" :class="mapContainerClass" :style="mapContainerStyle">
 
             <div v-if="showRefresh || searching" class="redo-search">
               <button v-if="showRefresh" class="btn btn-dark" @click="searchArea">
@@ -103,7 +103,7 @@
         </div>
 
         <div class="col-md-5 col-lg-4 order-md-1 sidebar-column">
-          <div class="sidebar" :class="{'modal-active': modalActive}" id="food-list" v-scroll.window="handleSidebarScroll">
+          <div class="sidebar" :class="{'modal-active': modalActive}" ref="foodList" id="food-list" v-scroll.window="handleSidebarScroll">
             <food-sidebar-item v-if="searching" v-for="data in fakeFacilities"
               :key="data.id"
               :data="data">
@@ -572,7 +572,7 @@ export default {
       Vue.set(marker, 'icon', this.getIcon(marker))
     },
     goToMap () {
-      let fmc = document.getElementById('food-map-container')
+      let fmc = this.$refs.foodMapContainer
       if (fmc.getBoundingClientRect().top > 0) {
         return
       }
@@ -580,8 +580,8 @@ export default {
       smoothScroll({x: 0, y: y, el: this.scrollContainer}, 300)
     },
     goToList () {
-      let y = document.getElementById('food-map-container').offsetTop
-      let y2 = document.getElementById('food-map').getBoundingClientRect().height
+      let y = this.$refs.foodMapContainer.offsetTop
+      let y2 = this.$refs.foodMap.getBoundingClientRect().height
       smoothScroll({x: 0, y: y + y2 + 2, el: this.scrollContainer}, 300)
     },
     isStacked () {
@@ -593,12 +593,12 @@ export default {
       }
       if (L.Browser.safari) {
         /* FIXME: Ugly workaround for render bug in latest safari */
-        document.getElementById('food-map').style.top = 'unset'
+        this.$refs.foodMap.style.top = 'unset'
         window.requestAnimationFrame(() => {
-          document.getElementById('food-map').style.top = 0
+          this.$refs.foodMap.style.top = 0
         })
       }
-      let listTop = document.getElementById('food-list').getBoundingClientRect().top
+      let listTop = this.$refs.foodList.getBoundingClientRect().top
       if (listTop < this.dividerSwitchHeight) {
         if (!this.listShown) {
           this.showFilter = false
@@ -607,7 +607,7 @@ export default {
       } else {
         this.listShown = false
       }
-      let mapRect = document.getElementById('food-map').getBoundingClientRect()
+      let mapRect = this.$refs.foodMap.getBoundingClientRect()
       let mapTop = mapRect.top
       let isMapTop = mapTop <= 0
       if (isMapTop !== this.isMapTop) {
