@@ -185,7 +185,7 @@ const DEFAULT_ZOOM = 6
 
 export default {
   name: 'food-map',
-  props: ['config'],
+  props: ['config', 'leafletImagePath'],
   components: {
     LMap, LTileLayer, LControlLayers, LControlZoom, LMarker, LPopup, LTooltip,
     FoodPopup, FoodSidebarItem, FoodLocator, FoodMapoverlay, FoodLoader, FoodDetail,
@@ -250,6 +250,7 @@ export default {
     }
   },
   created () {
+    window.L.Icon.Default.imagePath = this.leafletImagePath
     var self = this
     Vue.directive('focusmarker', {
       // When the bound element is inserted into the DOM...

@@ -5,6 +5,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.urls import reverse
+from django.conf import settings
 
 from froide.foirequest.models import FoiRequest
 
@@ -19,15 +22,33 @@ TIME_PERIOD = timedelta(days=90)
 MAX_REQUEST_COUNT = 3
 
 
-def index(request, base_template='froide_food/base.html', extra_context=None):
+def get_dir_for_url(url):
+    return '/'.join(url.split('/')[:-1]) + '/'
+
+
+def get_food_map_config(city, embed):
+    image_path = get_dir_for_url(static('food/images/pin_0.svg'))
+    return {
+      'city': city or {},
+      'filters': venue_provider.FILTERS,
+      'imagePath': image_path + '/',
+      'embed': embed,
+      'requestUrl': '{}{}'.format(
+          settings.SITE_URL, reverse('food-make_request')
+        )
+    }
+
+
+def index(request, base_template='froide_food/base.html', embed=False):
     city = get_city_from_request(request)
+
+    markerPath = static('food/images/leaflet/marker-icon.png')
+
     context = {
         'base_template': base_template,
-        'city': json.dumps(city or {}),
-        'filters': json.dumps(venue_provider.FILTERS)
+        'config': json.dumps(get_food_map_config(city, embed)),
+        'leafletImagePath': get_dir_for_url(markerPath)
     }
-    if extra_context is not None:
-        context.update(extra_context)
     return render(request, 'froide_food/index.html', context)
 
 
@@ -36,9 +57,7 @@ def embed(request):
     return index(
         request,
         base_template='froide_food/embed_base.html',
-        extra_context={
-            'embed': True
-        }
+        embed=True
     )
 
 

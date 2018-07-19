@@ -6,16 +6,17 @@
 
 
 {% block main %}
-  <div id="food-map-wrapper">
-    <food-map :config="config">
-      <div class="text-center">
-        <h3>Anwendung wird geladen</h3>
-        <p>
-          <img src="{% static "img/spinner.gif" %}" alt="wird geladen"/>
-        </p>
-      </div>
-    </food-map>
-  </div>
+  <food-map
+    id="food-component"
+    leaflet-image-path="{{ leafletImagePath }}"
+    :config="{{ config }}">
+    <div class="text-center">
+      <h3>Anwendung wird geladen</h3>
+      <p>
+        <img src="{% static "img/spinner.gif" %}" alt="wird geladen"/>
+      </p>
+    </div>
+  </food-map>
 
 {% addtoblock 'css' %}
   <link rel="stylesheet" href="{% static 'css/food.css' %}">
@@ -24,16 +25,6 @@
 {% addtoblock 'js' %}
   <script src="{% static 'js/common.js' %}" charset="utf-8"></script>
   <script src="{% static 'js/food.js' %}" charset="utf-8"></script>
-  <script type="text/javascript">
-    window.L.Icon.Default.imagePath = '{% static "food/images/leaflet/marker-icon.png" %}'.split('/').slice(0, -1).join('/') + '/'
-    window.Froide.components.food.createFoodMap('#food-map-wrapper', {
-      city: {{ city | safe }},
-      filters: {{ filters | safe }},
-      imagePath: '{% static "food/images/pin_0.svg" %}'.split('/').slice(0, -1).join('/') + '/',
-      embed: {% if embed %}true{% else %}false{% endif %},
-      requestUrl: '{{ SITE_URL }}{% url "food-make_request" %}'
-    })
-  </script>
 {% endaddtoblock %}
 
 
