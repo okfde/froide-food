@@ -97,6 +97,10 @@ def get_social_url(ident):
 
 
 def get_social_text(ident, place):
-    return 'Ich mache gerade bei einer Aktion zu Lebensmittelhygiene mit. Könntest du mir helfen und den Kontrollbericht von „%s“ anfragen?\n\n%s' % (
-        place['name'], get_social_url(ident)
+    return (
+        'Ich mache gerade bei einer Aktion zu Lebensmittelhygiene mit. '
+        'Könntest du mir helfen und den Kontrollbericht von „%s“ '
+        'anfragen?\n\n%s' % (
+            place['name'], get_social_url(ident)
+        )
     )
