@@ -78,7 +78,10 @@ def get_city_from_request(request):
         return
 
     ip = get_client_ip(request)
-    result = g.city(ip)
+    try:
+        result = g.city(ip)
+    except Exception:
+        return
     if result and result.get('latitude'):
         return result
 
