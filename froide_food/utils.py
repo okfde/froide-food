@@ -49,7 +49,7 @@ def make_request_url(place, publicbody):
     )
     if len(subject) > 250:
         subject = subject[:250] + '...'
-    body = '''Den letzten, aktuellen Kontrollbericht der Betriebsüberprüfung von
+    body = '''Den letzten, aktuellen Kontrollbericht der lebensmittelrechtlichen Betriebsüberprüfung von
 {name}
 {address}'''.format(**place)
     ref = ('food:%s' % place['ident']).encode('utf-8')
