@@ -1,4 +1,4 @@
-import {renderDate} from '../lib/utils'
+import {renderDate, getPlaceStatus} from '../lib/utils'
 
 const DAYS_BETWEEN_REQUEST = 90
 
@@ -57,25 +57,23 @@ var FoodItemMixin = {
       return this.daysSinceLastRequest > DAYS_BETWEEN_REQUEST
     },
     requestComplete () {
-      return this.data.requests.some((r) => r.status === 'resolved')
+      let status = getPlaceStatus(this.data)
+      return status !== 'normal' && status !== 'pending'
     },
     requestStatusColor () {
-      if (this.hasRequest) {
-        if (this.lastRequest.status === 'resolved') {
-          if (this.lastRequest.resolution === 'successful' ||
-              this.lastRequest.resolution === 'partially_successful') {
-            return ['Anfrage erfolgreich', 'success']
-          } else if (this.lastRequest.resolution === 'refused') {
-            return ['Anfrage abgelehnt', 'danger']
-          } else {
-            return ['Anfrage abgeschlossen', 'info']
-          }
-        } else if (this.lastRequest.status === 'awaiting_response' ||
-                   this.lastRequest.status === 'awaiting_user_confirmation') {
+      let status = getPlaceStatus(this.data)
+      switch (status) {
+        case 'normal':
+          return [null, null]
+        case 'success':
+          return ['Anfrage erfolgreich', 'success']
+        case 'failure':
+          return ['Anfrage abgelehnt', 'danger']
+        case 'pending':
           return ['Anfrage läuft', 'warning']
-        }
+        case 'complete':
+          return ['Anfrage abgeschlossen', 'info']
       }
-      return [null, null]
     },
     requestStatus () {
       return this.requestStatusColor[0]

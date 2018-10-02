@@ -156,6 +156,8 @@ import FoodFilter from './food-filter'
 import FoodDetail from './food-detail'
 import FoodLoader from './food-loader'
 
+import {getPlaceStatus, getPinURL, getPinColor} from '../lib/utils'
+
 var getIdFromPopup = (e) => {
   let node = e.popup._content.firstChild
   return node.id.split('-').slice(1).join('-')
@@ -299,18 +301,6 @@ export default {
     },
     isMobile () {
       return this.stacked || L.Browser.mobile
-    },
-    iconUnRequested () {
-      return this.config.imagePath + '/pin_0.svg'
-    },
-    iconRequested () {
-      return this.config.imagePath + '/pin_1.svg'
-    },
-    iconSelectedUnRequested () {
-      return this.config.imagePath + '/pin_0_1.svg'
-    },
-    iconSelectedRequested () {
-      return this.config.imagePath + '/pin_1_1.svg'
     },
     iconCategoryMapping () {
       let filterIconMapping = {}
@@ -534,10 +524,10 @@ export default {
         })
     },
     getIcon (r) {
-      let iconUrl = r.requests.length > 0 ? this.iconRequested : this.iconUnRequested
-      if (this.selectedFacilityId === r.id) {
-        iconUrl = r.requests.length > 0 ? this.iconSelectedRequested : this.iconSelectedUnRequested
-      }
+      let status = getPlaceStatus(r)
+      let selected = this.selectedVenueId === r.id
+      let color = getPinColor(status, selected)
+      let iconUrl = getPinURL(color)
       return L.icon.glyph({
         className: 'food-marker-icon ',
         prefix: 'fa',
@@ -655,6 +645,39 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+$icon-normal: #007bff;
+$icon-pending: #ffc107;
+$icon-success: #28a745;
+$icon-failure: #dc3545;
+
+.icon-normal {
+  fill: $icon-normal;
+}
+.icon-normal.selected {
+  fill: darken($icon-normal, 30%)
+}
+
+.icon-pending {
+  fill: $icon-pending;
+}
+.icon-pending.selected {
+  fill: darken($icon-pending, 30%)
+}
+
+.icon-success {
+  fill: $icon-normal;
+}
+.icon-success.selected {
+  fill: darken($icon-success, 30%)
+}
+
+.icon-failure {
+  fill: $icon-failure;
+}
+.icon-failure.selected {
+  fill: darken($icon-failure, 30%)
+}
 
 .food-wrapper {
   position: relative;

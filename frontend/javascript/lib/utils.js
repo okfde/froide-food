@@ -3,6 +3,62 @@ function renderDate (date) {
   return `${d.getDate()}.${d.getMonth()}.${d.getFullYear()}`
 }
 
+function getPlaceStatus (place) {
+  if (place.requests.length === 0) {
+    return 'normal'
+  }
+  if (place.last_status === 'resolved') {
+    if (place.last_resolution === 'successful' ||
+        place.last_resolution === 'partially_successful') {
+      return 'success'
+    } else if (place.last_resolution === 'refused') {
+      return 'failure'
+    } else {
+      return 'complete'
+    }
+  } else if (place.last_status === 'awaiting_response' ||
+             place.last_status === 'awaiting_user_confirmation') {
+    return 'pending'
+  }
+  return 'normal'
+}
+
+function getPinURL (color) {
+  let uri = `data:image/svg+xml;utf8,<?xml version="1.0" encoding="UTF-8"?><svg viewBox="0 0 8.9999998 11.800001" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"> <defs><filter id="a" x="-.10828" y="-.086222" width="1.2166" height="1.1724" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="0.388"/></filter></defs> <path d="m4.5 0.90339c1.1 0 2.2 0.5 3 1.3 0.8 0.9 1.3 1.9 1.3 3.1s-0.5 2.5-1.3 3.3l-3 3.1-3-3.1c-0.8-0.8-1.3-2-1.3-3.3 0-1.2 0.4-2.2 1.3-3.1 0.8-0.8 1.9-1.3 3-1.3z" fill="#646464" fill-opacity=".39216" filter="url(#a)"/> <path fill="${color}" d="m4.5 0.2c1.1 0 2.2 0.5 3 1.3 0.8 0.9 1.3 1.9 1.3 3.1s-0.5 2.5-1.3 3.3l-3 3.1-3-3.1c-0.8-0.8-1.3-2-1.3-3.3 0-1.2 0.4-2.2 1.3-3.1 0.8-0.8 1.9-1.3 3-1.3z"/> </svg>`
+  return uri.replace(/#/g, '%23')
+}
+
+function getPinColor (status, selected) {
+  if (selected) {
+    switch (status) {
+      case 'normal':
+        return '#005de1'
+      case 'pending':
+        return '#e1a300'
+      case 'success':
+      case 'complete':
+        return '#0a8927'
+      case 'failure':
+        return '#be1727'
+    }
+  } else {
+    switch (status) {
+      case 'normal':
+        return '#007bff'
+      case 'pending':
+        return '#ffc107'
+      case 'success':
+      case 'complete':
+        return '#28a745'
+      case 'failure':
+        return '#dc3545'
+    }
+  }
+}
+
 export {
-  renderDate
+  renderDate,
+  getPlaceStatus,
+  getPinURL,
+  getPinColor
 }
