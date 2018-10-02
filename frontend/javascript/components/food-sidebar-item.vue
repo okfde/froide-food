@@ -70,7 +70,7 @@ export default {
     data: {
       type: Object
     },
-    selectedFacilityId: {
+    selectedVenueId: {
       type: String
     },
     config: {

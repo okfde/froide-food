@@ -87,7 +87,7 @@
               </l-marker>
 
             </l-map>
-            <food-mapoverlay :data="selectedFacility" :config="config" v-if="stacked && selectedFacility"
+            <food-mapoverlay :data="selectedVenue" :config="config" v-if="stacked && selectedVenue"
               @close="clearSelected"
               @detail="setDetail"></food-mapoverlay>
           </div>
@@ -111,7 +111,7 @@
             <food-sidebar-item v-for="data in facilities"
                 :key="data.ident" :data="data"
                 :config="config"
-                :selectedFacilityId="selectedFacilityId"
+                :selectedVenueId="selectedVenueId"
                 @select="markerClick(data, true)"
                 @detail="setDetail"
                 @imageLoaded="imageLoaded"></food-sidebar-item>
@@ -228,8 +228,8 @@ export default {
         city.latitude || 51.00289959043832,
         city.longitude || 10.245523452758789
       ],
-      selectedFacilityId: null,
-      facilityMap: {},
+      selectedVenueId: null,
+      venueMap: {},
       facilities: [],
       searching: false,
       error: false,
@@ -257,7 +257,7 @@ export default {
     Vue.directive('focusmarker', {
       // When the bound element is inserted into the DOM...
       componentUpdated: (el, binding, vnode) => {
-        if (vnode.key === self.selectedFacilityId) {
+        if (vnode.key === self.selectedVenueId) {
           vnode.componentInstance.mapObject.setZIndexOffset(300)
         } else {
           vnode.componentInstance.mapObject.setZIndexOffset(0)
@@ -281,7 +281,7 @@ export default {
     })
     this.map.on('popupopen', (e) => {
       let nodeId = getIdFromPopup(e)
-      this.selectedFacilityId = nodeId
+      this.selectedVenueId = nodeId
     })
     this.map.on('popupclose', (e) => {
       this.clearSelected()
@@ -335,9 +335,9 @@ export default {
     dividerSwitchHeight () {
       return window.innerHeight / 2
     },
-    selectedFacility () {
-      if (this.selectedFacilityId) {
-        return this.facilities[this.facilityMap[this.selectedFacilityId]]
+    selectedVenue () {
+      if (this.selectedVenueId) {
+        return this.facilities[this.venueMap[this.selectedVenueId]]
       }
       return null
     },
@@ -500,7 +500,7 @@ export default {
             return
           }
           this.locationKnown = true
-          this.facilityMap = {}
+          this.venueMap = {}
           this.facilities = data.results.map((r, i) => {
             let d = {
               position: [r.lat, r.lng],
@@ -509,14 +509,14 @@ export default {
               ...r
             }
             d.icon = this.getIcon(d)
-            this.facilityMap[d.id] = i
+            this.venueMap[d.id] = i
             return d
           })
           if (options.location) {
-            let facilityLocations = this.facilities.map((r) => {
+            let venueLocations = this.facilities.map((r) => {
               return L.latLng(r.position[0], r.position[1])
             })
-            let bounds = L.latLngBounds(facilityLocations)
+            let bounds = L.latLngBounds(venueLocations)
             this.map.fitBounds(bounds)
           }
           this.preventMapMoved()
@@ -536,11 +536,11 @@ export default {
       })
     },
     clearSelected () {
-      if (this.selectedFacilityId === null) {
+      if (this.selectedVenueId === null) {
         return
       }
-      let marker = this.facilities[this.facilityMap[this.selectedFacilityId]]
-      this.selectedFacilityId = null
+      let marker = this.facilities[this.venueMap[this.selectedVenueId]]
+      this.selectedVenueId = null
       if (marker) {
         this.map.closePopup()
         Vue.set(marker, 'icon', this.getIcon(marker))
@@ -551,7 +551,7 @@ export default {
       if (pan) {
         this.map.panTo(marker.position)
       }
-      this.selectedFacilityId = marker.id
+      this.selectedVenueId = marker.id
       if (!this.stacked) {
         let sidebarId = 'sidebar-' + marker.id
         let sidebarItem = document.getElementById(sidebarId)
