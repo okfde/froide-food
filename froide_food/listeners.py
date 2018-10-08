@@ -16,7 +16,8 @@ def connect_request_object(sender, **kwargs):
         defaults={
             'name': sender.title,
             'last_request': timezone.now(),
-            'last_status': 'awaiting_response'
+            'last_status': 'awaiting_response',
+            'last_resolution': ''
         }
     )
     VenueRequestItem.objects.create(
@@ -35,9 +36,11 @@ def connect_request_status_changed(sender, **kwargs):
         return
 
     status = kwargs['status']
+    resolution = kwargs['resolution']
     vris = VenueRequestItem.objects.filter(foirequest=sender).select_related()
     for vri in vris:
         venue = vri.venue
         venue.last_status = status
+        venue.last_resolution = resolution
         venue.last_request = sender.last_message
         venue.save()

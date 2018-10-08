@@ -15,6 +15,7 @@ class VenueRequest(models.Model):
         null=True, blank=True
     )
     last_status = models.CharField(max_length=50, blank=True)
+    last_resolution = models.CharField(max_length=50, blank=True)
 
     context = JSONField(blank=True, default=dict)
 
