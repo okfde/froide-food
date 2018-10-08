@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.conf import settings
 
 from froide.foirequest.models import FoiRequest
+from froide.foirequest.views import MakeRequestView
 
 from .venue_providers import venue_providers, venue_provider
 from .utils import (
@@ -44,11 +45,19 @@ def index(request, base_template='froide_food/base.html', embed=False):
 
     markerPath = static('food/images/leaflet/marker-icon.png')
 
+    fake_make_request_view = MakeRequestView(request=request)
+
     context = {
         'base_template': base_template,
         'config': json.dumps(get_food_map_config(city, embed)),
-        'leafletImagePath': get_dir_for_url(markerPath)
+        'leafletImagePath': get_dir_for_url(markerPath),
+        'request_form': fake_make_request_view.get_form(),
+        'request_config': json.dumps(fake_make_request_view.get_js_context())
     }
+
+    if not request.user.is_authenticated:
+        context['user_form'] = fake_make_request_view.get_user_form()
+
     return render(request, 'froide_food/index.html', context)
 
 
