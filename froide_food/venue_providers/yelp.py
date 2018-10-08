@@ -201,6 +201,8 @@ class YelpVenueProvider(BaseVenueProvider):
             category = [c for c in category if c is not None]
         if category:
             category = category[0]
+        else:
+            category = None
 
         return {
             'ident': '%s:%s' % (self.name, r['id']),

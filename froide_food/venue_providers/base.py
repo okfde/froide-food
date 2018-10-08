@@ -27,10 +27,12 @@ class BaseVenueProvider(object):
         )
         return {r.ident: r for r in qs}
 
-    def get_detail(self, ident):
+    def get_detail(self, ident, detail=False):
         place = {
             'ident': '%s:%s' % (self.name, ident)
         }
+        if detail:
+            place = self.get_place(ident)
         mapping = self.get_venue_mapping_for_places([place])
         self.add_requests(place, mapping)
 
@@ -56,6 +58,9 @@ class BaseVenueProvider(object):
     def add_requests(self, place, mapping):
         if place['ident'] in mapping:
             venue = mapping[place['ident']]
+            place['last_status'] = venue.last_status
+            place['last_resolution'] = venue.last_resolution
+            place['last_request'] = venue.last_request
             fr = venue.last_request
             if fr is not None:
                 place['requests'] = [{

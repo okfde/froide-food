@@ -2,9 +2,12 @@ from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.response import Response
 
+from froide.publicbody.api_views import PublicBodySerializer
+
 from .venue_providers import (
     venue_provider, venue_providers, VenueProviderException
 )
+from .utils import get_hygiene_publicbodies, make_request_url
 
 
 class VenueRequestDocumentSerializer(serializers.Serializer):
@@ -32,8 +35,24 @@ class VenueSerializer(serializers.Serializer):
     rating = serializers.FloatField(required=False)
     review_count = serializers.FloatField(required=False)
     category = serializers.CharField(required=False)
+    last_status = serializers.CharField(required=False)
+    last_resolution = serializers.CharField(required=False)
+    last_request = serializers.DateTimeField(required=False)
 
     requests = VenueRequestSerializer(many=True)
+    publicbody = PublicBodySerializer(required=False)
+    makeRequestURL = serializers.CharField(required=False)
+
+def get_lat_lng(request):
+    try:
+        lat = float(request.GET.get('lat'))
+    except (ValueError, TypeError):
+        raise ValueError
+    try:
+        lng = float(request.GET.get('lng'))
+    except (ValueError, TypeError):
+        raise ValueError
+    return lat, lng
 
 
 class VenueViewSet(viewsets.ViewSet):
@@ -43,14 +62,9 @@ class VenueViewSet(viewsets.ViewSet):
             location_kwargs = {'location': location}
         else:
             try:
-                lat = float(request.GET.get('lat'))
-            except (ValueError, TypeError):
+                lat, lng = get_lat_lng(request)
+            except ValueError:
                 return Response([])
-            try:
-                lng = float(request.GET.get('lng'))
-            except (ValueError, TypeError):
-                return Response([])
-
             location_kwargs = {'coordinates': (lat, lng)}
 
         try:
@@ -82,6 +96,35 @@ class VenueViewSet(viewsets.ViewSet):
             return Response({'result': None, 'error': True})
         provider, ident = pk.split(':', 1)
         provider = venue_providers[provider]
-        place = provider.get_detail(ident)
-        serializer = VenueSerializer(place)
+
+        try:
+            lat, lng = get_lat_lng(request)
+            name = request.GET['name']
+            city = request.GET['city']
+            address = request.GET['address']
+            place = provider.get_detail(ident, detail=False)
+            place['name'] = name
+            place['city'] = city
+            place['address'] = address
+            place['lat'] = lat
+            place['lng'] = lng
+        except (ValueError, KeyError):
+            place = provider.get_detail(ident, detail=True)
+
+        try:
+            pbs = get_hygiene_publicbodies(
+                place['lat'], place['lng']
+            ).prefetch_related(
+                'classification',
+                'jurisdiction',
+                'categories',
+                'laws',
+                'laws__combined'
+            )
+            place['publicbody'] = pbs[0]
+            place['makeRequestURL'] = make_request_url(place, pbs[0])
+        except (ValueError, IndexError):
+            pass
+
+        serializer = VenueSerializer(place, context={'request': request})
         return Response({'result': serializer.data, 'error': False})
