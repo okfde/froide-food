@@ -1,7 +1,4 @@
-try:
-    from urllib.parse import urlencode
-except ImportError:
-    from urllib import urlencode
+from urllib.parse import urlencode, quote
 
 from django.urls import reverse
 from django.conf import settings
@@ -17,23 +14,30 @@ from froide.georegion.models import GeoRegion
 from froide.helper.utils import get_client_ip
 
 
-def get_hygiene_publicbody(lat, lng):
+def get_hygiene_publicbodies(lat, lng):
     point = 'POINT(%f %f)' % (lng, lat)
 
     regions = GeoRegion.objects.filter(
         geom__covers=point,
+    ).exclude(
+        kind__in=['country', 'zipcode']
     ).order_by('kind')
+    regions = list(regions)
     if not regions:
         raise ValueError('Dieser Ort scheint nicht in Deutschland zu sein!')
 
-    pbs = PublicBody.objects.filter(
+    return PublicBody.objects.filter(
         categories__name='Lebensmittelüberwachung',
         region__in=regions
     )
+
+
+def get_hygiene_publicbody(lat, lng):
+    pbs = get_hygiene_publicbodies(lat, lng)
     if len(pbs) == 0:
-        raise ValueError('Keine Behoerde gefunden in %s' % regions)
+        raise ValueError('Keine Behörde gefunden!')
     elif len(pbs) > 1:
-        raise ValueError('Mehr als eine Behoerde gefunden in %s' % regions)
+        raise ValueError('Mehr als eine Behörde gefunden')
     return pbs[0]
 
 
@@ -64,7 +68,7 @@ def make_request_url(place, publicbody):
         'hide_draft', 'hide_editing'
     )
     query.update({f: b'1' for f in hide_features})
-    query = urlencode(query)
+    query = urlencode(query, quote_via=quote)
     return '%s?%s' % (url, query)
 
 
