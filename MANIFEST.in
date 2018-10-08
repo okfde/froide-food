@@ -1,3 +1,4 @@
 include README.md LICENSE
 recursive-include froide_food/templates *
 recursive-include froide_food/static *
+recursive-include froide_food/venue_providers/data *
