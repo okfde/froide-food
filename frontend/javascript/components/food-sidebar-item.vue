@@ -4,10 +4,12 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-3 col-md-4 image-column">
-            <a v-if="data.url" class="image-column-inner" :href="data.url" target="_blank" rel="noopener" v-lazy-container="{ selector: 'img.img-loading' }">
+            <a v-if="data.url" class="image-column-inner" :href="data.url" target="_blank" rel="noopener">
               <template v-if="data.image">
                 <img v-if="data.imageLoaded" :src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
-                <img v-else :data-src="data.image" @load="$emit('imageLoaded', data)" alt="Yelp venue image" class="venue-img img-fluid img-loading"/>
+                <lazy-component v-else>
+                  <img :src="data.image" @load="$emit('imageLoaded', data)" alt="Yelp venue image" class="venue-img img-fluid img-loading"/>
+                </lazy-component>
               </template>
               <div v-else class="dummy-image"></div>
               <div class="image-column-provider">
@@ -45,7 +47,7 @@
                 </p>
               </div>
               <p v-if="canRequest">
-                <a class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
+                <a @click.prevent.stop="startRequest" class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
                   Hygienekontrolle<br class="d-block d-sm-none"/>
                   anfragen&nbsp;&rarr;
                 </a>
@@ -75,6 +77,11 @@ export default {
     },
     config: {
       type: Object
+    }
+  },
+  methods: {
+    lazyShow (comp) {
+      console.log(comp)
     }
   }
 }

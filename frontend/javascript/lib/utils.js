@@ -32,7 +32,7 @@ function getPinColor (status, selected) {
   if (selected) {
     switch (status) {
       case 'normal':
-        return '#005de1'
+        return '#003d7f'
       case 'pending':
         return '#e1a300'
       case 'success':

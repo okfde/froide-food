@@ -13,37 +13,37 @@
         <div class="modal-body">
           <div class="row">
             <div class="col-12">
-                <food-loader v-if="fetching"></food-loader>
-                <template v-else>
-                  <ul v-if="data.requests.length > 0" class="list-unstyled">
-                    <li v-for="req in data.requests" :key="req.id">
-                      <h5>
-                          Anfrage vom {{ req.timestamp | date }}
-                          <small class="ml-3">
-                            <a :href="req.url" target="_blank">
-                              zur Anfrage&nbsp;&rarr;
-                            </a>
-                          </small>
-                      </h5>
-                      <p v-if="req.documents.length > 0">
-                        Dokumente in dieser Anfrage:
-                      </p>
-                      <ul v-if="req.documents.length > 0">
-                        <li v-for="doc in req.documents" :key="doc.url">
-                          <a :href="doc.url" target="_blank">
-                            {{ doc.name }}
+              <food-loader v-if="fetching"></food-loader>
+              <template v-else>
+                <ul v-if="data.requests.length > 0" class="list-unstyled">
+                  <li v-for="req in data.requests" :key="req.id">
+                    <h5>
+                        Anfrage vom {{ req.timestamp | date }}
+                        <small class="ml-3">
+                          <a :href="req.url" target="_blank">
+                            zur Anfrage&nbsp;&rarr;
                           </a>
-                        </li>
-                      </ul>
-                      <p v-else class="text-muted">
-                        Noch keine Dokumente.
-                      </p>
-                    </li>
-                  </ul>
-                  <p v-else>
-                    Noch keine Anfragen
-                  </p>
-                </template>
+                        </small>
+                    </h5>
+                    <p v-if="req.documents.length > 0">
+                      Dokumente in dieser Anfrage:
+                    </p>
+                    <ul v-if="req.documents.length > 0">
+                      <li v-for="doc in req.documents" :key="doc.url">
+                        <a :href="doc.url" target="_blank">
+                          {{ doc.name }}
+                        </a>
+                      </li>
+                    </ul>
+                    <p v-else class="text-muted">
+                      Noch keine Dokumente.
+                    </p>
+                  </li>
+                </ul>
+                <p v-else>
+                  Noch keine Anfragen
+                </p>
+              </template>
             </div>
           </div>
         </div>
@@ -56,12 +56,13 @@
 
 import FoodLoader from './food-loader'
 import FoodItemMixin from '../lib/mixin'
+import FoodDetailMixin from '../lib/detailmixin'
 import {renderDate} from '../lib/utils'
 
 export default {
   name: 'food-detail',
   components: {FoodLoader},
-  mixins: [FoodItemMixin],
+  mixins: [FoodItemMixin, FoodDetailMixin],
   props: {
     'data': {
       type: Object
@@ -69,7 +70,7 @@ export default {
   },
   mounted () {
     if (!this.data.full) {
-      this.getDetail(this.data.ident)
+      this.getDetail(this.data)
     }
   },
   data () {
@@ -80,21 +81,6 @@ export default {
   filters: {
     date: function (d) {
       return renderDate(d)
-    }
-  },
-  methods: {
-    getDetail (ident) {
-      this.fetching = true
-      window.fetch(`/api/v1/venue/${ident}/`)
-        .then((response) => {
-          return response.json()
-        }).then((data) => {
-          if (data.error) {
-            console.warn('Error requesting the API')
-          }
-          this.fetching = false
-          this.$emit('detailfetched', data['result'])
-        })
     }
   }
 }

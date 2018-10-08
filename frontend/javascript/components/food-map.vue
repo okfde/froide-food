@@ -1,137 +1,161 @@
 <template>
-  <div :class="{'food-map-embed': config.embed, 'modal-active': modalActive}" v-scroll="handleSidebarScroll">
-    <div class="food-map-container container-fluid" ref="foodMapContainer" id="food-map-container" :class="{'is-embed': config.embed}">
+  <div>
+    <food-request v-if="showRequestForm"
+      :config="requestConfig"
+      :request-form="requestForm"
+      :user-info="userInfo"
+      :user-form="userForm"
+      :data="showRequestForm"
+      @detailfetched="detailFetched"
+      @close="showRequestForm = null"
+    ></food-request>
+    <div v-show="!showRequestForm" :class="{'food-map-embed': config.embed, 'modal-active': modalActive}" v-scroll="handleSidebarScroll">
+      <div class="food-map-container container-fluid" ref="foodMapContainer" id="food-map-container" :class="{'is-embed': config.embed}">
 
-      <div class="searchbar d-block d-md-none" id="searchbar">
-        <div class="searchbar-inner">
-          <div class="input-group">
-            <div class="clearable-input">
-              <input type="text" v-model="query" class="form-control" placeholder="Restaurant, Fleischer, etc." @keydown.enter.prevent="userSearch">
-              <span class="clearer fa fa-close" v-if="query.length > 0" @click.stop="query = ''"></span>
-            </div>
-            <div class="input-group-append">
-              <button class="btn btn-outline-secondary" type="button" @click="userSearch">
-                <i class="fa fa-search" aria-hidden="true"></i>
-                <span class="d-none d-sm-none d-md-inline">Suchen</span>
-              </button>
-            </div>
-            <div class="input-group-append mr-auto">
-              <button class="btn btn-outline-secondary" @click="showLocator = true">
-                <i class="fa fa-location-arrow" aria-hidden="true"></i>
-                <span class="d-none d-sm-none d-md-inline">Ort</span>
-              </button>
-            </div>
-            <div class="input-group-append" v-if="false">
-              <button class="btn btn-outline-secondary" :class="{'active': showFilter}" @click="openFilter">
-                <i class="fa fa-gears" aria-hidden="true"></i>
-                <span class="d-none d-sm-none d-md-inline">Filter</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- <slide-up-down :active="showFilter" :duration="300">
-        <food-filter :filters="filters" @change="filterChanged" @apply="applyFilter"></food-filter>
-      </slide-up-down> -->
-      <div class="row">
-        <div class="col-md-7 col-lg-8 order-md-2 map-column">
-          <div class="map-container" ref="foodMap" id="food-map" :class="mapContainerClass" :style="mapContainerStyle">
-
-            <div v-if="showRefresh || searching" class="redo-search">
-              <button v-if="showRefresh" class="btn btn-dark" @click="searchArea">
-                Im aktuellen Bereich suchen
-              </button>
-              <button v-if="searching" class="btn btn-secondary btn-sm disabled">
-                <food-loader></food-loader>
-                Suche läuft&hellip;
-              </button>
-            </div>
-
-            <div class="map-search d-none d-md-block">
-              <div class="input-group">
-                <div class="clearable-input">
-                  <input type="text" v-model="query" class="form-control" placeholder="Restaurant"  @keydown.enter.prevent="userSearch">
-                  <span class="clearer fa fa-close" v-if="query.length > 0" @click.stop="query = ''"></span>
-                </div>
-                <div class="input-group-append">
-                  <button class="btn btn-outline-secondary" type="button" @click="userSearch">
-                    <i class="fa fa-search" aria-hidden="true"></i>
-                    <span class="d-none d-sm-none d-lg-inline">Suchen</span>
-                  </button>
-                </div>
-                <div class="input-group-append">
-                  <button class="btn btn-outline-secondary" @click="showLocator = true">
-                    <i class="fa fa-location-arrow" aria-hidden="true"></i>
-                    <span class="d-none d-lg-inline">Ort</span>
-                  </button>
-                </div>
+        <div class="searchbar d-block d-md-none" id="searchbar">
+          <div class="searchbar-inner">
+            <div class="input-group">
+              <div class="clearable-input">
+                <input type="text" v-model="query" class="form-control" placeholder="Restaurant, Fleischer, etc." @keydown.enter.prevent="userSearch">
+                <span class="clearer fa fa-close" v-if="query.length > 0" @click.stop="query = ''"></span>
+              </div>
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" @click="userSearch">
+                  <i class="fa fa-search" aria-hidden="true"></i>
+                  <span class="d-none d-sm-none d-md-inline">Suchen</span>
+                </button>
+              </div>
+              <div class="input-group-append mr-auto">
+                <button class="btn btn-outline-secondary" @click="showLocator = true">
+                  <i class="fa fa-location-arrow" aria-hidden="true"></i>
+                  <span class="d-none d-sm-none d-md-inline">Ort</span>
+                </button>
+              </div>
+              <div class="input-group-append" v-if="false">
+                <button class="btn btn-outline-secondary" :class="{'active': showFilter}" @click="openFilter">
+                  <i class="fa fa-gears" aria-hidden="true"></i>
+                  <span class="d-none d-sm-none d-md-inline">Filter</span>
+                </button>
               </div>
             </div>
-
-            <l-map ref="map" :zoom="zoom" :center="center" :options="mapOptions" :maxBounds="maxBounds">
-              <l-tile-layer
-                layerType="base" :name="tileProvider.name" :visible="true"
-                :url="tileProvider.url" :attribution="tileProvider.attribution"/>
-
-              <l-control-zoom position="bottomright" v-if="!isTouch"/>
-
-              <l-marker v-for="marker in facilities" :key="marker.id"
-                  :lat-lng="marker.position" :title="marker.name"
-                  :draggable="false" :icon="marker.icon" :options="markerOptions"
-                  @click="markerClick(marker, false)"
-                  @touchstart.prevent="markerClick(marker, false)" v-focusmarker>
-                <l-tooltip :content="marker.name" v-if="!isMobile"/>
-                <l-popup :options="popupOptions" v-if="!isMobile">
-                  <food-popup :data="marker" :config="config" @detail="setDetail"/>
-                </l-popup>
-              </l-marker>
-
-            </l-map>
-            <food-mapoverlay :data="selectedVenue" :config="config" v-if="stacked && selectedVenue"
-              @close="clearSelected"
-              @detail="setDetail"></food-mapoverlay>
           </div>
         </div>
+        <!-- <slide-up-down :active="showFilter" :duration="300">
+          <food-filter :filters="filters" @change="filterChanged" @apply="applyFilter"></food-filter>
+        </slide-up-down> -->
+        <div class="row">
+          <div class="col-md-7 col-lg-8 order-md-2 map-column">
+            <div class="map-container" ref="foodMap" id="food-map" :class="mapContainerClass" :style="mapContainerStyle">
 
-        <div class="col-12 d-block d-md-none divider-column" id="divider">
-          <p v-if="listShown" class="divider-button">
-            <a @click.prevent="goToMap" @touchend.prevent="goToMap">zurück zur Karte</a>
-          </p>
-          <p v-else class="divider-button">
-            <a @click.prevent="goToList" @touchend.prevent="goToList">zur Liste</a>
-          </p>
-        </div>
+              <div v-if="showRefresh || searching" class="redo-search">
+                <button v-if="showRefresh" class="btn btn-dark" @click="searchArea">
+                  Im aktuellen Bereich suchen
+                </button>
+                <button v-if="searching" class="btn btn-secondary btn-sm disabled">
+                  <food-loader></food-loader>
+                  Suche läuft&hellip;
+                </button>
+              </div>
 
-        <div class="col-md-5 col-lg-4 order-md-1 sidebar-column">
-          <div class="sidebar" :class="{'modal-active': modalActive}" ref="foodList" id="food-list" v-scroll.window="handleSidebarScroll">
-            <food-sidebar-item v-if="searching" v-for="data in fakeFacilities"
-              :key="data.id"
-              :data="data">
-            </food-sidebar-item>
-            <food-sidebar-item v-for="data in facilities"
-                :key="data.ident" :data="data"
+              <div class="map-search d-none d-md-block">
+                <div class="input-group">
+                  <div class="clearable-input">
+                    <input type="text" v-model="query" class="form-control" placeholder="Restaurant"  @keydown.enter.prevent="userSearch">
+                    <span class="clearer fa fa-close" v-if="query.length > 0" @click.stop="query = ''"></span>
+                  </div>
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" @click="userSearch">
+                      <i class="fa fa-search" aria-hidden="true"></i>
+                      <span class="d-none d-sm-none d-lg-inline">Suchen</span>
+                    </button>
+                  </div>
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" @click="showLocator = true">
+                      <i class="fa fa-location-arrow" aria-hidden="true"></i>
+                      <span class="d-none d-lg-inline">Ort</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <l-map ref="map" :zoom="zoom" :center="center" :options="mapOptions" :maxBounds="maxBounds">
+                <l-tile-layer
+                  layerType="base" :name="tileProvider.name" :visible="true"
+                  :url="tileProvider.url" :attribution="tileProvider.attribution"/>
+
+                <l-control-zoom position="bottomright" v-if="!isTouch"/>
+
+                <l-marker v-for="marker in venues" :key="marker.id"
+                    :lat-lng="marker.position" :title="marker.name"
+                    :draggable="false" :icon="marker.icon" :options="markerOptions"
+                    @click="markerClick(marker, false)"
+                    @touchstart.prevent="markerClick(marker, false)" v-focusmarker>
+                  <l-tooltip :content="marker.name" :options="tooltipOptions" v-if="!isMobile"/>
+                  <l-popup :options="popupOptions" v-if="!isMobile">
+                    <food-popup
+                      :data="marker"
+                      :config="config"
+                      @startRequest="startRequest"
+                      @detail="setDetail"/>
+                  </l-popup>
+                </l-marker>
+
+              </l-map>
+              <food-mapoverlay v-if="stacked && selectedVenue"
+                :data="selectedVenue"
                 :config="config"
-                :selectedVenueId="selectedVenueId"
-                @select="markerClick(data, true)"
+                @close="clearSelected"
+                @startRequest="startRequest"
                 @detail="setDetail"
-                @imageLoaded="imageLoaded"></food-sidebar-item>
+              ></food-mapoverlay>
+            </div>
           </div>
-        </div>
 
+          <div class="col-12 d-block d-md-none divider-column" id="divider">
+            <p v-if="listShown" class="divider-button">
+              <a @click.prevent="goToMap" @touchend.prevent="goToMap">zurück zur Karte</a>
+            </p>
+            <p v-else class="divider-button">
+              <a @click.prevent="goToList" @touchend.prevent="goToList">zur Liste</a>
+            </p>
+          </div>
+
+          <div class="col-md-5 col-lg-4 order-md-1 sidebar-column">
+            <div class="sidebar" :class="{'modal-active': modalActive}" ref="foodList" id="food-list" v-scroll.window="handleSidebarScroll">
+              <food-sidebar-item v-if="searching" v-for="data in fakeVenues"
+                :key="data.id"
+                :data="data">
+              </food-sidebar-item>
+              <food-sidebar-item v-for="data in venues"
+                  :key="data.ident" :data="data"
+                  :config="config"
+                  :selectedVenueId="selectedVenueId"
+                  @select="markerClick(data, true)"
+                  @detail="setDetail"
+                  @startRequest="startRequest"
+                  @imageLoaded="imageLoaded"></food-sidebar-item>
+            </div>
+          </div>
+
+        </div>
+        <food-locator v-if="showLocator"
+          :defaultPostcode="postcode"
+          :defaultLocation="locationName"
+          :exampleCity="city"
+          :locationKnown="locationKnown"
+          :error="error"
+          :isMobile="isMobile"
+          @close="showLocator = false"
+          @postcodeChosen="postcodeChosen"
+          @coordinatesChosen="coordinatesChosen"
+          @locationChosen="locationChosen"
+          ></food-locator>
+        <food-detail v-if="showDetail"
+          :data="showDetail"
+          @close="showDetail = null"
+          @detailfetched="detailFetched"
+        ></food-detail>
       </div>
-      <food-locator v-if="showLocator"
-        :defaultPostcode="postcode"
-        :defaultLocation="locationName"
-        :exampleCity="city"
-        :locationKnown="locationKnown"
-        :error="error"
-        :isMobile="isMobile"
-        @close="showLocator = false"
-        @postcodeChosen="postcodeChosen"
-        @coordinatesChosen="coordinatesChosen"
-        @locationChosen="locationChosen"
-        ></food-locator>
-      <food-detail v-if="showDetail" :data="showDetail" @close="showDetail = null" @detailfetched="detailFetched"></food-detail>
     </div>
   </div>
 </template>
@@ -155,6 +179,7 @@ import FoodMapoverlay from './food-mapoverlay'
 import FoodFilter from './food-filter'
 import FoodDetail from './food-detail'
 import FoodLoader from './food-loader'
+import FoodRequest from './food-request'
 
 import {getPlaceStatus, getPinURL, getPinColor} from '../lib/utils'
 
@@ -187,11 +212,32 @@ const DEFAULT_ZOOM = 6
 
 export default {
   name: 'food-map',
-  props: ['config', 'leafletImagePath'],
+  props: {
+    config: {
+      type: Object
+    },
+    leafletImagePath: {
+      type: String
+    },
+    userInfo: {
+      type: Object,
+      default: null
+    },
+    userForm: {
+      type: Object,
+      default: null
+    },
+    requestForm: {
+      type: Object
+    },
+    requestConfig: {
+      type: Object
+    }
+  },
   components: {
     LMap, LTileLayer, LControlLayers, LControlZoom, LMarker, LPopup, LTooltip,
     FoodPopup, FoodSidebarItem, FoodLocator, FoodMapoverlay, FoodLoader, FoodDetail,
-    FoodFilter, SlideUpDown
+    FoodFilter, FoodRequest, SlideUpDown
   },
   data () {
     let locationKnown = false
@@ -219,6 +265,7 @@ export default {
       showLocator: false,
       showFilter: false,
       showDetail: null,
+      showRequestForm: null,
       filters: this.config.filters,
       maxBounds: L.latLngBounds(GERMANY_BOUNDS),
       city: city.city,
@@ -230,7 +277,7 @@ export default {
       ],
       selectedVenueId: null,
       venueMap: {},
-      facilities: [],
+      venues: [],
       searching: false,
       error: false,
       stacked: this.isStacked(),
@@ -329,7 +376,14 @@ export default {
       return {
         scrollWheelZoom: !this.isMobile,
         doubleClickZoom: true,
-        zoomControl: false
+        zoomControl: false,
+        maxZoom: 15
+      }
+    },
+    tooltipOptions () {
+      return {
+        offset: L.point(0, -40),
+        direction: 'top'
       }
     },
     dividerSwitchHeight () {
@@ -337,7 +391,7 @@ export default {
     },
     selectedVenue () {
       if (this.selectedVenueId) {
-        return this.facilities[this.venueMap[this.selectedVenueId]]
+        return this.venues[this.venueMap[this.selectedVenueId]]
       }
       return null
     },
@@ -364,7 +418,7 @@ export default {
       }
       return `height: ${this.mapHeight}px`
     },
-    fakeFacilities () {
+    fakeVenues () {
       let a = []
       for (let i = 0; i < 50; i += 1) {
         a.push({id: 'fake-' + i});
@@ -372,7 +426,7 @@ export default {
       return a
     },
     modalActive () {
-      return this.showLocator || this.showDetail
+      return this.showLocator || this.showDetail || this.showRequestForm
     }
   },
   methods: {
@@ -456,7 +510,7 @@ export default {
       this.error = false
       this.searching = true
       this.clearSelected()
-      this.facilities = []
+      this.venues = []
       this.goToMap()
       let locationParam
       if (options.location) {
@@ -501,7 +555,7 @@ export default {
           }
           this.locationKnown = true
           this.venueMap = {}
-          this.facilities = data.results.map((r, i) => {
+          this.venues = data.results.map((r, i) => {
             let d = {
               position: [r.lat, r.lng],
               id: r.ident.replace(/:/g, '-'),
@@ -513,7 +567,7 @@ export default {
             return d
           })
           if (options.location) {
-            let venueLocations = this.facilities.map((r) => {
+            let venueLocations = this.venues.map((r) => {
               return L.latLng(r.position[0], r.position[1])
             })
             let bounds = L.latLngBounds(venueLocations)
@@ -539,7 +593,7 @@ export default {
       if (this.selectedVenueId === null) {
         return
       }
-      let marker = this.facilities[this.venueMap[this.selectedVenueId]]
+      let marker = this.venues[this.venueMap[this.selectedVenueId]]
       this.selectedVenueId = null
       if (marker) {
         this.map.closePopup()
@@ -555,8 +609,13 @@ export default {
       if (!this.stacked) {
         let sidebarId = 'sidebar-' + marker.id
         let sidebarItem = document.getElementById(sidebarId)
-        if (sidebarItem && sidebarItem.scrollIntoView) {
-          sidebarItem.scrollIntoView({behavior: 'smooth'})
+        if (sidebarItem) {
+          if (sidebarItem.scrollIntoView) {
+            let scrollDifference = Math.abs(sidebarItem.getBoundingClientRect().top - window.pageYOffset)
+            sidebarItem.scrollIntoView({behavior: scrollDifference < 2000 ? 'smooth': 'instant', 'block': 'nearest'})
+          } else {
+            window.scrollTo(0, sidebarItem.offsetTop)
+          }
         }
       } else {
         this.goToMap()
@@ -564,6 +623,7 @@ export default {
       Vue.set(marker, 'icon', this.getIcon(marker))
     },
     imageLoaded (data) {
+      console.log('image loaded', data.ident)
       Vue.set(data, 'imageLoaded', true)
     },
     goToMap () {
@@ -606,7 +666,9 @@ export default {
       let mapTop = mapRect.top
       let isMapTop = mapTop <= 0
       if (isMapTop !== this.isMapTop) {
-        this.map.invalidateSize()
+        window.setTimeout(() => {
+          this.map.invalidateSize()
+        }, 1000)
         this.preventMapMoved()
       }
       this.isMapTop = isMapTop
@@ -629,11 +691,21 @@ export default {
     },
     setDetail (data) {
       this.showDetail = data
+      if (data) {
+        this.goToMap()
+      }
+    },
+    startRequest (data) {
+      this.markerClick(data, true)
+      this.showRequestForm = data
+      this.goToMap()
     },
     detailFetched (data) {
-      this.facilities = this.facilities.map((f) => {
+      this.venues = this.venues.map((f) => {
         if (f.ident === data.ident) {
           f.requests = data.requests
+          f.publicbody = data.publicbody
+          f.makeRequestURL = data.makeRequestURL
           f.full = true
           return f
         }
@@ -753,6 +825,11 @@ $icon-failure: #dc3545;
   margin-left: auto;
   margin-right: auto;
   margin-top: 1rem;
+
+  pointer-events: none;
+  .btn {
+    pointer-events: auto;
+  }
 }
 
 @media screen and (min-width: 768px){

@@ -14,7 +14,7 @@ var FoodItemMixin = {
       return this.lastRequest !== null
     },
     isSelected () {
-      return this.data.id === this.selectedFacilityId
+      return this.data.id === this.selectedVenueId
     },
     starClass () {
       let suffix = ''
@@ -90,6 +90,9 @@ var FoodItemMixin = {
   methods: {
     setDetail () {
       this.$emit('detail', this.data)
+    },
+    startRequest () {
+      this.$emit('startRequest', this.data)
     }
   }
 }

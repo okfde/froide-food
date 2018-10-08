@@ -7,7 +7,9 @@ import {renderComponent} from 'froide/frontend/javascript/lib/vue-helper'
 
 import FoodMap from './components/food-map'
 
-Vue.use(VueLazyload)
+Vue.use(VueLazyload, {
+  lazyComponent: true
+})
 
 Vue.config.productionTip = false
 

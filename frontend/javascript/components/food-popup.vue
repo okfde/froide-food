@@ -24,7 +24,7 @@
           </p>
         </div>
         <p v-if="canRequest">
-          <a class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
+          <a @click.prevent.stop="startRequest" class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
             Hygienekontrolle<br class="d-block d-sm-none"/>
             anfragen&nbsp;&rarr;
           </a>
