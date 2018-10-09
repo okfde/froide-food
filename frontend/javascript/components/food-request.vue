@@ -11,7 +11,7 @@
               zurück
             </button>
           </div>
-          <form method="post" :action="config.url.makeRequest" novalidate>
+          <form method="post" :action="config.url.makeRequest">
             <input type="hidden" name="csrfmiddlewaretoken" :value="csrfToken"/>
 
             <input type="hidden" name="redirect_url" v-model="params.redirect"/>
