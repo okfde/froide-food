@@ -28,11 +28,9 @@ def get_dir_for_url(url):
 
 
 def get_food_map_config(city, embed):
-    image_path = get_dir_for_url(static('food/images/pin_0.svg'))
     return {
       'city': city or {},
       'filters': venue_provider.FILTERS,
-      'imagePath': image_path + '/',
       'embed': embed,
       'requestUrl': '{}{}'.format(
           settings.SITE_URL, reverse('food-make_request')
