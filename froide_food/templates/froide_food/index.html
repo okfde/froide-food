@@ -9,7 +9,6 @@
   {% csrf_token %}
   <food-map
     id="food-component"
-    leaflet-image-path="{{ leafletImagePath }}"
     :config="{{ config }}"
     :request-config="{{ request_config }}"
     :request-form="{{ request_form.as_json }}"

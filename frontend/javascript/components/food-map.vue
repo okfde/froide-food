@@ -216,9 +216,6 @@ export default {
     config: {
       type: Object
     },
-    leafletImagePath: {
-      type: String
-    },
     userInfo: {
       type: Object,
       default: null
@@ -299,7 +296,6 @@ export default {
     }
   },
   created () {
-    window.L.Icon.Default.imagePath = this.leafletImagePath
     var self = this
     Vue.directive('focusmarker', {
       // When the bound element is inserted into the DOM...

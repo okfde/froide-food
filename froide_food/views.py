@@ -43,14 +43,11 @@ def get_food_map_config(city, embed):
 def index(request, base_template='froide_food/base.html', embed=False):
     city = get_city_from_request(request)
 
-    markerPath = static('food/images/leaflet/marker-icon.png')
-
     fake_make_request_view = MakeRequestView(request=request)
 
     context = {
         'base_template': base_template,
         'config': json.dumps(get_food_map_config(city, embed)),
-        'leafletImagePath': get_dir_for_url(markerPath),
         'request_form': fake_make_request_view.get_form(),
         'request_config': json.dumps(fake_make_request_view.get_js_context())
     }
