@@ -11,7 +11,7 @@
               zurück
             </button>
           </div>
-          <form method="post" :action="config.url.makeRequest">
+          <form method="post" :action="config.url.makeRequest" target="_blank">
             <input type="hidden" name="csrfmiddlewaretoken" :value="csrfToken"/>
 
             <input type="hidden" name="redirect_url" v-model="params.redirect"/>
