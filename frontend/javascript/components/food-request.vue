@@ -32,6 +32,7 @@
               :hide-full-text="true"
               :hide-editing="true"
               :law-type="lawType"
+              :use-pseudonym="false"
               :config="config"
             ></request-form>
             <user-registration
@@ -39,6 +40,7 @@
               :config="config"
               :user="userInfo"
               :default-law="defaultLaw"
+              :address-help-text="addressHelpText"
             ></user-registration>
             <user-terms v-if="!userInfo"
               :form="userForm"
@@ -103,7 +105,8 @@ export default {
   data () {
     return {
       fetching: !this.data.full,
-      lawType: LAW_TYPE
+      lawType: LAW_TYPE,
+      addressHelpText: 'Ihre Adresse wird nicht öffentlich angezeigt. Im Anfragetext widersprechen Sie der Weitergabe Ihrer Anschrift an Dritte.'
     }
   },
   computed: {
