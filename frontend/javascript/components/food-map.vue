@@ -422,7 +422,7 @@ export default {
       return a
     },
     modalActive () {
-      return this.showLocator || this.showDetail || this.showRequestForm
+      return this.showLocator || this.showDetail
     }
   },
   methods: {
