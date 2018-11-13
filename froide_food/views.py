@@ -5,7 +5,6 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.urls import reverse
 from django.conf import settings
 
@@ -21,10 +20,6 @@ from .utils import (
 
 TIME_PERIOD = timedelta(days=90)
 MAX_REQUEST_COUNT = 3
-
-
-def get_dir_for_url(url):
-    return '/'.join(url.split('/')[:-1]) + '/'
 
 
 def get_food_map_config(city, embed):
@@ -47,11 +42,9 @@ def index(request, base_template='froide_food/base.html', embed=False):
         'base_template': base_template,
         'config': json.dumps(get_food_map_config(city, embed)),
         'request_form': fake_make_request_view.get_form(),
+        'user_form': fake_make_request_view.get_user_form(),
         'request_config': json.dumps(fake_make_request_view.get_js_context())
     }
-
-    if not request.user.is_authenticated:
-        context['user_form'] = fake_make_request_view.get_user_form()
 
     return render(request, 'froide_food/index.html', context)
 

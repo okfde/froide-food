@@ -43,6 +43,7 @@ class VenueSerializer(serializers.Serializer):
     publicbody = PublicBodySerializer(required=False)
     makeRequestURL = serializers.CharField(required=False)
 
+
 def get_lat_lng(request):
     try:
         lat = float(request.GET.get('lat'))

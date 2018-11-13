@@ -13,7 +13,7 @@
     :request-config="{{ request_config }}"
     :request-form="{{ request_form.as_json }}"
     {% if request.user.is_authenticated %}:user-info="{{ request.user.as_json }}"{% endif %}
-    {% if not request.user.is_authenticated %}:user-form="{{ user_form.as_json }}"{% endif %}
+    :user-form="{{ user_form.as_json }}"
     >
     <div class="text-center">
       <h3>Anwendung wird geladen</h3>

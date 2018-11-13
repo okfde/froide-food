@@ -118,6 +118,9 @@ export default {
     },
     params () {
       let params = {}
+      if (!this.data.makeRequestURL) {
+        return {}
+      }
       this.data.makeRequestURL.split('?')[1].split('&').forEach((pair) => {
         pair = pair.split('=')
         params[pair[0]] = decodeURIComponent(pair[1])
