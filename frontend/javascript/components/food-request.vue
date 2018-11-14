@@ -45,6 +45,7 @@
             <user-terms v-if="!userInfo"
               :form="userForm"
             ></user-terms>
+            <input type="hidden" name="public" value="1"/>
             <div class="text-right">
               <button type="submit" class="btn btn-lg btn-success">
                 <i class="fa fa-angle-double-right" aria-hidden="true"></i>
