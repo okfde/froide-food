@@ -28,7 +28,7 @@ def get_hygiene_publicbodies(lat, lng):
 
     return PublicBody.objects.filter(
         categories__name='Lebensmittelüberwachung',
-        region__in=regions
+        regions__in=regions
     )
 
 
