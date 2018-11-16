@@ -15,8 +15,8 @@
             <input type="hidden" name="csrfmiddlewaretoken" :value="csrfToken"/>
 
             <input type="hidden" name="redirect_url" v-model="params.redirect"/>
-            <input type="hidden" name="ref" v-model="params.ref"/>
-
+            <input type="hidden" name="reference" v-model="params.ref"/>
+            <input type="hidden" name="public" value="1"/>
             <input type="hidden" v-for="k in hideParams" :key="k" :name="k" value="1"/>
             
             <request-form v-if="!fetching"
@@ -45,7 +45,6 @@
             <user-terms v-if="!userInfo"
               :form="userForm"
             ></user-terms>
-            <input type="hidden" name="public" value="1"/>
             <div class="text-right">
               <button type="submit" class="btn btn-lg btn-success">
                 <i class="fa fa-angle-double-right" aria-hidden="true"></i>
