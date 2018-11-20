@@ -18,15 +18,15 @@
               </div>
 
               <p v-if="geolocationAvailable">
-                Suchen Sie in einem PLZ-Bereich oder in Ihrer Umgebung.
+                Suchen Sie nach einem Ort, mit PLZ oder in Ihrer Umgebung.
               </p>
               <p v-else>
-                Bitte geben Sie eine Postleitzahl ein, um in der Nähe zu suchen.
+                Bitte geben Sie eine Postleitzahl oder Ort ein.
               </p>
             </div>
           </div>
           <div class="row justify-content-lg-center">
-            <div :class="{'col-lg-5': geolocationAvailable, 'col-lg-8': !geolocationAvailable}">
+            <div :class="{'col-lg-6 col-md-7': geolocationAvailable, 'col-lg-8': !geolocationAvailable}">
               <div class="input-group" v-if="false">
                 <input type="text" pattern="\d*" class="form-control postcode-input" v-model="postcode" placeholder="PLZ" maxlength="5" @keydown.enter.prevent="postcodeLookup">
                 <div class="input-group-append">
@@ -56,10 +56,10 @@
               </div>
             </div>
             <template v-if="geolocationAvailable">
-              <div class="col-lg-2 or-column">
+              <div class="col-lg-1 col-md-1 or-column">
                 <strong>oder</strong>
               </div>
-              <div class="col-lg-5">
+              <div class="col-md-4 col-lg-5">
                 <button class="btn btn-primary btn-block" @click.prevent="requestGeolocation" :disabled="determiningGeolocation">
                   <template v-if="geolocationDetermined">
                     <i class="fa fa-dot-circle-o" aria-hidden="true"></i>
