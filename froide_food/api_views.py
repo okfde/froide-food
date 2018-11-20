@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -7,7 +9,9 @@ from froide.publicbody.api_views import PublicBodySerializer
 from .venue_providers import (
     venue_provider, venue_providers, VenueProviderException
 )
-from .utils import get_hygiene_publicbodies, make_request_url
+from .utils import (
+    get_hygiene_publicbodies, make_request_url, get_request_count
+)
 
 
 class VenueRequestDocumentSerializer(serializers.Serializer):
@@ -42,6 +46,7 @@ class VenueSerializer(serializers.Serializer):
     requests = VenueRequestSerializer(many=True)
     publicbody = PublicBodySerializer(required=False)
     makeRequestURL = serializers.CharField(required=False)
+    userRequestCount = serializers.IntegerField(required=False)
 
 
 def get_lat_lng(request):
@@ -123,7 +128,13 @@ class VenueViewSet(viewsets.ViewSet):
                 'laws__combined'
             )
             place['publicbody'] = pbs[0]
-            place['makeRequestURL'] = make_request_url(place, pbs[0])
+            place['userRequestCount'] = get_request_count(
+                request, place['publicbody']
+            )
+            # FIXME
+            place['userRequestCount'] = 5
+            url = settings.SITE_URL + make_request_url(place, pbs[0])
+            place['makeRequestURL'] = url
         except (ValueError, IndexError):
             pass
 

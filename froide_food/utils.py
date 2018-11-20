@@ -1,7 +1,8 @@
+from datetime import timedelta
 from urllib.parse import urlencode, quote
 
 from django.urls import reverse
-from django.conf import settings
+from django.utils import timezone
 
 try:
     from django.contrib.gis.geoip2 import GeoIP2
@@ -10,8 +11,12 @@ except ImportError:
     GeoIP2 = None
 
 from froide.publicbody.models import PublicBody
+from froide.foirequest.models import FoiRequest
 from froide.georegion.models import GeoRegion
 from froide.helper.utils import get_client_ip
+
+TIME_PERIOD = timedelta(days=90)
+MAX_REQUEST_COUNT = 3
 
 
 def get_hygiene_publicbodies(lat, lng):
@@ -90,21 +95,12 @@ def get_city_from_request(request):
         return result
 
 
-def get_social_url(ident):
-    return '%s%s?%s' % (
-        settings.SITE_URL,
-        reverse('food-make_request'),
-        urlencode({
-            'ident': ident.encode('utf-8'),
-            'social': b'1'
-        }))
-
-
-def get_social_text(ident, place):
-    return (
-        'Ich mache gerade bei einer Aktion zu Lebensmittelhygiene mit. '
-        'Könntest du mir helfen und den Kontrollbericht von „%s“ '
-        'anfragen?\n\n%s' % (
-            place['name'], get_social_url(ident)
-        )
-    )
+def get_request_count(request, pb):
+    if request.user.is_authenticated:
+        request_count = FoiRequest.objects.filter(
+            public_body=pb,
+            user=request.user,
+            first_message__gte=timezone.now() - TIME_PERIOD
+        ).count()
+        return request_count
+    return 0

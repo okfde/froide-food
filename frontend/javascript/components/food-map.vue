@@ -6,8 +6,9 @@
       :user-info="userInfo"
       :user-form="userForm"
       :data="showRequestForm"
+      :current-url="currentUrl"
       @detailfetched="detailFetched"
-      @close="showRequestForm = null"
+      @close="requestFormClosed"
     ></food-request>
     <div v-show="!showRequestForm" :class="{'food-map-embed': config.embed, 'modal-active': modalActive}" v-scroll="handleSidebarScroll">
       <div class="food-map-container container-fluid" ref="foodMapContainer" id="food-map-container" :class="{'is-embed': config.embed}">
@@ -17,7 +18,7 @@
             <div class="input-group">
               <div class="clearable-input">
                 <input type="text" v-model="query" class="form-control" placeholder="Restaurant, Fleischer, etc." @keydown.enter.prevent="userSearch">
-                <span class="clearer fa fa-close" v-if="query.length > 0" @click.stop="query = ''"></span>
+                <span class="clearer fa fa-close" v-if="query.length > 0" @click="clearSearch"></span>
               </div>
               <div class="input-group-append">
                 <button class="btn btn-outline-secondary" type="button" @click="userSearch">
@@ -60,8 +61,8 @@
               <div class="map-search d-none d-md-block">
                 <div class="input-group">
                   <div class="clearable-input">
-                    <input type="text" v-model="query" class="form-control" placeholder="Restaurant"  @keydown.enter.prevent="userSearch">
-                    <span class="clearer fa fa-close" v-if="query.length > 0" @click.stop="query = ''"></span>
+                    <input type="text" v-model="query" class="form-control" placeholder="Name Restaurant"  @keydown.enter.prevent="userSearch">
+                    <span class="clearer fa fa-close" v-if="query.length > 0" @click="clearSearch"></span>
                   </div>
                   <div class="input-group-append">
                     <button class="btn btn-outline-secondary" type="button" @click="userSearch">
@@ -181,7 +182,7 @@ import FoodDetail from './food-detail'
 import FoodLoader from './food-loader'
 import FoodRequest from './food-request'
 
-import {getPlaceStatus, getPinURL, getPinColor} from '../lib/utils'
+import {getPlaceStatus, getPinURL, getPinColor, getQueryVariable} from '../lib/utils'
 
 var getIdFromPopup = (e) => {
   let node = e.popup._content.firstChild
@@ -209,6 +210,7 @@ const GERMANY_BOUNDS = [
 ]
 const DETAIL_ZOOM_LEVEL = 12
 const DEFAULT_ZOOM = 6
+const DEFAULT_POS = [51.00289959043832, 10.245523452758789]
 
 export default {
   name: 'food-map',
@@ -242,22 +244,57 @@ export default {
     let zoom = null
     let center = null
     let postcode = null
+    let requestsMade = []
 
-    if (window.localStorage) {
-      zoom = parseInt(window.localStorage.getItem('froide-food:zoom'))
-      center = JSON.parse(window.localStorage.getItem('froide-food:center'))
-      postcode = JSON.parse(window.localStorage.getItem('froide-food:postcode'))
-    }
-    if (zoom && zoom !== DEFAULT_ZOOM) {
-      locationKnown = true
-    }
+    let latlng = getQueryVariable('latlng')
+    let query = getQueryVariable('query')
+    let paramIdent = getQueryVariable('ident')
+
     let city = this.config.city
     if (city.country_code && city.country_code !== 'DE') {
       city = {}
     }
 
+    if (latlng) {
+      let parts = latlng.split(',')
+      center = [
+        parseFloat(parts[0]),
+        parseFloat(parts[1])
+      ]
+      if (center[0] && center[1]) {
+        zoom = DETAIL_ZOOM_LEVEL
+      }
+    }
+
+    if (window.localStorage) {
+      requestsMade = JSON.parse(window.localStorage.getItem('froide-food:requestsmade'))
+      zoom = parseInt(window.localStorage.getItem('froide-food:zoom'))
+      if (center === null) {
+        center = JSON.parse(window.localStorage.getItem('froide-food:center'))
+        if (center !== null) {
+          center = [center.lat, center.lng]
+        }
+      }
+      postcode = JSON.parse(window.localStorage.getItem('froide-food:postcode'))
+    }
+    if (center === null) {
+      center = [null, null]
+    }
+
+    center = [
+      center[0] || city.latitude || DEFAULT_POS[0],
+      center[1] || city.longitude || DEFAULT_POS[1]
+    ]
+
+    if (center[0] !== DEFAULT_POS[0]) {
+      locationKnown = true
+      zoom = zoom || DETAIL_ZOOM_LEVEL
+    } else {
+      zoom = DEFAULT_ZOOM
+    }
+
     return {
-      zoom: zoom || (city.latitude ? DETAIL_ZOOM_LEVEL : DEFAULT_ZOOM),
+      zoom: zoom,
       locationKnown: locationKnown,
       showLocator: false,
       showFilter: false,
@@ -268,10 +305,8 @@ export default {
       city: city.city,
       postcode: '' + (postcode || city.postal_code || ''),
       locationName: '',
-      center: center || [
-        city.latitude || 51.00289959043832,
-        city.longitude || 10.245523452758789
-      ],
+      center: center,
+      requestsMade: requestsMade,
       selectedVenueId: null,
       venueMap: {},
       venues: [],
@@ -282,7 +317,8 @@ export default {
       mapHeight: null,
       isTouch: L.Browser.touch && L.Browser.mobile,
       listShown: false,
-      query: '',
+      query: query || '',
+      paramIdent: paramIdent,
       mapMoved: false,
       tooltipOffset: L.point([-10, -50]),
       markerOptions: {
@@ -341,6 +377,17 @@ export default {
   computed: {
     map () {
       return this.$refs.map.mapObject
+    },
+    currentUrl () {
+      let url = `${this.config.appUrl}?latlng=${this.center[0]},${this.center[1]}`
+      
+      if (this.selectedVenueId) {
+        url += `&ident=${encodeURIComponent(this.selectedVenue.ident)}`
+        url += `&query=${encodeURIComponent(this.selectedVenue.name)}`
+      } else if (this.query) {
+        url += `&query=${encodeURIComponent(this.query)}`
+      }
+      return url
     },
     isMobile () {
       return this.stacked || L.Browser.mobile
@@ -498,6 +545,10 @@ export default {
       }
       this.search()
     },
+    clearSearch () {
+      this.query = ''
+      this.search()
+    },
     searchArea () {
       this.search()
     },
@@ -560,6 +611,9 @@ export default {
             }
             d.icon = this.getIcon(d)
             this.venueMap[d.id] = i
+            if (this.paramIdent && r.ident.indexOf(this.paramIdent) !== -1) {
+              this.selectedVenueId = d.id
+            }
             return d
           })
           if (options.location) {
@@ -619,7 +673,6 @@ export default {
       Vue.set(marker, 'icon', this.getIcon(marker))
     },
     imageLoaded (data) {
-      console.log('image loaded', data.ident)
       Vue.set(data, 'imageLoaded', true)
     },
     goToMap () {
@@ -633,7 +686,7 @@ export default {
     goToList () {
       let y = this.$refs.foodMapContainer.offsetTop
       let y2 = this.$refs.foodMap.getBoundingClientRect().height
-      smoothScroll({x: 0, y: y + y2 + 2, el: this.scrollContainer}, 300)
+      smoothScroll({x: 0, y: y + y2 + 5, el: this.scrollContainer}, 300)
     },
     isStacked () {
       return this.stacked = (window.innerWidth < 768)
@@ -678,6 +731,7 @@ export default {
     },
     recordMapPosition () {
       let latlng = this.map.getCenter()
+      this.center = [latlng.lat, latlng.lng]
       let zoom = this.map.getZoom()
       if (!window.localStorage) {
         return
@@ -696,12 +750,17 @@ export default {
       this.showRequestForm = data
       this.goToMap()
     },
+    requestFormClosed () {
+      this.showRequestForm = null
+      this.goToMap()
+    },
     detailFetched (data) {
       this.venues = this.venues.map((f) => {
         if (f.ident === data.ident) {
           f.requests = data.requests
           f.publicbody = data.publicbody
           f.makeRequestURL = data.makeRequestURL
+          f.userRequestCount = data.userRequestCount
           f.full = true
           return f
         }

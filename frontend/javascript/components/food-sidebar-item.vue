@@ -78,11 +78,6 @@ export default {
     config: {
       type: Object
     }
-  },
-  methods: {
-    lazyShow (comp) {
-      console.log(comp)
-    }
   }
 }
 </script>

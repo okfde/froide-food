@@ -11,7 +11,15 @@
               zurück
             </button>
           </div>
-          <form method="post" :action="config.url.makeRequest" target="_blank">
+          <food-recommend v-if="showWarning"
+            :user="userInfo"
+            :publicbody="publicBody"
+            :place-name="data.name"
+            :request-count="userRequestCount"
+            :current-url="currentUrl"
+            @close="closedWarning = true"
+          />
+          <form v-else method="post" @submit="formSubmit" :action="config.url.makeRequest" target="_blank">
             <input type="hidden" name="csrfmiddlewaretoken" :value="csrfToken"/>
 
             <input type="hidden" name="redirect_url" v-model="params.redirect"/>
@@ -65,8 +73,10 @@ import UserTerms from 'froide/frontend/javascript/components/user-terms.vue'
 import {selectBestLaw} from 'froide/frontend/javascript/lib/law-select'
 
 import FoodLoader from './food-loader'
+import FoodRecommend from './food-recommend'
 import FoodDetailMixin from '../lib/detailmixin'
 
+const MAX_REQUEST_COUNT = 3
 const LAW_TYPE = 'VIG'
 
 export default {
@@ -75,6 +85,7 @@ export default {
   components: {
     RequestForm,
     FoodLoader,
+    FoodRecommend,
     UserTerms,
     UserRegistration
   },
@@ -95,17 +106,23 @@ export default {
     userForm: {
       type: Object,
       default: null
+    },
+    currentUrl: {
+      type: String
     }
   },
   mounted () {
+    console.log('mounted', this.data.full)
     if (!this.data.full) {
       this.getDetail(this.data)
     }
   },
   data () {
+    console.log('mounted', this.data.full)
     return {
       fetching: !this.data.full,
       lawType: LAW_TYPE,
+      closedWarning: false, 
       addressHelpText: 'Ihre Adresse wird nicht öffentlich angezeigt. Im Anfragetext widersprechen Sie der Weitergabe Ihrer Anschrift an Dritte.'
     }
   },
@@ -115,6 +132,12 @@ export default {
     },
     publicBody () {
       return this.data.publicbody
+    },
+    showWarning () {
+      return this.userInfo && this.data.userRequestCount >= MAX_REQUEST_COUNT && !this.closedWarning
+    },
+    userRequestCount () {
+      return this.data.userRequestCount
     },
     params () {
       let params = {}
@@ -151,6 +174,9 @@ export default {
   },
   methods: {
     close () {
+      this.$emit('close')
+    },
+    formSubmit () {
       this.$emit('close')
     }
   }

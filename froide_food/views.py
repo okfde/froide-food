@@ -1,46 +1,42 @@
 import json
-from datetime import timedelta
 
 from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.utils import timezone
-from django.views.decorators.clickjacking import xframe_options_exempt
 from django.urls import reverse
 from django.conf import settings
+from django.views.decorators.clickjacking import xframe_options_exempt
+from django.contrib import messages
 
-from froide.foirequest.models import FoiRequest
 from froide.foirequest.views import MakeRequestView
+from froide.helper.utils import get_redirect
 
-from .venue_providers import venue_providers, venue_provider
+from .venue_providers import venue_provider, venue_providers
 from .utils import (
-    get_hygiene_publicbody, make_request_url, get_city_from_request,
-    get_social_url, get_social_text
+    get_city_from_request, make_request_url, get_request_count,
+    get_hygiene_publicbody, MAX_REQUEST_COUNT
 )
 
 
-TIME_PERIOD = timedelta(days=90)
-MAX_REQUEST_COUNT = 3
+def get_food_map_config(request, embed):
+    city = get_city_from_request(request)
 
-
-def get_food_map_config(city, embed):
     return {
-      'city': city or {},
-      'filters': venue_provider.FILTERS,
-      'embed': embed,
-      'requestUrl': '{}{}'.format(
-          settings.SITE_URL, reverse('food-make_request')
-        )
+        'city': city or {},
+        'filters': venue_provider.FILTERS,
+        'embed': embed,
+        'requestUrl': '{}{}'.format(
+            settings.SITE_URL, reverse('food-make_request')
+        ),
+        'appUrl': settings.SITE_URL + reverse('food-index')
     }
 
 
 def index(request, base_template='froide_food/base.html', embed=False):
-    city = get_city_from_request(request)
 
     fake_make_request_view = MakeRequestView(request=request)
 
     context = {
         'base_template': base_template,
-        'config': json.dumps(get_food_map_config(city, embed)),
+        'config': json.dumps(get_food_map_config(request, embed)),
         'request_form': fake_make_request_view.get_form(),
         'user_form': fake_make_request_view.get_user_form(),
         'request_config': json.dumps(fake_make_request_view.get_js_context())
@@ -72,6 +68,15 @@ def make_request(request):
         return redirect('food-index')
 
     place = venue_providers[provider].get_place(ident)
+
+    return get_redirect(request, default='food-index', params={
+        'query': place['name'],
+        'latlng': '{},{}'.format(place['lat'], place['lng']),
+        'ident': ident
+    })
+
+
+def old_make_request(request, place, ident):
     try:
         pb = get_hygiene_publicbody(place['lat'], place['lng'])
     except ValueError as e:
@@ -83,27 +88,15 @@ def make_request(request):
     stopper = False
     request_count = 0
     if request.user.is_authenticated:
-        request_count = FoiRequest.objects.filter(
-            public_body=pb,
-            user=request.user,
-            first_message__gte=timezone.now() - TIME_PERIOD
-        ).count()
+        request_count = get_request_count(request, pb)
         if request_count >= MAX_REQUEST_COUNT:
             stopper = True
 
-    social_url = get_social_url(ident)
-    social_text = get_social_text(ident, place)
-
     if stopper or request.GET.get('stopper') is not None:
-        return render(request, 'froide_food/recommend.html', {
-            'publicbody': pb,
-            'request_count': request_count,
-            'days': TIME_PERIOD.days,
-            'max_count': MAX_REQUEST_COUNT,
-            'social_url': social_url,
-            'social_text': social_text,
-            'url': url,
-            'place': place
+        return get_redirect(request, default='food-index', params={
+            'query': place['name'],
+            'latlng': '{},{}'.format(place['lat'], place['lng']),
+            'ident': ident
         })
 
     return redirect(url)
