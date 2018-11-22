@@ -131,8 +131,6 @@ class VenueViewSet(viewsets.ViewSet):
             place['userRequestCount'] = get_request_count(
                 request, place['publicbody']
             )
-            # FIXME
-            place['userRequestCount'] = 5
             url = settings.SITE_URL + make_request_url(place, pbs[0])
             place['makeRequestURL'] = url
         except (ValueError, IndexError):
