@@ -333,6 +333,16 @@ export default {
   },
   created () {
     var self = this
+
+    if ('serviceWorker' in navigator) {
+      let scope = this.config.swUrl.replace(/^(.*\/)[\w\.]+$/, '$1')
+      navigator.serviceWorker.register(this.config.swUrl, {scope: scope}).then(function(reg) {
+        console.log('ServiceWorker registration successful!', reg.scope);
+      }).catch(function(err) {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+    }
+
     Vue.directive('focusmarker', {
       // When the bound element is inserted into the DOM...
       componentUpdated: (el, binding, vnode) => {

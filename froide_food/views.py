@@ -26,7 +26,9 @@ def get_food_map_config(request, embed):
         'requestUrl': '{}{}'.format(
             settings.SITE_URL, reverse('food-make_request')
         ),
-        'appUrl': settings.SITE_URL + reverse('food-index')
+        'appUrl': settings.SITE_URL + reverse('food-index'),
+        'swUrl': reverse('food-service_worker'),
+        'swUrl': reverse('food-service_worker')
     }
 
 
