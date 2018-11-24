@@ -67,9 +67,9 @@
 </template>
 
 <script>
-import RequestForm from 'froide/frontend/javascript/components/request-form.vue'
-import UserRegistration from 'froide/frontend/javascript/components/user-registration.vue'
-import UserTerms from 'froide/frontend/javascript/components/user-terms.vue'
+import RequestForm from 'froide/frontend/javascript/components/makerequest/request-form.vue'
+import UserRegistration from 'froide/frontend/javascript/components/makerequest/user-registration.vue'
+import UserTerms from 'froide/frontend/javascript/components/makerequest/user-terms.vue'
 import {selectBestLaw} from 'froide/frontend/javascript/lib/law-select'
 
 import FoodLoader from './food-loader'
