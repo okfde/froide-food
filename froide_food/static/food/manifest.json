@@ -4,7 +4,7 @@
   "theme_color": "#0069d0",
   "background_color": "rgba(255,255,255,0)",
   "display": "standalone",
-  "scope": "/kampagnen/lebensmittelkontrolle/app/",
+  "scope": "https://fragdenstaat.de/kampagnen/lebensmittelkontrolle/app/",
   "start_url": "https://fragdenstaat.de/kampagnen/lebensmittelkontrolle/app/?pk_campaign=food-appinstalled",
   "icons": [
     {
