@@ -17,7 +17,7 @@
           <div class="searchbar-inner">
             <div class="input-group">
               <div class="clearable-input">
-                <input type="text" v-model="query" class="form-control" placeholder="Restaurant, Fleischer, etc." @keydown.enter.prevent="userSearch">
+                <input type="text" v-model="query" class="form-control" placeholder="Suche nach Restaurant etc." @keydown.enter.prevent="userSearch">
                 <span class="clearer fa fa-close" v-if="query.length > 0" @click="clearSearch"></span>
               </div>
               <div class="input-group-append">
@@ -61,7 +61,7 @@
               <div class="map-search d-none d-md-block">
                 <div class="input-group">
                   <div class="clearable-input">
-                    <input type="text" v-model="query" class="form-control" placeholder="Name Restaurant"  @keydown.enter.prevent="userSearch">
+                    <input type="text" v-model="query" class="form-control" placeholder="Suche Restaurant"  @keydown.enter.prevent="userSearch">
                     <span class="clearer fa fa-close" v-if="query.length > 0" @click="clearSearch"></span>
                   </div>
                   <div class="input-group-append">
