@@ -58,9 +58,14 @@ def make_request_url(place, publicbody):
     )
     if len(subject) > 250:
         subject = subject[:250] + '...'
-    body = '''Den letzten, aktuellen Kontrollbericht der lebensmittelrechtlichen Betriebsüberprüfung von
+    body = '''1. Wann haben die beiden letzten lebensmittelrechtlichen Betriebsüberprüfungen im folgenden Betrieb stattgefunden:
 {name}
-{address}'''.format(**place)
+{address}
+
+2. Kam es hierbei zu Beanstandungen? Falls ja, beantrage ich hiermit die Herausgabe des entsprechenden Kontrollberichts an mich.
+
+Unter „Beanstandungen“ verstehe ich unzulässige Abweichungen von den Anforderungen des Lebensmittel- und Futtermittelgesetzbuches (LFBG) oder anderen geltenden Hygienevorschriften. Sollte es zu einer oder mehreren solchen Beanstandungen gekommen sein, beantrage ich die Herausgabe des entsprechenden, vollständigen Kontrollberichts – unabhängig davon, wie Ihre Behörde die Beanstandungen eingestuft hat (bspw. als „geringfügig“ oder „schwerwiegend“).
+'''.format(**place)
     ref = ('food:%s' % place['ident']).encode('utf-8')
     query = {
         'subject': subject.encode('utf-8'),
