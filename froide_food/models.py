@@ -28,7 +28,10 @@ class VenueRequest(models.Model):
 
 
 class VenueRequestItem(models.Model):
-    venue = models.ForeignKey(VenueRequest, related_name='request_items')
+    venue = models.ForeignKey(
+        VenueRequest, related_name='request_items',
+        on_delete=models.CASCADE
+    )
 
     timestamp = models.DateTimeField(default=timezone.now)
     foirequest = models.ForeignKey(FoiRequest, null=True, blank=True,
