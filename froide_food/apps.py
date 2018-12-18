@@ -24,5 +24,5 @@ class FroideFoodConfig(AppConfig):
         api_router.register(
             r'venue',
             VenueViewSet,
-            base_name='venue'
+            basename='venue'
         )
