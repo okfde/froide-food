@@ -101,6 +101,12 @@ FILTERS = [
       'icon': 'fa-car',
       'active': False,
       'categories': ['servicestations']
+    },
+    {
+      'name': 'Kino',
+      'icon': 'fa-film',
+      'active': False,
+      'categories': ['movietheaters']
     }
     # // Fleischerei/Metzgerei
     # // Bäckerei/Konditorei
