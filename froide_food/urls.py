@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 from django.views.generic import TemplateView
 
 from .views import (
@@ -6,10 +6,10 @@ from .views import (
 )
 
 urlpatterns = [
-    url(r'^$', index, name='food-index'),
-    url(r'^embed/$', embed, name='food-embed'),
-    url(r'^anfragen/$', make_request, name='food-make_request'),
-    url(r'^sw.js', TemplateView.as_view(
+    path('', index, name='food-index'),
+    path('embed/', embed, name='food-embed'),
+    path('anfragen/', make_request, name='food-make_request'),
+    path('sw.js', TemplateView.as_view(
         template_name='froide_food/sw.js',
         content_type='application/javascript'), name='food-service_worker'),
 ]
