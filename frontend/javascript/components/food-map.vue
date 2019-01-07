@@ -320,6 +320,7 @@ export default {
       query: query || '',
       paramIdent: paramIdent,
       mapMoved: false,
+      autoMoved: false,
       tooltipOffset: L.point([-10, -50]),
       markerOptions: {
         riseOnHover: true
@@ -357,12 +358,12 @@ export default {
   mounted () {
     this.map.attributionControl.setPrefix('')
     this.map.on('zoomend', (e) => {
-      this.mapMoved = true
+      this.mapHasMoved()
       this.zoom = this.map.getZoom()
       this.recordMapPosition()
     })
     this.map.on('moveend', (e) => {
-      this.mapMoved = true
+      this.mapHasMoved()
       this.recordMapPosition()
     })
     this.map.on('click', (e) => {
@@ -535,17 +536,17 @@ export default {
         this.goToMap()
       }
     },
-    preventMapMoved () {
-      window.requestAnimationFrame(() => {
-        this.mapMoved = false
-      })
-      this.map.on('viewreset', this.preventMapMovedCallback)
+    mapHasMoved() {
+      if (this.autoMoved) {
+        window.requestAnimationFrame(() => {
+          this.autoMoved = false
+        })
+        return
+      }
+      this.mapMoved = true
     },
-    preventMapMovedCallback () {
-      window.requestAnimationFrame(() => {
-        this.mapMoved = false
-      })
-      this.map.off('viewreset', this.preventMapMovedCallback)
+    preventMapMoved () {
+      this.autoMoved = true
     },
     userSearch () {
       if (this.query.match(/^\d{5}$/)) {
