@@ -1,4 +1,5 @@
 from datetime import timedelta
+import logging
 from urllib.parse import urlencode, quote
 
 from django.urls import reverse
@@ -6,7 +7,6 @@ from django.utils import timezone
 
 try:
     from django.contrib.gis.geoip2 import GeoIP2
-    from django.contrib.gis.geoip2.base import GeoIP2Exception
 except ImportError:
     GeoIP2 = None
 
@@ -17,6 +17,8 @@ from froide.helper.utils import get_client_ip
 
 TIME_PERIOD = timedelta(days=90)
 MAX_REQUEST_COUNT = 3
+
+logger = logging.getLogger(__name__)
 
 
 def get_hygiene_publicbodies(lat, lng):
@@ -85,15 +87,20 @@ def get_city_from_request(request):
     if GeoIP2 is None:
         return
 
-    try:
-        g = GeoIP2()
-    except GeoIP2Exception:
+    ip = get_client_ip(request)
+    if not ip:
+        logger.warning('No IP found on request: %s', request)
         return
 
-    ip = get_client_ip(request)
+    try:
+        g = GeoIP2()
+    except Exception as e:
+        logger.exception(e)
+        return
     try:
         result = g.city(ip)
-    except Exception:
+    except Exception as e:
+        logger.exception(e)
         return
     if result and result.get('latitude'):
         return result
