@@ -49,10 +49,14 @@
               :user="userInfo"
               :default-law="defaultLaw"
               :address-help-text="addressHelpText"
+              :address-required="true"
             ></user-registration>
             <user-terms v-if="!userInfo"
               :form="userForm"
             ></user-terms>
+            <p class="small text-right">
+              Sie erhalten im Rahmen der Aktion „Topf Secret“ auch eine separate E-Mail von FoodWatch mit Informationen.
+            </p>
             <div class="text-right">
               <button type="submit" class="btn btn-lg btn-success">
                 <i class="fa fa-angle-double-right" aria-hidden="true"></i>
@@ -112,13 +116,11 @@ export default {
     }
   },
   mounted () {
-    console.log('mounted', this.data.full)
     if (!this.data.full) {
       this.getDetail(this.data)
     }
   },
   data () {
-    console.log('mounted', this.data.full)
     return {
       fetching: !this.data.full,
       lawType: LAW_TYPE,
@@ -188,8 +190,8 @@ export default {
   .loading {
     height: 100vh;
     padding-top: 30%;
-    background-color: #ddd;
-    animation: blinker 0.8s linear infinite;
+    background-color: #fff;
+    // animation: blinker 0.8s linear infinite;
     text-align: center;
   }
 
