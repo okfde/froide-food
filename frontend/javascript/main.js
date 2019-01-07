@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function () {
   createFoodMap('#food-component')
 })
 
-module.exports = {
+export default {
   createFoodMap
 }
-export default module.exports
