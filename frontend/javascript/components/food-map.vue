@@ -27,7 +27,7 @@
                 </button>
               </div>
               <div class="input-group-append mr-auto">
-                <button class="btn btn-outline-secondary" @click="showLocator = true">
+                <button class="btn btn-outline-secondary" @click="setLocator(true)">
                   <i class="fa fa-location-arrow" aria-hidden="true"></i>
                   <span class="d-none d-sm-none d-md-inline">Ort</span>
                 </button>
@@ -71,7 +71,7 @@
                     </button>
                   </div>
                   <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" @click="showLocator = true">
+                    <button class="btn btn-outline-secondary" @click="setLocator(true)">
                       <i class="fa fa-location-arrow" aria-hidden="true"></i>
                       <span class="d-none d-lg-inline">Ort</span>
                     </button>
@@ -146,7 +146,7 @@
           :locationKnown="locationKnown"
           :error="error"
           :isMobile="isMobile"
-          @close="showLocator = false"
+          @close="setLocator(false)"
           @postcodeChosen="postcodeChosen"
           @coordinatesChosen="coordinatesChosen"
           @locationChosen="locationChosen"
@@ -379,7 +379,7 @@ export default {
       this.isStacked()
     })
     if (!this.locationKnown) {
-      this.showLocator = true
+      this.setLocator(true)
     } else {
       this.search()
     }
@@ -751,6 +751,12 @@ export default {
     },
     setDetail (data) {
       this.showDetail = data
+      if (data) {
+        this.goToMap()
+      }
+    },
+    setLocator (data) {
+      this.showLocator = data
       if (data) {
         this.goToMap()
       }
