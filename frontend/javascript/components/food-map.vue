@@ -430,7 +430,7 @@ export default {
         scrollWheelZoom: !this.isMobile,
         doubleClickZoom: true,
         zoomControl: false,
-        maxZoom: 15
+        maxZoom: 18
       }
     },
     tooltipOptions () {
