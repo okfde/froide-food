@@ -28,7 +28,6 @@ def get_food_map_config(request, embed):
         ),
         'appUrl': settings.SITE_URL + reverse('food-index'),
         'swUrl': reverse('food-service_worker'),
-        'swUrl': reverse('food-service_worker')
     }
 
 
