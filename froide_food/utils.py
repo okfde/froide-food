@@ -63,15 +63,14 @@ def make_request_url(place, publicbody):
 {address}
 
 2. Kam es hierbei zu Beanstandungen? Falls ja, beantrage ich hiermit die Herausgabe des entsprechenden Kontrollberichts an mich.
-
-Unter „Beanstandungen“ verstehe ich unzulässige Abweichungen von den Anforderungen des Lebensmittel- und Futtermittelgesetzbuches (LFBG) oder anderen geltenden Hygienevorschriften. Sollte es zu einer oder mehreren solchen Beanstandungen gekommen sein, beantrage ich die Herausgabe des entsprechenden, vollständigen Kontrollberichts – unabhängig davon, wie Ihre Behörde die Beanstandungen eingestuft hat (bspw. als „geringfügig“ oder „schwerwiegend“).
 '''.format(**place)
     ref = ('food:%s' % place['ident']).encode('utf-8')
     query = {
         'subject': subject.encode('utf-8'),
         'body': body.encode('utf-8'),
         'ref': ref,
-        'law_type': 'VIG'
+        'law_type': 'VIG',
+        'redirect': '/k/lks'  # short, redirects to /kampagnen/lebensmittelkontrolle/gesendet/
     }
     hide_features = (
         'hide_public', 'hide_full_text', 'hide_similar', 'hide_publicbody',
