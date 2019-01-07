@@ -1,0 +1,18 @@
+{% autoescape off %}Hallo {{ name }},
+
+Sie möchten bei der Aktion „Topf Secret“ von FoodWatch und FragDenStaat mitmachen?
+
+Um Ihre Hygienekontrollanfrage abzusenden, klicken Sie bitte auf den folgenden Bestätigungs-Link:
+
+{{ url }}
+
+----
+
+{% if password %}Wir haben für Sie ein zufälliges Passwort generiert. Sie können es nutzen, um sich einzuloggen und Ihre Anfragen zu bearbeiten.
+Ihr Passwort ist: {{ password }}
+
+Wir raten Ihnen, Ihr Passwort zu ändern.
+{% endif %}
+Viele Grüße
+FragDenStaat
+{% endautoescape %}
