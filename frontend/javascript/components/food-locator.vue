@@ -233,10 +233,6 @@ export default {
     display: flex;
     transition: opacity .3s ease;
   }
-  .is-embed .modal-mask {
-    top: 10px;
-  }
-
 
   .clearable-input {
     position: relative;
