@@ -23,9 +23,15 @@ function getPlaceStatus (place) {
   return 'normal'
 }
 
+const PINS = {}
+
 function getPinURL (color) {
-  let uri = `data:image/svg+xml;utf8,<?xml version="1.0" encoding="UTF-8"?><svg viewBox="0 0 8.9999998 11.800001" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"> <defs><filter id="a" x="-.10828" y="-.086222" width="1.2166" height="1.1724" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="0.388"/></filter></defs> <path d="m4.5 0.90339c1.1 0 2.2 0.5 3 1.3 0.8 0.9 1.3 1.9 1.3 3.1s-0.5 2.5-1.3 3.3l-3 3.1-3-3.1c-0.8-0.8-1.3-2-1.3-3.3 0-1.2 0.4-2.2 1.3-3.1 0.8-0.8 1.9-1.3 3-1.3z" fill="#646464" fill-opacity=".39216" filter="url(#a)"/> <path fill="${color}" d="m4.5 0.2c1.1 0 2.2 0.5 3 1.3 0.8 0.9 1.3 1.9 1.3 3.1s-0.5 2.5-1.3 3.3l-3 3.1-3-3.1c-0.8-0.8-1.3-2-1.3-3.3 0-1.2 0.4-2.2 1.3-3.1 0.8-0.8 1.9-1.3 3-1.3z"/> </svg>`
-  return uri.replace(/#/g, '%23')
+  if (PINS[color] === undefined) {
+    let svg = `<?xml version="1.0" encoding="UTF-8"?><svg viewBox="0 0 8.9999998 11.800001" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"> <defs><filter id="a" x="-.10828" y="-.086222" width="1.2166" height="1.1724" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="0.388"/></filter></defs> <path d="m4.5 0.90339c1.1 0 2.2 0.5 3 1.3 0.8 0.9 1.3 1.9 1.3 3.1s-0.5 2.5-1.3 3.3l-3 3.1-3-3.1c-0.8-0.8-1.3-2-1.3-3.3 0-1.2 0.4-2.2 1.3-3.1 0.8-0.8 1.9-1.3 3-1.3z" fill="#646464" fill-opacity=".39216" filter="url(#a)"/> <path fill="${color}" d="m4.5 0.2c1.1 0 2.2 0.5 3 1.3 0.8 0.9 1.3 1.9 1.3 3.1s-0.5 2.5-1.3 3.3l-3 3.1-3-3.1c-0.8-0.8-1.3-2-1.3-3.3 0-1.2 0.4-2.2 1.3-3.1 0.8-0.8 1.9-1.3 3-1.3z"/> </svg>`
+    // return `data:image/svg+xml;utf8,` + svg.replace(/#/g, '%23')
+    PINS[color] = window.URL.createObjectURL(new window.Blob([svg], {type: 'image/svg+xml'}))
+  }
+  return PINS[color]
 }
 
 function getPinColor (status, selected) {
