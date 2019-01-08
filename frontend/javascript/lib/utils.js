@@ -86,8 +86,8 @@ function canUseLocalStorage (window) {
 
 function latlngToGrid (latlng) {
   return {
-    lat: Math.round(latlng.lat * 500) / 500,
-    lng: Math.round(latlng.lng * 500) / 500
+    lat: Math.round(latlng.lat * 1000) / 1000,
+    lng: Math.round(latlng.lng * 1000) / 1000
   }
 }
 

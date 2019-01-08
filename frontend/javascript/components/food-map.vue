@@ -597,7 +597,7 @@ export default {
             bounds.getSouthEast()
           )
         )
-        radius = Math.max(Math.round(Math.min(radius, 40000) * 100) / 100, 500)
+        radius = Math.max(Math.round(Math.min(radius, 40000) / 100) * 100, 500)
         let reqCoords = latlngToGrid(coordinates, radius)
         locationParam = `lat=${reqCoords.lat}&lng=${reqCoords.lng}&radius=${radius}`
       }
