@@ -11,7 +11,7 @@ var FoodItemMixin = {
       return `${this.config.requestUrl}?ident=${encodeURIComponent(this.data.ident)}`
     },
     hasRequest () {
-      return this.lastRequest !== null
+      return this.lastRequest !== null || this.data.requested
     },
     isSelected () {
       return this.data.id === this.selectedVenueId
@@ -51,6 +51,9 @@ var FoodItemMixin = {
       return Math.max(0, Math.ceil(days))
     },
     canRequest () {
+      if (this.data.requested) {
+        return false
+      }
       if (this.lastRequest === null) {
         return true
       }
