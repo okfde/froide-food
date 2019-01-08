@@ -73,10 +73,22 @@ function getQueryVariable (variable) {
   }
 }
 
+function canUseLocalStorage (window) {
+  try {
+    const key = '__canary_key__'
+    window.localStorage.setItem(key, key)
+    window.localStorage.removeItem(key)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
 export {
   getQueryVariable,
   renderDate,
   getPlaceStatus,
   getPinURL,
-  getPinColor
+  getPinColor,
+  canUseLocalStorage
 }

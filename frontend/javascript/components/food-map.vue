@@ -182,7 +182,10 @@ import FoodDetail from './food-detail'
 import FoodLoader from './food-loader'
 import FoodRequest from './food-request'
 
-import {getPlaceStatus, getPinURL, getPinColor, getQueryVariable} from '../lib/utils'
+import {
+  getPlaceStatus, getPinURL, getPinColor,
+  getQueryVariable, canUseLocalStorage
+} from '../lib/utils'
 
 var getIdFromPopup = (e) => {
   let node = e.popup._content.firstChild
@@ -266,7 +269,7 @@ export default {
       }
     }
 
-    if (window.localStorage) {
+    if (canUseLocalStorage(window)) {
       requestsMade = JSON.parse(window.localStorage.getItem('froide-food:requestsmade'))
       zoom = parseInt(window.localStorage.getItem('froide-food:zoom'))
       if (center === null) {
@@ -744,7 +747,7 @@ export default {
       let latlng = this.map.getCenter()
       this.center = [latlng.lat, latlng.lng]
       let zoom = this.map.getZoom()
-      if (!window.localStorage) {
+      if (!canUseLocalStorage(window)) {
         return
       }
       window.localStorage.setItem('froide-food:zoom', zoom)
