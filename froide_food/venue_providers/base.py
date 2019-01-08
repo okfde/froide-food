@@ -1,7 +1,7 @@
 from collections import defaultdict
 from django.db.models import Prefetch
 
-from froide.foirequest.models import FoiAttachment
+from froide.foirequest.models import FoiRequest, FoiAttachment
 
 from ..models import VenueRequest, VenueRequestItem
 
@@ -63,14 +63,8 @@ class BaseVenueProvider(object):
             place['last_request'] = venue.last_request
             fr = venue.last_request
             if fr is not None:
-                place['requests'] = [{
-                    'id': vri.foirequest.pk,
-                    'url': vri.foirequest.get_absolute_url(),
-                    'status': vri.foirequest.status,
-                    'resolution': vri.foirequest.resolution,
-                    'timestamp': vri.timestamp,
-                    'documents': []
-                } for vri in venue.request_items.all()]
+                vris = venue.request_items.all()
+                place['requests'] = [to_vri(vri) for vri in vris]
             else:
                 place['requests'] = []
         else:
@@ -81,3 +75,23 @@ class BaseVenueProvider(object):
             'name': att.name,
             'url': att.get_absolute_domain_url(),
         } for att in attachment_mapping[req['id']]]
+
+
+def to_vri(vri):
+    if vri.foirequest.is_public():
+        return {
+            'id': vri.foirequest.pk,
+            'url': vri.foirequest.get_absolute_url(),
+            'status': vri.foirequest.status,
+            'resolution': vri.foirequest.resolution,
+            'timestamp': vri.timestamp,
+            'documents': []
+        }
+    return {
+        'id': None,
+        'url': '',
+        'status': vri.foirequest.status,
+        'resolution': vri.foirequest.resolution,
+        'timestamp': vri.timestamp,
+        'documents': []
+    }
