@@ -184,7 +184,7 @@ import FoodRequest from './food-request'
 
 import {
   getPlaceStatus, getPinURL, getPinColor,
-  getQueryVariable, canUseLocalStorage
+  getQueryVariable, canUseLocalStorage, latlngToGrid
 } from '../lib/utils'
 
 var getIdFromPopup = (e) => {
@@ -595,8 +595,9 @@ export default {
             bounds.getSouthEast()
           )
         )
-        radius = Math.round(Math.min(radius, 40000))
-        locationParam = `lat=${coordinates.lat}&lng=${coordinates.lng}&radius=${radius}`
+        radius = Math.max(Math.round(Math.min(radius, 40000) * 100) / 100, 500)
+        let reqCoords = latlngToGrid(coordinates, radius)
+        locationParam = `lat=${reqCoords.lat}&lng=${reqCoords.lng}&radius=${radius}`
       }
       let categories = this.filterCategories
       let cats = categories.map((c) => `categories=${encodeURIComponent(c)}`)

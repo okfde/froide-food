@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 from rest_framework import serializers
 from rest_framework import viewsets
@@ -62,6 +64,8 @@ def get_lat_lng(request):
 
 
 class VenueViewSet(viewsets.ViewSet):
+
+    @method_decorator(cache_page(60*5))
     def list(self, request):
         location = request.GET.get('location')
         if location:
@@ -80,7 +84,6 @@ class VenueViewSet(viewsets.ViewSet):
 
         query = request.GET.get('q')
         categories = request.GET.getlist('categories', [])
-
         try:
             places = venue_provider.search_places(
                 q=query,

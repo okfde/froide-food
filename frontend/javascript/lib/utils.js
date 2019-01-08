@@ -84,11 +84,19 @@ function canUseLocalStorage (window) {
   }
 }
 
+function latlngToGrid (latlng) {
+  return {
+    lat: Math.round(latlng.lat * 500) / 500,
+    lng: Math.round(latlng.lng * 500) / 500
+  }
+}
+
 export {
   getQueryVariable,
   renderDate,
   getPlaceStatus,
   getPinURL,
   getPinColor,
-  canUseLocalStorage
+  canUseLocalStorage,
+  latlngToGrid
 }

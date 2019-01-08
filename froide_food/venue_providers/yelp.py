@@ -2,6 +2,7 @@ import os
 import json
 
 from django.conf import settings
+from django.core.cache import cache
 
 import requests
 import logging
@@ -150,6 +151,16 @@ def _get_mapping(cats, filter_cats):
 CATEGORY_MAPPING = make_mapping(DATA_PATH, FILTERS)
 
 
+def make_cache_key(params, method='search'):
+    keys = ('radius', 'latitude', 'longitude')
+    return 'froide_food:yelp:%s:%s' % (
+        method,
+        '_'.join(
+            str(params.get(key)) for key in keys
+        )
+    )
+
+
 class YelpVenueProvider(BaseVenueProvider):
     name = 'yelp'
     FILTERS = FILTERS
@@ -161,7 +172,9 @@ class YelpVenueProvider(BaseVenueProvider):
             'limit': 50,
             'locale': 'de_DE'
         }
+        can_cache = True
         if location is not None:
+            can_cache = False
             params['location'] = location
         else:
             params.update({
@@ -169,27 +182,39 @@ class YelpVenueProvider(BaseVenueProvider):
                 'longitude': coordinates[1],
             })
         if q:
+            can_cache = False
             params['term'] = q
         if categories:
             params['categories'] = ','.join(categories)
         if radius is not None:
             params['radius'] = radius
 
-        response = requests.get(
-            SEARCH_URL,
-            params=params,
-            headers={
-                'Authorization': 'Bearer %s' % API_KEY
-            }
-        )
-        logger.info('API Request: %s (%s)',
-                    response.request.url, response.status_code)
-        if response.status_code != 200:
-            logger.warn('API response: %s - %s',
-                        response.status_code, response.text)
-            raise VenueProviderException()
+        response = None
+        if can_cache:
+            cache_key = make_cache_key(params)
+            response = cache.get(cache_key)
 
-        results = response.json()
+        if response is not None:
+            results = json.loads(response)
+        if not can_cache or response is None:
+            response = requests.get(
+                SEARCH_URL,
+                params=params,
+                headers={
+                    'Authorization': 'Bearer %s' % API_KEY
+                }
+            )
+            logger.info('API Request: %s (%s)',
+                        response.request.url, response.status_code)
+            if response.status_code != 200:
+                logger.warn('API response: %s - %s',
+                            response.status_code, response.text)
+                raise VenueProviderException()
+
+            if can_cache:
+                cache.set(cache_key, response.text, 60 * 10)
+            results = response.json()
+
         if 'businesses' not in results:
             return []
         results = results['businesses']
