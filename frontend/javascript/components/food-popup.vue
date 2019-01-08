@@ -18,9 +18,10 @@
             </a>
           </p>
           <p v-else>
-            <a :href="requestUrl" target="_blank">
+            <a v-if="requestUrl" :href="requestUrl" target="_blank">
               zur Anfrage&nbsp;&rarr;
             </a>
+            <span v-else>Anfrage gestellt!</span>
           </p>
         </div>
         <p v-if="canRequest">

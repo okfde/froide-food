@@ -19,6 +19,12 @@
             :current-url="currentUrl"
             @close="closedWarning = true"
           />
+          <template v-else-if="!canRequest">
+            <p>Dieser Betrieb wurde zwischenzeitlich schon angefragt.</p>
+            <button class="btn btn-secondary" @click="$emit('close')">
+              zurück
+            </button>
+          </template>
           <form v-else method="post" @submit="formSubmit" :action="config.url.makeRequest" target="_blank">
             <input type="hidden" name="csrfmiddlewaretoken" :value="csrfToken"/>
 
@@ -179,6 +185,7 @@ export default {
       this.$emit('close')
     },
     formSubmit () {
+      this.$emit('requestMade', this.data)
       this.$emit('close')
     }
   }

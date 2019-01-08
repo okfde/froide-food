@@ -8,6 +8,7 @@
       :data="showRequestForm"
       :current-url="currentUrl"
       @detailfetched="detailFetched"
+      @requestmade="requestMade"
       @close="requestFormClosed"
     ></food-request>
     <div v-show="!showRequestForm" :class="{'food-map-embed': config.embed, 'modal-active': modalActive}" v-scroll="handleSidebarScroll">
@@ -324,6 +325,7 @@ export default {
       paramIdent: paramIdent,
       mapMoved: false,
       autoMoved: false,
+      alreadyRequested: {},
       tooltipOffset: L.point([-10, -50]),
       markerOptions: {
         riseOnHover: true
@@ -629,6 +631,9 @@ export default {
             if (this.paramIdent && r.ident.indexOf(this.paramIdent) !== -1) {
               this.selectedVenueId = d.id
             }
+            if (this.alreadyRequested[d.id]) {
+              d.requested = true
+            }
             return d
           })
           if (options.location) {
@@ -775,6 +780,9 @@ export default {
       this.showRequestForm = null
       this.goToMap()
     },
+    requestMade (data) {
+      this.alreadyRequested[data.id] = true
+    },
     detailFetched (data) {
       this.venues = this.venues.map((f) => {
         if (f.ident === data.ident) {
@@ -782,6 +790,7 @@ export default {
           f.publicbody = data.publicbody
           f.makeRequestURL = data.makeRequestURL
           f.userRequestCount = data.userRequestCount
+          f.icon = this.getIcon(data)
           f.full = true
           return f
         }

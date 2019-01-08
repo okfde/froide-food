@@ -9,29 +9,40 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <p class="venue-address">{{ data.address }}</p>
-          <a :href="data.url" class="provider-logo" target="_blank" rel="noopener"></a>
-          <div class="clearfix mt-3">
-            <div v-if="hasRequest" class="request-status">
-              <p :class="requestColor">
-                {{ requestStatus }}
-              </p>
-              <p v-if="requestComplete">
-                <a :href="requestUrl" target="_blank" @click.prevent="setDetail">
-                  zu den Berichten&nbsp;&rarr;
-                </a>
-              </p>
-              <p v-else>
-                <a :href="requestUrl" target="_blank">
-                  zur Anfrage&nbsp;&rarr;
-                </a>
-              </p>
+          <div class="row">
+            <div class="col-8">
+              <p class="venue-address">{{ data.address }}</p>
+              <div class="clearfix mt-3">
+                <div v-if="hasRequest" class="request-status">
+                  <p :class="requestColor">
+                    {{ requestStatus }}
+                  </p>
+                  <p v-if="requestComplete">
+                    <a :href="requestUrl" target="_blank" @click.prevent="setDetail">
+                      zu den Berichten&nbsp;&rarr;
+                    </a>
+                  </p>
+                  <p v-else>
+                    <a v-if="requestUrl" :href="requestUrl" target="_blank">
+                      zur Anfrage&nbsp;&rarr;
+                    </a>
+                    <span v-else>Anfrage gestellt!</span>
+                  </p>
+                </div>
+                <p v-if="canRequest">
+                  <a @click.prevent.stop="startRequest" class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
+                    Hygienekontrolle anfragen&nbsp;&rarr;
+                  </a>
+                </p>
+              </div>
             </div>
-            <p v-if="canRequest">
-              <a @click.prevent.stop="startRequest" class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
-                Hygienekontrolle anfragen&nbsp;&rarr;
+            <div class="col-4">
+              <a :href="data.url" target="_blank" rel="noopener" class="provider-credit">
+                <div class="provider-logo"></div>
+                <div :class="starClass" :title="starRating"></div>
+                <small class="review-count">{{ data.review_count }} Beiträge</small>
               </a>
-            </p>
+            </div>
           </div>
         </div>
       </div>
@@ -108,6 +119,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+@import "../../styles/yelp_stars";
 
 .food-mapoverlay {
   position: absolute;
@@ -193,16 +206,29 @@ export default {
   transition: all .3s ease-in-out;
 }
 
+.provider-credit {
+  display: block;
+  padding: 15px;
+  background-color: #f5f5f5;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
 
 .provider-logo {
   background-image: url('/static/food/images/yelp_logo.png');
   background-repeat: no-repeat;
   background-size: contain;
-  float: right;
-  width: 65px;
   height: 40px;
   margin: 0.25rem;
 }
 
+.review-count {
+  font-size: 0.7rem;
+  display: block;
+  margin: 0.25rem 0 0;
+  padding: 0 0 0.25rem;
+  color: #888;
+  text-decoration: none;
+}
 
 </style>
