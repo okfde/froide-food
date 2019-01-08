@@ -64,7 +64,7 @@ export default {
   components: {FoodLoader},
   mixins: [FoodItemMixin, FoodDetailMixin],
   props: {
-    'data': {
+    data: {
       type: Object
     }
   },
