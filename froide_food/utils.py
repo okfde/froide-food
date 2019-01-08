@@ -4,6 +4,7 @@ from urllib.parse import urlencode, quote
 
 from django.urls import reverse
 from django.utils import timezone
+from django.contrib.gis.geos import GEOSGeometry
 
 try:
     from django.contrib.gis.geoip2 import GeoIP2
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_hygiene_publicbodies(lat, lng):
-    point = 'POINT(%f %f)' % (lng, lat)
+    point = GEOSGeometry('POINT(%f %f)' % (lng, lat))
 
     regions = GeoRegion.objects.filter(
         geom__covers=point,
