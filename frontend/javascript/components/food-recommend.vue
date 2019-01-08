@@ -12,7 +12,7 @@
         </p>
 
         <p>
-          Es könnte sein, dass die Behörde Ihre Anfragen zu einer großen Anfrage zusammenfasst und für den erhöhten Aufwand Gebühren in Rechnung stellt.
+          Es könnte sein, dass die Behörde Ihre Anfragen zu einer großen Anfrage zusammenfasst und für den erhöhten Aufwand <strong>Gebühren</strong> in Rechnung stellt.
         </p>
 
         <h3>Holen Sie sich Unterstützung!</h3>
@@ -50,6 +50,11 @@
 
     <div class="row justify-content-center mt-5">
     <div class="col-md-8">
+        <p>
+          <button class="btn btn-secondary" @click="$emit('close')">
+            zurück zur Karte
+          </button>
+        </p>
         <p>
           Sie wissen was Sie tun und möchten diese Anfrage dennoch stellen?
           <br/>
