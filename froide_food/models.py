@@ -1,4 +1,4 @@
-from django.db import models
+from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.contrib.postgres.fields import JSONField
@@ -16,6 +16,9 @@ class VenueRequest(models.Model):
     )
     last_status = models.CharField(max_length=50, blank=True)
     last_resolution = models.CharField(max_length=50, blank=True)
+
+    address = models.TextField(blank=True)
+    geo = models.PointField(null=True, blank=True, geography=True)
 
     context = JSONField(blank=True, default=dict)
 
