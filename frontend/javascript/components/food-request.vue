@@ -85,13 +85,14 @@ import {selectBestLaw} from 'froide/frontend/javascript/lib/law-select'
 import FoodLoader from './food-loader'
 import FoodRecommend from './food-recommend'
 import FoodDetailMixin from '../lib/detailmixin'
+import FoodItemMixin from '../lib/mixin.js'
 
 const MAX_REQUEST_COUNT = 3
 const LAW_TYPE = 'VIG'
 
 export default {
   name: 'food-request',
-  mixins: [FoodDetailMixin],
+  mixins: [FoodDetailMixin, FoodItemMixin],
   components: {
     RequestForm,
     FoodLoader,
