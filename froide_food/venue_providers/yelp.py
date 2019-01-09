@@ -175,7 +175,7 @@ class YelpVenueProvider(BaseVenueProvider):
         can_cache = True
         if location is not None:
             can_cache = False
-            params['location'] = location
+            params['location'] = location + ', Deutschland'
         else:
             params.update({
                 'latitude': coordinates[0],
