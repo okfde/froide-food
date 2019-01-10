@@ -4,7 +4,7 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-3 col-md-4 image-column">
-            <a v-if="data.url" class="image-column-inner" :href="data.url" target="_blank" rel="noopener">
+            <a v-if="data.url" class="image-column-inner-link" :href="data.url" target="_blank" rel="noopener">
               <template v-if="data.image">
                 <img v-if="data.imageLoaded" :src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
                 <lazy-component v-else>
@@ -12,14 +12,14 @@
                 </lazy-component>
               </template>
               <div v-else class="dummy-image"></div>
-              <div class="image-column-provider">
+              <div v-if="needsCredit" class="image-column-provider">
                 <div class="provider-logo"></div>
                 <div :class="starClass" :title="starRating"></div>
                 <small class="review-count">{{ data.review_count }} Beiträge</small>
               </div>
             </a>
             <div v-else class="image-column-inner" >
-              <div class="dummy-provider dummy"></div>
+              <div class="dummy-provider" :class="{'dummy': !isCustom}"></div>
             </div>
           </div>
           <div class="col info-column">
@@ -30,7 +30,7 @@
 
             <p v-if="data.address" class="venue-address">{{ data.address }}</p>
             <div v-else class="venue-address-dummy dummy"></div>
-            <template v-if="data.url">
+            <template v-if="data.url || isCustom">
               <div v-if="hasRequest" class="request-status">
                 <p :class="requestColor">
                   {{ requestStatus }}
@@ -114,7 +114,6 @@ export default {
 .image-column {
   padding: 0 5px 0 5px;
   min-width: 110px;
-  cursor: pointer;
 }
 
 @media screen and (min-width: 768px){
@@ -134,14 +133,19 @@ export default {
   }
 }
 
-.image-column-inner {
+.image-column-inner, .image-column-inner-link {
   display: block;
   background-color: #eee;
   padding: 0;
 }
 
-.image-column-inner:hover {
+.image-column-inner:hover,
+.image-column-inner-link:hover {
   text-decoration: none;
+}
+
+.image-column-inner-link {
+  cursor: pointer;
 }
 
 .info-column {

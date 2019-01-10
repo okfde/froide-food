@@ -36,7 +36,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         'froide',
-        'requests'
+        'requests',
+        'geocoder'
     ],
     include_package_data=True,
     classifiers=[

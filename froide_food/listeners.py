@@ -15,11 +15,15 @@ def connect_request_object(sender, **kwargs):
         ident=food_place_id,
         defaults={
             'name': sender.title,
-            'last_request': timezone.now(),
-            'last_status': 'awaiting_response',
-            'last_resolution': ''
         }
     )
+    if not venue.name:
+        venue.name = sender.title
+    venue.last_request = timezone.now()
+    venue.last_status = 'awaiting_response'
+    venue.last_resolution = ''
+    venue.save()
+
     VenueRequestItem.objects.create(
         venue=venue,
         foirequest=sender,

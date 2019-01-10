@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from froide.foirequest.models import FoiRequest
+from froide.helper.admin_utils import make_nullfilter
 
 from .models import VenueRequest, VenueRequestItem
 
@@ -15,7 +16,10 @@ class VenueRequestAdmin(admin.ModelAdmin):
         VenueRequestItemInlineAdmin
     ]
     date_hierarchy = 'last_request'
-    list_filter = ('last_status', 'last_resolution',)
+    list_filter = (
+        'last_status', 'last_resolution',
+        make_nullfilter('geo', 'Hat eigene Koordinate')
+    )
     list_display = (
         'name', 'last_request',
         'get_last_status_display', 'get_last_resolution_display'

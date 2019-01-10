@@ -258,6 +258,8 @@ class YelpVenueProvider(BaseVenueProvider):
         }
 
     def get_place(self, ident):
+        if ident.startswith('yelp:'):
+            ident = ident.replace('yelp:', '')
         response = requests.get(
             LOOKUP_URL.format(ident=ident),
             params={'locale': 'de_DE'},

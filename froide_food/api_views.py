@@ -2,11 +2,12 @@ from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
-from rest_framework import serializers
-from rest_framework import viewsets
+from rest_framework import serializers, viewsets, status
+from rest_framework.throttling import UserRateThrottle
 from rest_framework.response import Response
 
 from froide.publicbody.api_views import PublicBodySerializer
+from froide.foirequest.api_views import throttle_action
 
 from .venue_providers import (
     venue_provider, venue_providers, VenueProviderException
@@ -45,6 +46,7 @@ class VenueSerializer(serializers.Serializer):
     last_status = serializers.CharField(required=False)
     last_resolution = serializers.CharField(required=False)
     last_request = serializers.DateTimeField(required=False)
+    custom = serializers.BooleanField(required=False, default=False)
 
     requests = VenueRequestSerializer(many=True)
     publicbody = PublicBodySerializer(required=False)
@@ -64,7 +66,15 @@ def get_lat_lng(request):
     return lat, lng
 
 
+class CreateVenueThrottle(UserRateThrottle):
+    scope = 'food-createvenue'
+    THROTTLE_RATES = {
+        scope: '10/day',
+    }
+
+
 class VenueViewSet(viewsets.ViewSet):
+    permission_classes = ()
 
     @method_decorator(cache_page(60*5))
     def list(self, request):
@@ -145,3 +155,25 @@ class VenueViewSet(viewsets.ViewSet):
 
         serializer = VenueSerializer(place, context={'request': request})
         return Response({'result': serializer.data, 'error': False})
+
+    @throttle_action((CreateVenueThrottle,))
+    def create(self, request, *args, **kwargs):
+        serializer = VenueSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        place = self.perform_create(serializer)
+        if place is None:
+            return Response(
+                {'result': None, 'error': True},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer = VenueSerializer(place, context={'request': request})
+        return Response(
+            {'result': serializer.data, 'error': False},
+            status=status.HTTP_201_CREATED
+        )
+
+    def perform_create(self, serializer):
+        data = serializer.validated_data
+        provider = venue_providers['custom']
+        venue = provider.create(data)
+        return venue

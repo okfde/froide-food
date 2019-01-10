@@ -10,7 +10,7 @@
             </button>
           </div>
           <div class="row">
-            <div class="col-8">
+            <div class="col-sm-7 col-6">
               <p class="venue-address">{{ data.address }}</p>
               <div class="clearfix mt-3">
                 <div v-if="hasRequest" class="request-status">
@@ -36,7 +36,7 @@
                 </p>
               </div>
             </div>
-            <div class="col-4">
+            <div v-if="needsCredit" class="col-sm-5 col-6">
               <a :href="data.url" target="_blank" rel="noopener" class="provider-credit">
                 <div class="provider-logo"></div>
                 <div :class="starClass" :title="starRating"></div>

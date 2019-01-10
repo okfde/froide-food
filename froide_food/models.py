@@ -29,6 +29,17 @@ class VenueRequest(models.Model):
     def __str__(self):
         return self.name
 
+    def to_place(self):
+        return {
+            'ident': self.ident,
+            'lat': self.geo.coords[1],
+            'lng': self.geo.coords[0],
+            'name': self.name,
+            'address': self.address,
+            'requests': [],
+            'custom': True
+        }
+
 
 class VenueRequestItem(models.Model):
     venue = models.ForeignKey(

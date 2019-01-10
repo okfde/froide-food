@@ -124,18 +124,26 @@
 
           <div class="col-md-5 col-lg-4 order-md-1 sidebar-column">
             <div class="sidebar" :class="{'modal-active': modalActive}" ref="foodList" id="food-list" v-scroll.window="handleSidebarScroll">
-              <food-sidebar-item v-if="searching" v-for="data in fakeVenues"
-                :key="data.id"
-                :data="data">
-              </food-sidebar-item>
+              <template v-if="searching">
+                <food-sidebar-item v-for="data in fakeVenues"
+                  :key="data.id"
+                  :data="data">
+                </food-sidebar-item>
+              </template>
               <food-sidebar-item v-for="data in venues"
-                  :key="data.ident" :data="data"
-                  :config="config"
-                  :selectedVenueId="selectedVenueId"
-                  @select="markerClick(data, true)"
-                  @detail="setDetail"
-                  @startRequest="startRequest"
-                  @imageLoaded="imageLoaded"></food-sidebar-item>
+                :key="data.ident" :data="data"
+                :config="config"
+                :selectedVenueId="selectedVenueId"
+                @select="markerClick(data, true)"
+                @detail="setDetail"
+                @startRequest="startRequest"
+                @imageLoaded="imageLoaded"
+              ></food-sidebar-item>
+              <!-- <div class="new-venue-area">
+                <button class="btn btn-secondary" @click="setNewVenue(true)">
+                  Betrieb nicht gefunden?
+                </button>
+              </div> -->
             </div>
           </div>
 
@@ -159,6 +167,11 @@
           @close="showDetail = null"
           @detailfetched="detailFetched"
         ></food-detail>
+        <food-new-venue v-if="showNewVenue"
+          @close="showNewVenue = false"
+          @detailfetched="detailFetched"
+          @venuecreated="venueCreated"
+        ></food-new-venue>
       </div>
     </div>
   </div>
@@ -184,6 +197,7 @@ import FoodFilter from './food-filter'
 import FoodDetail from './food-detail'
 import FoodLoader from './food-loader'
 import FoodRequest from './food-request'
+import FoodNewVenue from './food-new-venue'
 
 import {
   getPlaceStatus, getPinURL, getPinColor,
@@ -242,7 +256,7 @@ export default {
   components: {
     LMap, LTileLayer, LControlLayers, LControlZoom, LMarker, LPopup, LTooltip,
     FoodPopup, FoodSidebarItem, FoodLocator, FoodMapoverlay, FoodLoader, FoodDetail,
-    FoodFilter, FoodRequest, SlideUpDown
+    FoodFilter, FoodRequest, FoodNewVenue, SlideUpDown
   },
   data () {
     let locationKnown = false
@@ -311,6 +325,7 @@ export default {
       showFilter: false,
       showDetail: null,
       showRequestForm: null,
+      showNewVenue: false,
       filters: this.config.filters,
       maxBounds: maxBounds,
       city: city.city,
@@ -637,13 +652,7 @@ export default {
           this.locationKnown = true
           this.venueMap = {}
           this.venues = data.results.map((r, i) => {
-            let d = {
-              position: [r.lat, r.lng],
-              id: r.ident.replace(/:/g, '-'),
-              full: false,
-              ...r
-            }
-            d.icon = this.getIcon(d)
+            let d = this.createVenue(r, i)
             this.venueMap[d.id] = i
             if (this.paramIdent && r.ident.indexOf(this.paramIdent) !== -1) {
               this.selectedVenueId = d.id
@@ -653,7 +662,7 @@ export default {
             }
             return d
           })
-          if (options.location) {
+          if (options.location && this.venues.length > 0) {
             let venueLocations = this.venues.map((r) => {
               return L.latLng(r.position[0], r.position[1])
             })
@@ -670,6 +679,16 @@ export default {
           this.preventMapMoved()
           this.searching = false
         })
+    },
+    createVenue (r, i) {
+      let d = {
+        position: [r.lat, r.lng],
+        id: r.ident.replace(/:/g, '-'),
+        full: false,
+        ...r
+      }
+      d.icon = this.getIcon(d)
+      return d
     },
     getIcon (r) {
       let status = getPlaceStatus(r)
@@ -795,6 +814,12 @@ export default {
         this.goToMap()
       }
     },
+    setNewVenue(show) {
+      this.showNewVenue = show
+      if (show) {
+        this.goToMap()
+      }
+    },
     startRequest (data) {
       this.markerClick(data, true)
       this.showRequestForm = data
@@ -820,6 +845,16 @@ export default {
         }
         return f
       })
+    },
+    venueCreated (data) {
+      let newVenue = this.createVenue(data)
+      if (this.venueMap[newVenue.id] === undefined) {
+        this.venues.push(newVenue)
+        this.venueMap[newVenue.id] = this.venues.length - 1
+      } else {
+        this.detailFetched(data)
+      }
+      this.startRequest(newVenue)
     }
   }
 }
@@ -1078,6 +1113,12 @@ $icon-failure: #dc3545;
   top: 30%;
   color: #999;
   cursor: pointer;
+}
+
+.new-venue-area {
+  text-align: center;
+  margin-top: 15px;
+  padding: 15px 0;
 }
 
 </style>

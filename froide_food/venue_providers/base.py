@@ -1,7 +1,11 @@
 from collections import defaultdict
-from django.db.models import Prefetch
 
-from froide.foirequest.models import FoiRequest, FoiAttachment
+from django.db.models import Prefetch, Q
+from django.contrib.gis.measure import D
+from django.contrib.gis.geos import Point
+
+from froide.foirequest.models import FoiAttachment
+from froide.georegion.models import GeoRegion
 
 from ..models import VenueRequest, VenueRequestItem
 
@@ -11,16 +15,45 @@ class VenueProviderException(Exception):
 
 
 class BaseVenueProvider(object):
+    bounds = None
+
     def search_places(self, *args, **kwargs):
         places = self.get_places(*args, **kwargs)
-        mapping = self.get_venue_mapping_for_places(places)
+        mapping = self.get_venue_mapping_for_places(places, **kwargs)
+        others = set(mapping) - set(p['ident'] for p in places)
+        places = places + [
+            mapping[o].to_place() for o in others
+        ]
         for p in places:
             self.add_requests(p, mapping)
         return places
 
-    def get_venue_mapping_for_places(self, places):
+    def is_in_germany(self, coords):
+        if self.bounds is None:
+            try:
+                region = GeoRegion.objects.get(
+                    name='Deutschland', level=0, kind='country'
+                )
+                self.bounds = region.geom.prepared
+            except GeoRegion.DoesNotExist:
+                self.bounds = False
+        if not self.bounds:
+            return True
+        point = Point(*coords)
+        return self.bounds.covers(point)
+
+    def get_venue_mapping_for_places(self, places,
+                                     coordinates=None, radius=None, **kwargs):
         ident_list = [p['ident'] for p in places]
-        qs = VenueRequest.objects.filter(ident__in=ident_list)
+        query = Q(ident__in=ident_list)
+        if coordinates is not None:
+            point = Point(coordinates[1], coordinates[0])
+            query |= Q(
+                geo__isnull=False,
+                geo__distance_lte=(point, D(m=radius or 500))
+            )
+
+        qs = VenueRequest.objects.filter(query)
         vris = VenueRequestItem.objects.select_related('foirequest')
         qs = qs.prefetch_related(
             Prefetch('request_items', queryset=vris)
@@ -29,11 +62,12 @@ class BaseVenueProvider(object):
 
     def get_detail(self, ident, detail=False):
         place = {
-            'ident': '%s:%s' % (self.name, ident)
+            'ident': ident
         }
         if detail:
             place = self.get_place(ident)
         mapping = self.get_venue_mapping_for_places([place])
+        self.add_extras(place, mapping)
         self.add_requests(place, mapping)
 
         attachments = FoiAttachment.objects.filter(
@@ -54,6 +88,9 @@ class BaseVenueProvider(object):
             self.add_documents(req, attachment_mapping)
 
         return place
+
+    def add_extras(self, place, mapping):
+        pass
 
     def add_requests(self, place, mapping):
         if place['ident'] in mapping:

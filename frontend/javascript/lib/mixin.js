@@ -16,6 +16,12 @@ var FoodItemMixin = {
     isSelected () {
       return this.data.id === this.selectedVenueId
     },
+    needsCredit () {
+      return !this.data.custom
+    },
+    isCustom () {
+      return !!this.data.custom
+    },
     starClass () {
       let suffix = ''
       let rating = this.data.rating
