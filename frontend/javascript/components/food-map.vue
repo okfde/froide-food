@@ -146,6 +146,8 @@
           :exampleCity="city"
           :locationKnown="locationKnown"
           :error="error"
+          :error-message="locatorErrorMessage"
+          :geolocation-disabled="geolocationDisabled"
           :isMobile="isMobile"
           @close="setLocator(false)"
           @postcodeChosen="postcodeChosen"
@@ -290,6 +292,11 @@ export default {
       center[1] || city.longitude || DEFAULT_POS[1]
     ]
 
+    const maxBounds = L.latLngBounds(GERMANY_BOUNDS)
+    if (!maxBounds.contains(L.latLng(center))) {
+      center = DEFAULT_POS
+    }
+
     if (center[0] !== DEFAULT_POS[0]) {
       locationKnown = true
       zoom = zoom || DETAIL_ZOOM_LEVEL
@@ -305,7 +312,7 @@ export default {
       showDetail: null,
       showRequestForm: null,
       filters: this.config.filters,
-      maxBounds: L.latLngBounds(GERMANY_BOUNDS),
+      maxBounds: maxBounds,
       city: city.city,
       postcode: '' + (postcode || city.postal_code || ''),
       locationName: '',
@@ -316,6 +323,8 @@ export default {
       venues: [],
       searching: false,
       error: false,
+      locatorErrorMessage: '',
+      geolocationDisabled: false,
       stacked: this.isStacked(),
       isMapTop: false,
       mapHeight: null,
@@ -491,6 +500,14 @@ export default {
   methods: {
     coordinatesChosen (latlng) {
       let center = L.latLng(latlng)
+      if (!this.maxBounds.contains(center)) {
+        this.geolocationDisabled = true
+        this.locatorErrorMessage = 'Dein Ort scheint nicht in Deutschland zu sein!'
+        this.setLocator(true)
+        return
+      }
+      this.geolocationDisabled = false
+      this.locatorErrorMessage = ''
       this.locationKnown = true
       this.map.setView(center, DETAIL_ZOOM_LEVEL)
       this.search({coordinates: center})
@@ -641,6 +658,13 @@ export default {
               return L.latLng(r.position[0], r.position[1])
             })
             let bounds = L.latLngBounds(venueLocations)
+
+            if (!this.maxBounds.contains(bounds)) {
+              this.locatorErrorMessage = 'Dein Ort scheint nicht in Deutschland zu sein!'
+              this.setLocator(true)
+              return
+            }
+
             this.map.fitBounds(bounds)
           }
           this.preventMapMoved()

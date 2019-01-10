@@ -14,7 +14,12 @@
           <div class="row">
             <div class="col-12">
               <div v-if="error" class="alert alert-danger">
-                Es wurde nichts gefunden.
+                <span v-if="errorMessage">
+                  {{ errorMessage }}
+                </span>
+                <span v-else>
+                  Es wurde nichts gefunden.
+                </span>
               </div>
 
               <p v-if="geolocationAvailable">
@@ -26,7 +31,7 @@
             </div>
           </div>
           <div class="row justify-content-lg-center">
-            <div :class="{'col-lg-6 col-md-7': geolocationAvailable, 'col-lg-8': !geolocationAvailable}">
+            <div :class="{'col-lg-6 col-md-7': geolocationAvailable, 'col-lg-12': !geolocationAvailable}">
               <div class="input-group" v-if="false">
                 <input type="text" pattern="\d*" class="form-control postcode-input" v-model="postcode" placeholder="PLZ" maxlength="5" @keydown.enter.prevent="postcodeLookup">
                 <div class="input-group-append">
@@ -91,27 +96,35 @@ export default {
   name: 'food-locator',
   components: {FoodLoader},
   props: {
-    'defaultPostcode': {
+    defaultPostcode: {
       type: String,
       default: ''
     },
-    'defaultLocation': {
+    defaultLocation: {
       type: String,
       default: ''
     },
-    'exampleCity': {
+    exampleCity: {
       type: String,
       default: ''
     },
-    'locationKnown': {
+    locationKnown: {
       type: Boolean,
       default: false
     },
-    'error': {
+    error: {
       type: Boolean,
       default: false
     },
-    'isMobile': {
+    errorMessage: {
+      type: String,
+      default: ''
+    },
+    isMobile: {
+      type: Boolean,
+      default: false
+    },
+    geolocationDisabled: {
       type: Boolean,
       default: false
     }
@@ -146,10 +159,10 @@ export default {
       return this.location.length > 0
     },
     geolocationAvailable () {
-      return !!window.navigator.geolocation && this.geolocationAllowed
+      return !!window.navigator.geolocation && this.geolocationAllowed && !this.geolocationDisabled
     },
     exampleCities () {
-      let examples = ['Berlin', 'Hamburg', 'München']
+      let examples = ['Berlin', 'Hamburg', 'Köln', 'München']
       if (this.exampleCity === '') {
         return examples
       }

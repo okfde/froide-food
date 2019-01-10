@@ -222,6 +222,10 @@ class YelpVenueProvider(BaseVenueProvider):
         return [
             self.extract_result(r)
             for r in results
+            if self.is_in_germany((
+                r['coordinates']['longitude'],
+                r['coordinates']['latitude'],
+            ))
         ]
 
     def extract_result(self, r):
