@@ -1,5 +1,6 @@
 from datetime import timedelta
 import logging
+import re
 from urllib.parse import urlencode, quote
 
 from django.urls import reverse
@@ -20,6 +21,8 @@ TIME_PERIOD = timedelta(days=90)
 MAX_REQUEST_COUNT = 3
 
 logger = logging.getLogger(__name__)
+
+CITY_RE = re.compile(r'\d{5} ([\w -]+)')
 
 
 def get_hygiene_publicbodies(lat, lng):
@@ -49,16 +52,30 @@ def get_hygiene_publicbody(lat, lng):
     return pbs[0]
 
 
+def get_city(place):
+    if place.get('city'):
+        return place['city']
+    match = CITY_RE.search(place['address'])
+    if match is None:
+        return ''
+    return match.group(1)
+
+
 def make_request_url(place, publicbody):
     pb_slug = publicbody.slug
     url = reverse('foirequest-make_request', kwargs={
         'publicbody_slug': pb_slug
     })
-
-    subject = 'Kontrollbericht zu {name}, {city}'.format(
-        name=place['name'],
-        city=place['city']
-    )
+    city = get_city(place)
+    if city:
+        subject = 'Kontrollbericht zu {name}, {city}'.format(
+            name=place['name'],
+            city=city
+        )
+    else:
+        subject = 'Kontrollbericht zu {name}'.format(
+            name=place['name']
+        )
     if len(subject) > 250:
         subject = subject[:250] + '...'
     body = '''1. Wann haben die beiden letzten lebensmittelrechtlichen Betriebsüberprüfungen im folgenden Betrieb stattgefunden:
