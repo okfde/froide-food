@@ -61,7 +61,7 @@
               :form="userForm"
             ></user-terms>
             <p class="small text-right">
-              Sie erhalten im Rahmen der Aktion „Topf Secret“ auch eine separate E-Mail von foodwatch mit Informationen.
+              Sie erhalten im Rahmen der Aktion „Topf Secret“ einmalig eine separate E-Mail von foodwatch.
             </p>
             <div class="text-right">
               <button type="submit" class="btn btn-lg btn-success">
