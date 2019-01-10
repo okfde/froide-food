@@ -42,9 +42,9 @@
             </div>
           </div>
         </div>
-        <!-- <slide-up-down :active="showFilter" :duration="300">
+        <slide-up-down :active="showFilter" :duration="300">
           <food-filter :filters="filters" @change="filterChanged" @apply="applyFilter"></food-filter>
-        </slide-up-down> -->
+        </slide-up-down>
         <div class="row">
           <div class="col-md-7 col-lg-8 order-md-2 map-column">
             <div class="map-container" ref="foodMap" id="food-map" :class="mapContainerClass" :style="mapContainerStyle">
@@ -75,6 +75,12 @@
                     <button class="btn btn-outline-secondary" @click="setLocator(true)">
                       <i class="fa fa-location-arrow" aria-hidden="true"></i>
                       <span class="d-none d-lg-inline">Ort</span>
+                    </button>
+                  </div>
+                  <div class="input-group-append" v-if="false">
+                    <button class="btn btn-outline-secondary" :class="{'active': showFilter}" @click="openFilter">
+                      <i class="fa fa-gears" aria-hidden="true"></i>
+                      <span class="d-none d-sm-none d-md-inline">Filter</span>
                     </button>
                   </div>
                 </div>
