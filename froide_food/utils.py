@@ -5,7 +5,7 @@ from urllib.parse import urlencode, quote
 
 from django.urls import reverse
 from django.utils import timezone
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import Point
 
 try:
     from django.contrib.gis.geoip2 import GeoIP2
@@ -26,7 +26,7 @@ CITY_RE = re.compile(r'\d{5} ([\w -]+)')
 
 
 def get_hygiene_publicbodies(lat, lng):
-    point = GEOSGeometry('POINT(%f %f)' % (lng, lat))
+    point = Point(lng, lat)
 
     regions = GeoRegion.objects.filter(
         geom__covers=point,
