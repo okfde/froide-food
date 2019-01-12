@@ -61,7 +61,7 @@ def make_request(request):
         messages.add_message(request, messages.ERROR, 'Fehlerhafter Link')
         return redirect('food-index')
     try:
-        provider, ident = ident.split(':')
+        provider, _ = ident.split(':')
         if provider not in venue_providers:
             raise ValueError
     except ValueError:
