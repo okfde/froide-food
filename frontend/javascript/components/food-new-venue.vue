@@ -38,13 +38,13 @@
                   <div class="col">
                     <div class="form-group">
                       <label for="new-venue-plz">PLZ</label>
-                      <input v-model="postcode" id="new-venue-plz" type="text" class="form-control" placeholder="12345" pattern="[0-9]{5}" required>
+                      <input v-model="postcode" id="new-venue-plz" type="text" class="form-control" pattern="[0-9]{5}" required>
                     </div>
                   </div>
                   <div class="col">
                     <div class="form-group">
                       <label for="new-venue-ort">Ort</label>
-                      <input v-model="city" id="new-venue-ort" type="text" class="form-control" placeholder="Berlin" required>
+                      <input v-model="city" id="new-venue-ort" type="text" class="form-control" placeholder="z.B. Berlin" required>
                     </div>
                   </div>
                 </div>

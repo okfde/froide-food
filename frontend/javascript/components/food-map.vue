@@ -145,11 +145,15 @@
                 @startRequest="startRequest"
                 @imageLoaded="imageLoaded"
               ></food-sidebar-item>
-              <!-- <div class="new-venue-area">
-                <button class="btn btn-secondary" @click="setNewVenue(true)">
+              <div class="new-venue-area" v-if="hasSearched">
+                <template v-if="searchEmpty">
+                  <p v-if="lastQuery">Keine Betriebe mit dem Suchwort „{{ lastQuery }}“ gefunden.</p>
+                  <p v-else>Keine Betriebe an diesem Ort gefunden.</p>
+                </template>
+                <button class="btn btn-sm btn-light" @click="setNewVenue(true)">
                   Betrieb nicht gefunden?
                 </button>
-              </div> -->
+              </div>
             </div>
           </div>
 
@@ -343,6 +347,8 @@ export default {
       venueMap: {},
       venues: [],
       searching: false,
+      hasSearched: false,
+      searchEmpty: false,
       error: false,
       locatorErrorMessage: '',
       geolocationDisabled: false,
@@ -352,6 +358,7 @@ export default {
       isTouch: L.Browser.touch && L.Browser.mobile,
       listShown: false,
       query: query || '',
+      lastQuery: '',
       paramIdent: paramIdent,
       mapMoved: false,
       autoMoved: false,
@@ -610,6 +617,7 @@ export default {
       this.mapMoved = false
       this.error = false
       this.searching = true
+      this.searchEmpty = false
       this.clearSelected()
       this.venues = []
       this.goToMap()
@@ -639,6 +647,7 @@ export default {
         let reqCoords = latlngToGrid(coordinates, radius)
         locationParam = `lat=${reqCoords.lat}&lng=${reqCoords.lng}&radius=${radius}`
       }
+      this.lastQuery = this.query
       let categories = this.filterCategories
       let cats = categories.map((c) => `categories=${encodeURIComponent(c)}`)
       cats = cats.join('&')
@@ -654,6 +663,10 @@ export default {
             this.error = true
             this.showLocator = true
             return
+          }
+          this.hasSearched = true
+          if (data.results.length === 0) {
+            this.searchEmpty = true
           }
           this.locationKnown = true
           this.venueMap = {}
