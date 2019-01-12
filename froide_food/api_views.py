@@ -1,6 +1,6 @@
 from django.conf import settings
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
+# from django.utils.decorators import method_decorator
+# from django.views.decorators.cache import cache_page
 
 from rest_framework import serializers, viewsets, status
 from rest_framework.throttling import UserRateThrottle
@@ -76,7 +76,7 @@ class CreateVenueThrottle(UserRateThrottle):
 class VenueViewSet(viewsets.ViewSet):
     permission_classes = ()
 
-    @method_decorator(cache_page(60*5))
+    # @method_decorator(cache_page(60*5))
     def list(self, request):
         location = request.GET.get('location')
         if location:
