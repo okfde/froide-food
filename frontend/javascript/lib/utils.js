@@ -1,6 +1,6 @@
 function renderDate (date) {
   let d = (new Date(date))
-  return `${d.getDate()}.${d.getMonth()}.${d.getFullYear()}`
+  return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`
 }
 
 function getPlaceStatus (place) {
