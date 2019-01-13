@@ -3,7 +3,7 @@
     <div class="sidebar-item-inner" :class="{requested: hasRequest, highlighted: isSelected}" @click="$emit('select', data)">
       <div class="container-fluid">
         <div class="row">
-          <div class="col-3 col-md-4 image-column">
+          <div v-if="isDummy || isYelp" class="col-3 col-md-4 image-column">
             <a v-if="data.url" class="image-column-inner-link" :href="data.url" target="_blank" rel="noopener">
               <template v-if="data.image">
                 <img v-if="data.imageLoaded" :src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
@@ -19,7 +19,7 @@
               </div>
             </a>
             <div v-else class="image-column-inner" >
-              <div class="dummy-provider" :class="{'dummy': !isCustom}"></div>
+              <div class="dummy-provider" :class="{'dummy': isDummy}"></div>
             </div>
           </div>
           <div class="col info-column">
@@ -30,7 +30,7 @@
 
             <p v-if="data.address" class="venue-address">{{ data.address }}</p>
             <div v-else class="venue-address-dummy dummy"></div>
-            <template v-if="data.url || isCustom">
+            <template v-if="!isDummy">
               <div v-if="hasRequest" class="request-status">
                 <p :class="requestColor">
                   {{ requestStatus }}

@@ -17,10 +17,22 @@ var FoodItemMixin = {
       return this.data.id === this.selectedVenueId
     },
     needsCredit () {
-      return !this.data.custom
+      return !this.isCustom && this.isGoogle !== 0
     },
     isCustom () {
       return !!this.data.custom
+    },
+    isDummy () {
+      return !this.isCustom && !this.isGoogle && !this.isYelp
+    },
+    hasIdent () {
+      return this.data.ident
+    },
+    isGoogle () {
+      return this.hasIdent && this.data.ident.indexOf('google:') === 0
+    },
+    isYelp () {
+      return this.hasIdent && this.data.ident.indexOf('yelp:') === 0
     },
     starClass () {
       let suffix = ''
