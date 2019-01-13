@@ -244,11 +244,11 @@ class YelpVenueProvider(BaseVenueProvider):
             'lat': r['coordinates']['latitude'],
             'lng': r['coordinates']['longitude'],
             'name': r['name'],
-            'address': '%s\n%s %s' % (
-                r['location']['address1'],
-                r['location']['zip_code'],
-                r['location']['city']
-            ),
+            'address': ('%s\n%s %s' % (
+                r['location']['address1'] or '',
+                r['location']['zip_code'] or '',
+                r['location']['city'] or ''
+            )).strip(),
             'city': r['location']['city'],
             'image': r['image_url'].replace('o.jpg', 'l.jpg'),
             'rating': r.get('rating'),
