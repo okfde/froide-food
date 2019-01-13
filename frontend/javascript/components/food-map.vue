@@ -375,6 +375,7 @@ export default {
     }
   },
   created () {
+    this.$root.config = this.config
     var self = this
 
     if ('serviceWorker' in navigator) {

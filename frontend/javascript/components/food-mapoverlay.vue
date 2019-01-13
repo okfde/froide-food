@@ -38,7 +38,7 @@
             </div>
             <div v-if="needsCredit" class="col-sm-5 col-6">
               <a :href="data.url" target="_blank" rel="noopener" class="provider-credit">
-                <div class="provider-logo"></div>
+                <div class="provider-logo" :style="providerLogoBg"></div>
                 <div :class="starClass" :title="starRating"></div>
                 <small class="review-count">{{ data.review_count }} Beiträge</small>
               </a>
@@ -215,7 +215,6 @@ export default {
 }
 
 .provider-logo {
-  background-image: url('/static/food/images/yelp_logo.png');
   background-repeat: no-repeat;
   background-size: contain;
   height: 40px;

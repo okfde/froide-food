@@ -1,10 +1,18 @@
 <template>
-  <img src="/static/img/spinner.svg" alt="wird geladen" width="25"/>
+  <img :src="spinner" alt="wird geladen" width="25"/>
 </template>
 
 <script>
 
 export default {
-  name: 'food-loader'
+  name: 'food-loader',
+  props: {
+    staticUrl: String,
+  },
+  computed: {
+    spinner () {
+      return this.$root.config.staticUrl + 'img/spinner.svg'
+    }
+  }
 }
 </script>

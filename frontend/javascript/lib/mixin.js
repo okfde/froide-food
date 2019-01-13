@@ -46,6 +46,11 @@ var FoodItemMixin = {
     starRating () {
       return `Bewertung ${this.data.rating} Sterne`
     },
+    providerLogoBg () {
+      return {
+        backgroundImage: `url('${this.$root.config.staticUrl}food/images/yelp_logo.png')`
+      }
+    },
     lastRequest () {
       if (this.data.requests && this.data.requests.length > 0) {
         return this.data.requests[0]
