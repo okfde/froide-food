@@ -650,8 +650,12 @@ export default {
       this.lastQuery = this.query
       let categories = this.filterCategories
       let cats = categories.map((c) => `categories=${encodeURIComponent(c)}`)
-      cats = cats.join('&')
-      window.fetch(`/api/v1/venue/?q=${encodeURIComponent(this.query)}&${cats}&${locationParam}`)
+      if (cats.length > 0) {
+        cats = '&' + cats.join('&')
+      } else {
+        cats = ''
+      }
+      window.fetch(`/api/v1/venue/?q=${encodeURIComponent(this.query)}${cats}&${locationParam}`)
         .then((response) => {
           return response.json()
         }).then((data) => {
