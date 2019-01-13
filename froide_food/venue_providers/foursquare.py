@@ -13,7 +13,7 @@ logger = logging.getLogger('froide')
 
 SEARCH_URL = 'https://api.foursquare.com/v2/venues/search'
 LOOKUP_URL = 'https://api.foursquare.com/v2/venues/{ident}'
-API_KEY = settings.FROIDE_FOOD_CONFIG.get('api_key_foursquare', '|')
+API_KEY = settings.FROIDE_FOOD_CONFIG.get('api_key_foursquare') or '|'
 CLIENT_ID, CLIENT_SECRET = API_KEY.split('|')
 
 
