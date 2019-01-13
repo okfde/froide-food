@@ -60,7 +60,7 @@
             <user-terms v-if="!userInfo"
               :form="userForm"
             ></user-terms>
-            <p class="small text-right">
+            <p v-if="!userInfo" class="small text-right">
               Sie erhalten im Rahmen der Aktion „Topf Secret“ einmalig eine separate E-Mail von foodwatch.
             </p>
             <div class="text-right">
