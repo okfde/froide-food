@@ -17,13 +17,13 @@ var FoodItemMixin = {
       return this.data.id === this.selectedVenueId
     },
     needsCredit () {
-      return !this.isCustom && this.isGoogle !== 0
+      return this.isYelp
     },
     isCustom () {
       return !!this.data.custom
     },
     isDummy () {
-      return !this.isCustom && !this.isGoogle && !this.isYelp
+      return !this.hasIdent
     },
     hasIdent () {
       return this.data.ident
@@ -33,6 +33,9 @@ var FoodItemMixin = {
     },
     isYelp () {
       return this.hasIdent && this.data.ident.indexOf('yelp:') === 0
+    },
+    isFoursquare () {
+      return this.hasIdent && this.data.ident.indexOf('foursquare:') === 0
     },
     starClass () {
       let suffix = ''
