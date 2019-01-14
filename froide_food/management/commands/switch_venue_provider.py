@@ -42,35 +42,35 @@ class Command(BaseCommand):
 
     def match_venue_with_provider(self, venue, provider):
         if venue.ident.startswith(provider):
-            return
+            return True
         if venue.context.get('failed_' + provider):
-            return
+            return False
         if provider in venue.context:
             current, current_id = venue.ident.split(':', 1)
             venue.context[current] = current_id
             venue.ident = provider + ':' + venue.context[provider]
             venue.save()
-            return
+            return True
         info = get_name_and_address(venue)
         if not info:
-            return
+            return False
         address = ', '.join(info['address'])
         point, formatted_address = geocode(address)
         if not point:
-            return
+            return False
         venue_provider = venue_providers[provider]
         places = venue_provider.get_places(coordinates=[
             point.coords[1],
             point.coords[0]
         ], radius=200, q=info['name'])
         if not places:
-            return
+            return False
         place = places[0]
         place['lat']
         place_point = Point(place['lng'], place['lat'])
         distance = geopy_distance(place_point, point)
         if distance.meters > 200:
-            return
+            return False
         venue.context[provider] = place['ident'].split(':', 1)[1]
         current, current_id = venue.ident.split(':', 1)
         venue.context[current] = current_id
