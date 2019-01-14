@@ -1,4 +1,7 @@
+import json
+
 from django.conf import settings
+from django.core.cache import cache
 
 import requests
 import logging
@@ -86,6 +89,16 @@ GERMANY = (
 )
 
 
+def make_cache_key(params, method='search'):
+    keys = ('radius', 'location')
+    return 'froide_food:google:%s:%s' % (
+        method,
+        '_'.join(
+            str(params.get(key)) for key in keys
+        )
+    )
+
+
 class GoogleVenueProvider(BaseVenueProvider):
     name = 'google'
     FILTERS = FILTERS
@@ -116,21 +129,38 @@ class GoogleVenueProvider(BaseVenueProvider):
                 candidate['geometry']['location']['lng']
             )
             radius = 5000
-
+        can_cache = True
         url = NEARBY_URL
         params.update({
             'location': '{},{}'.format(*coordinates),
             'radius': min(radius, 5000),
             'type': 'restaurant'
         })
-        if q is not None:
+        if q:
+            can_cache = False
             params['keyword'] = q
         else:
-            params['keyword'] = 'Restaurant'
+            params['keyword'] = ''
         params['fields'] = self.FIELDS
-        response = requests.get(url, params=params)
-        logger.info('API Request: %s', response.request.url)
-        results = response.json()
+        response = None
+        if can_cache:
+            cache_key = make_cache_key(params)
+            response = cache.get(cache_key)
+
+        if response is not None:
+            results = json.loads(response)
+
+        if not can_cache or response is None:
+            response = requests.get(url, params=params)
+            logger.info('API Request: %s', response.request.url)
+            if response.json()['status'] != 'OK':
+                logger.warn('API response: %s - %s',
+                            response.status_code, response.text)
+                raise VenueProviderException()
+            if can_cache:
+                cache.set(cache_key, response.text, 60 * 10)
+            results = response.json()
+
         if 'results' not in results:
             return []
         results = results['results']
