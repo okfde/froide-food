@@ -10,7 +10,7 @@
             </button>
           </div>
           <div class="row">
-            <div class="col-sm-7 col-6">
+            <div :class="{'col-sm-7 col-6': needsCredit, 'col-12': !needsCredit}">
               <p class="venue-address">{{ data.address }}</p>
               <div class="clearfix mt-3">
                 <div v-if="hasRequest" class="request-status">
