@@ -25,9 +25,13 @@ MAX_REQUEST_COUNT = 3
 logger = logging.getLogger(__name__)
 
 CITY_RE = re.compile(r'\d{5} ([\w -]+)')
+CITY2_RE = re.compile(r', ([\w -]+)$')
 
-TITLE_RE = re.compile(r'Kontrollbericht (?:für|zu) ([\w -]+), ([\w -]+)$')
+TITLE_RE = re.compile(r'Kontrollbericht (?:für|zu) ([\w -]+)(?:, ([\w -]+))?$')
 PLZ_RE = re.compile(r'(\d{5}) ([\w -]+)')
+
+Q1 = '1. Wann haben die beiden letzten lebensmittelrechtlichen Betriebsüberprüfungen im folgenden Betrieb stattgefunden:'
+Q2 = '2. Kam es hierbei zu Beanstandungen? Falls ja, beantrage ich hiermit die Herausgabe des entsprechenden Kontrollberichts an mich.'
 
 
 def get_hygiene_publicbodies(lat, lng):
@@ -61,9 +65,14 @@ def get_city(place):
     if place.get('city'):
         return place['city']
     match = CITY_RE.search(place['address'])
-    if match is None:
-        return ''
-    return match.group(1)
+    if match is not None:
+        return match.group(1)
+    address = place['address']
+    address = address.replace(', Deutschland', '')
+    match = CITY2_RE.search(address)
+    if match is not None:
+        return match.group(1)
+    return ''
 
 
 def make_request_url(place, publicbody):
@@ -83,12 +92,12 @@ def make_request_url(place, publicbody):
         )
     if len(subject) > 250:
         subject = subject[:250] + '...'
-    body = '''1. Wann haben die beiden letzten lebensmittelrechtlichen Betriebsüberprüfungen im folgenden Betrieb stattgefunden:
+    body = '''{q1}
 {name}
 {address}
 
-2. Kam es hierbei zu Beanstandungen? Falls ja, beantrage ich hiermit die Herausgabe des entsprechenden Kontrollberichts an mich.
-'''.format(**place)
+{q2}
+'''.format(q1=Q1, q2=Q2, **place)
     ref = ('food:%s' % place['ident']).encode('utf-8')
     query = {
         'subject': subject.encode('utf-8'),
@@ -156,16 +165,12 @@ def get_name_and_address(venue):
     if not match:
         return
     name = match.group(1)
-    descr = foirequest.description.splitlines()
-    address = None
-    for i, line in enumerate(descr):
-        match = PLZ_RE.search(line)
-        if match:
-            if match.start() > 0:
-                address = line.split(', ')
-            else:
-                address = [descr[i - 1], line]
-            break
+    descr = foirequest.description
+    descr = descr.replace(Q1, '')
+    descr = descr.replace(Q2, '').strip()
+    descr = descr.replace(name + '\n', '')
+    address = descr.strip()
+
     if not address:
         return
     return {
