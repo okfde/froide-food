@@ -13,4 +13,4 @@ venue_providers = {
     'custom': CustomVenueProvider()
 }
 
-venue_provider = venue_providers['yelp']
+venue_provider = venue_providers['foursquare']
