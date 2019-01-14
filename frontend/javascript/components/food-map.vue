@@ -722,7 +722,7 @@ export default {
       return L.icon.glyph({
         className: 'food-marker-icon ',
         prefix: 'fa',
-        glyph: this.iconCategoryMapping[r.category] || 'question',
+        glyph: this.iconCategoryMapping[r.category] || '',
         iconUrl: iconUrl
       })
     },
