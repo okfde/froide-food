@@ -17,12 +17,17 @@ from froide.foirequest.models import FoiRequest
 from froide.georegion.models import GeoRegion
 from froide.helper.utils import get_client_ip
 
+from .models import VenueRequestItem
+
 TIME_PERIOD = timedelta(days=90)
 MAX_REQUEST_COUNT = 3
 
 logger = logging.getLogger(__name__)
 
 CITY_RE = re.compile(r'\d{5} ([\w -]+)')
+
+TITLE_RE = re.compile(r'Kontrollbericht (?:für|zu) ([\w -]+), ([\w -]+)$')
+PLZ_RE = re.compile(r'(\d{5}) ([\w -]+)')
 
 
 def get_hygiene_publicbodies(lat, lng):
@@ -133,3 +138,37 @@ def get_request_count(request, pb):
         ).count()
         return request_count
     return 0
+
+
+def get_name_and_address(venue):
+    vris = VenueRequestItem.objects.filter(venue=venue)
+    if not vris:
+        return
+    foirequest = None
+    for vri in vris:
+        if vri.foirequest is not None:
+            foirequest = vri.foirequest
+            break
+    if not foirequest:
+        return
+    title = foirequest.title
+    match = TITLE_RE.search(title)
+    if not match:
+        return
+    name = match.group(1)
+    descr = foirequest.description.splitlines()
+    address = None
+    for i, line in enumerate(descr):
+        match = PLZ_RE.search(line)
+        if match:
+            if match.start() > 0:
+                address = line.split(', ')
+            else:
+                address = [descr[i - 1], line]
+            break
+    if not address:
+        return
+    return {
+        'name': name,
+        'address': address
+    }
