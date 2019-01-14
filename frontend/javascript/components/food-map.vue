@@ -145,7 +145,7 @@
                 @startRequest="startRequest"
                 @imageLoaded="imageLoaded"
               ></food-sidebar-item>
-              <div class="new-venue-area" v-if="hasSearched">
+              <div class="new-venue-area" v-if="hasSearched || error">
                 <template v-if="searchEmpty">
                   <p v-if="lastQuery">Keine Betriebe mit dem Suchwort „{{ lastQuery }}“ gefunden.</p>
                   <p v-else>Keine Betriebe an diesem Ort gefunden.</p>
