@@ -146,5 +146,5 @@ class FoursquareVenueProvider(BaseVenueProvider):
 
         logger.info('API Request: %s (%s)',
                     response.request.url, response.status_code)
-        result = response.json()
+        result = response.json()['response']['venue']
         return self.extract_result(result)
