@@ -50,7 +50,7 @@
                 </div>
                 <p class="text-right">
                   <button type="submit" class="btn btn-primary">
-                    zuständige Behörde finden
+                    Betrieb finden und Anfrage stellen
                   </button>
                 </p>
               </form>
