@@ -69,7 +69,7 @@ def make_request(request):
         messages.add_message(request, messages.ERROR, 'Fehlerhafter Link')
         return redirect('food-index')
 
-    place = venue_providers[provider].get_place(ident)
+    place = venue_providers[provider].get_place(ident, detail=True)
 
     return get_redirect(request, default='food-index', params={
         'query': place['name'],
