@@ -54,6 +54,11 @@ var FoodItemMixin = {
         backgroundImage: `url('${this.$root.config.staticUrl}food/images/yelp_logo.png')`
       }
     },
+    providerLogo () {
+      if (this.isFoursquare) {
+        return `${this.$root.config.staticUrl}food/images/powered-by-foursquare-blue.svg`
+      }
+    },
     lastRequest () {
       if (this.data.requests && this.data.requests.length > 0) {
         return this.data.requests[0]

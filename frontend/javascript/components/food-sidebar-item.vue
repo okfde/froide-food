@@ -56,6 +56,11 @@
             </template>
             <div v-else class="dummy-actions dummy">
             </div>
+            <div if="isFoursquare">
+              <a :href="data.url" target="_blank">
+                <img :src="providerLogo" alt="" class="foursquare-logo"/>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -229,6 +234,10 @@ export default {
   margin: 0.25rem 0 0;
   width: 60px;
   height: 32px;
+}
+
+.foursquare-logo {
+  height: 10px;
 }
 
 .review-count {
