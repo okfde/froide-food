@@ -73,6 +73,7 @@ function postData(url = '', data = {}) {
       credentials: "same-origin", // include, *same-origin, omit
       headers: {
           "Content-Type": "application/json",
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
       },
       body: JSON.stringify(data),
   })
