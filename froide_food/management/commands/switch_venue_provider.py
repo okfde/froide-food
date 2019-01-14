@@ -27,12 +27,12 @@ class Command(BaseCommand):
             Q(ident__startswith=provider)
             | Q(ident__startswith='custom')
         )
-        import ipdb ; ipdb.set_trace()
         for venue in venues:
             if not venue.context:
                 venue.context = {}
             if venue.context.get('failed_' + provider):
                 return
+            print('Trying venue', venue)
             result = self.match_venue_with_provider(venue, provider)
             if not result:
                 venue.context['failed_' + provider] = True
