@@ -18,6 +18,7 @@ class VenueRequestAdmin(admin.ModelAdmin):
     date_hierarchy = 'last_request'
     list_filter = (
         'last_status', 'last_resolution',
+        make_nullfilter('last_request', 'Hat Anfrage'),
         make_nullfilter('geo', 'Hat eigene Koordinate')
     )
     list_display = (
