@@ -23,7 +23,8 @@ class VenueRequestAdmin(admin.ModelAdmin):
     )
     list_display = (
         'name', 'last_request',
-        'get_last_status_display', 'get_last_resolution_display'
+        'get_last_status_display', 'get_last_resolution_display',
+        'get_provider'
     )
     search_fields = ('name', 'ident')
 
@@ -32,6 +33,10 @@ class VenueRequestAdmin(admin.ModelAdmin):
             obj.last_status, (obj.last_status,)
         )[0]
     get_last_status_display.short_description = 'letzter Status'
+
+    def get_provider(self, obj):
+        return obj.ident.split(':')[0]
+    get_provider.short_description = 'provider'
 
     def get_last_resolution_display(self, obj):
         return FoiRequest.STATUS_RESOLUTION_DICT.get(
