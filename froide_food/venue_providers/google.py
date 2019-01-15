@@ -89,12 +89,11 @@ GERMANY = (
 )
 
 
-def make_cache_key(params, method='search'):
-    keys = ('radius', 'location')
+def make_cache_key(params, method='search', keys=('radius', 'location',)):
     return 'froide_food:google:%s:%s' % (
         method,
         '_'.join(
-            str(params.get(key)) for key in keys
+            str(params.get(key)).replace(' ', '') for key in keys
         )
     )
 
@@ -118,9 +117,16 @@ class GoogleVenueProvider(BaseVenueProvider):
                 'inputtype': 'textquery',
                 'locationbias': 'rectangle:%s,%s|%s,%s' % GERMANY
             })
-            response = requests.get(url, params=params)
-            logger.info('API Request: %s', response.request.url)
-            candidates = response.json().get('candidates')
+            cache_key = make_cache_key(params, method='loc', keys=('input',))
+            response = cache.get(cache_key)
+            if response is not None:
+                candidates = json.loads(response).get('candidates')
+            else:
+                response = requests.get(url, params=params)
+                logger.info('API Request: %s', response.request.url)
+                cache.set(cache_key, response.text, None)
+                candidates = response.json().get('candidates')
+
             if not candidates:
                 return []
             candidate = candidates[0]
@@ -158,7 +164,7 @@ class GoogleVenueProvider(BaseVenueProvider):
                             response.status_code, response.text)
                 raise VenueProviderException()
             if can_cache:
-                cache.set(cache_key, response.text, 60 * 10)
+                cache.set(cache_key, response.text, None)
             results = response.json()
 
         if 'results' not in results:
