@@ -34,9 +34,11 @@ class Command(BaseCommand):
                 return
             print('Trying venue', venue)
             result = self.match_venue_with_provider(venue, provider)
-            if not result:
-                venue.context['failed_' + provider] = True
-                venue.save()
+            if result:
+                print('Success')
+            # if not result:
+            #     venue.context['failed_' + provider] = True
+            #     venue.save()
 
         self.stdout.write("Import done.\n")
 
@@ -54,7 +56,7 @@ class Command(BaseCommand):
         info = get_name_and_address(venue)
         if not info:
             return False
-        address = ', '.join(info['address'])
+        address = info['address']
         point, formatted_address = geocode(address)
         if not point:
             return False
@@ -66,7 +68,6 @@ class Command(BaseCommand):
         if not places:
             return False
         place = places[0]
-        place['lat']
         place_point = Point(place['lng'], place['lat'])
         distance = geopy_distance(place_point, point)
         if distance.meters > 200:
