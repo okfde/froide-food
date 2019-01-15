@@ -210,7 +210,7 @@ def match_venue_with_provider(venue, provider):
         address = info['address']
         point, formatted_address = geocode(address)
         if not point:
-            print('Geocoding failed.')
+            print('Geocoding failed.', address)
             return False
         venue.geo = point
         venue.save()
@@ -226,7 +226,7 @@ def match_venue_with_provider(venue, provider):
         print('No match found.')
         return False
     place_point = Point(place['lng'], place['lat'])
-    distance = geopy_distance(place_point, point)
+    distance = geopy_distance(place_point, venue.geo)
     if distance.meters > 100:
         print('Matches too far away.')
         return False
