@@ -8,6 +8,7 @@ from froide.foirequest.models import FoiAttachment
 from froide.georegion.models import GeoRegion
 
 from ..models import VenueRequest, VenueRequestItem
+from ..utils import get_city, is_address_bad
 
 
 class VenueProviderException(Exception):
@@ -60,12 +61,26 @@ class BaseVenueProvider(object):
         )
         return {r.ident: r for r in qs}
 
-    def get_detail(self, ident, detail=False):
+    def get_detail(self, ident, detail=False, info=None):
         place = {
             'ident': ident
         }
+        if info:
+            try:
+                place['name'] = info['name']
+                place['address'] = info['address']
+                place['lat'] = info['lat']
+                place['lng'] = info['lng']
+                place['city'] = get_city(place)
+            except KeyError:
+                detail = True
+
+        if is_address_bad(place['address']):
+            detail = True
+
         if detail:
             place = self.get_place(ident)
+
         mapping = self.get_venue_mapping_for_places([place])
         self.add_extras(place, mapping)
         self.add_requests(place, mapping)

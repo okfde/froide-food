@@ -124,15 +124,18 @@ class VenueViewSet(viewsets.ViewSet):
             lat, lng = get_lat_lng(request)
             name = request.GET['name']
             address = request.GET['address']
-            place = provider.get_detail(pk, detail=False)
-            place['name'] = name
-            if request.GET.get('city'):
-                place['city'] = request.GET.get('city')
-            place['address'] = address
-            place['lat'] = lat
-            place['lng'] = lng
+            place = provider.get_detail(pk, info={
+                'name': name,
+                'address': address,
+                'city': request.GET.get('city'),
+                'lat': lat,
+                'lng': lng,
+            })
         except (ValueError, KeyError):
             place = provider.get_detail(pk, detail=True)
+
+        if place is None:
+            return Response({'result': None, 'error': True})
 
         try:
             pbs = get_hygiene_publicbodies(
