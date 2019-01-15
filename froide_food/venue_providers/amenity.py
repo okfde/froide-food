@@ -114,7 +114,9 @@ class AmenityVenueProvider(BaseVenueProvider):
 
     def get_places(self, location=None, coordinates=None,
                    q=None, categories=None, radius=None):
+        location_search = False
         if location is not None:
+            location_search = True
             point, formatted_address = geocode(location, address=False)
         elif coordinates is not None:
             point = Point(coordinates[1], coordinates[0])
@@ -131,8 +133,12 @@ class AmenityVenueProvider(BaseVenueProvider):
             .exclude(name='')
             .filter(geo__dwithin=(point, radius))
             .filter(geo__distance_lte=(point, D(m=radius)))
-            .annotate(distance=Distance("geo", point))
-            .order_by("distance")
+        )
+        if not location_search:
+            results = (
+                results
+                .annotate(distance=Distance("geo", point))
+                .order_by("distance")
         )
         if q is not None:
             results = results.filter(name__contains=q)
