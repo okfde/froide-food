@@ -12,12 +12,16 @@ try:
 except ImportError:
     GeoIP2 = None
 
+from geopy.distance import distance as geopy_distance
+
 from froide.publicbody.models import PublicBody
 from froide.foirequest.models import FoiRequest
 from froide.georegion.models import GeoRegion
 from froide.helper.utils import get_client_ip
 
 from .models import VenueRequestItem
+from .geocode import geocode
+from .venue_providers import venue_providers
 
 TIME_PERIOD = timedelta(days=90)
 MAX_REQUEST_COUNT = 3
@@ -181,3 +185,41 @@ def get_name_and_address(venue):
         'name': name,
         'address': address
     }
+
+
+def match_venue_with_provider(venue, provider):
+    if venue.ident.startswith(provider):
+        return True
+    if venue.context.get('failed_' + provider):
+        return False
+    if provider in venue.context:
+        current, current_id = venue.ident.split(':', 1)
+        venue.context[current] = current_id
+        venue.ident = provider + ':' + venue.context[provider]
+        venue.save()
+        return True
+    info = get_name_and_address(venue)
+    if not info:
+        return False
+    address = info['address']
+    point, formatted_address = geocode(address)
+    if not point:
+        return False
+    venue_provider = venue_providers[provider]
+    places = venue_provider.get_places(coordinates=[
+        point.coords[1],
+        point.coords[0]
+    ], radius=200, q=info['name'])
+    if not places:
+        return False
+    place = places[0]
+    place_point = Point(place['lng'], place['lat'])
+    distance = geopy_distance(place_point, point)
+    if distance.meters > 200:
+        return False
+    venue.context[provider] = place['ident'].split(':', 1)[1]
+    current, current_id = venue.ident.split(':', 1)
+    venue.context[current] = current_id
+    venue.ident = provider + ':' + venue.context[provider]
+    venue.save()
+    return True
