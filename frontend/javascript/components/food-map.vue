@@ -860,6 +860,7 @@ export default {
       this.venues = this.venues.map((f) => {
         if (f.ident === data.ident) {
           f.requests = data.requests
+          f.address = data.address
           f.publicbody = data.publicbody
           f.makeRequestURL = data.makeRequestURL
           f.userRequestCount = data.userRequestCount
