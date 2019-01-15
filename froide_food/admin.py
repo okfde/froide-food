@@ -1,4 +1,5 @@
 from django.contrib import admin
+from leaflet.admin import LeafletGeoAdmin
 
 from froide.foirequest.models import FoiRequest
 from froide.helper.admin_utils import make_nullfilter
@@ -11,7 +12,7 @@ class VenueRequestItemInlineAdmin(admin.StackedInline):
     raw_id_fields = ('venue', 'foirequest', 'publicbody',)
 
 
-class VenueRequestAdmin(admin.ModelAdmin):
+class VenueRequestAdmin(LeafletGeoAdmin):
     inlines = [
         VenueRequestItemInlineAdmin
     ]
