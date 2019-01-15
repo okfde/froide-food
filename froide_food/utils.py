@@ -216,10 +216,11 @@ def match_venue_with_provider(venue, provider):
         venue.save()
     venue_provider = venue_providers[provider]
     places = venue_provider.match_place(
-        coordinates=[
+        [
             venue.geo.coords[1],
             venue.geo.coords[0]
-        ], name=info['name']
+        ],
+        info['name']
     )
     if not places:
         print('No match found.')
