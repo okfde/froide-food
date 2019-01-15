@@ -212,7 +212,11 @@ def match_venue_with_provider(venue, provider):
         if not point:
             print('Geocoding failed.', address)
             return False
+        venue.address = formatted_address
         venue.geo = point
+        venue.save()
+    if not venue.address and info.get('address'):
+        venue.address = info['address']
         venue.save()
     venue_provider = venue_providers[provider]
     place = venue_provider.match_place(

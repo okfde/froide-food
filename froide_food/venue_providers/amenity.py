@@ -139,7 +139,7 @@ class AmenityVenueProvider(BaseVenueProvider):
                 results
                 .annotate(distance=Distance("geo", point))
                 .order_by("distance")
-        )
+            )
         if q is not None:
             results = results.filter(name__contains=q)
 
@@ -208,9 +208,16 @@ class AmenityVenueProvider(BaseVenueProvider):
             .annotate(distance=Distance("geo", point))
             .order_by("distance")
         )[:5]
+        name = normalize_name(name)
         for r in results:
-            ratio = SequenceMatcher(None, name, r.name).ratio()
-            print('Checking', r.name, name, ratio)
+            r_name = normalize_name(r.name)
+            ratio = SequenceMatcher(None, name, r_name).ratio()
+            print('Checking: ', r.name, ' | ', name, ratio)
             if ratio > 0.7:
                 return self.extract_result(r)
         return None
+
+
+def normalize_name(name):
+    name = name.replace('Restaurant', '')
+    return name
