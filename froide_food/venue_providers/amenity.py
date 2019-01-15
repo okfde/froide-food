@@ -212,5 +212,5 @@ class AmenityVenueProvider(BaseVenueProvider):
             ratio = SequenceMatcher(None, name, r.name).ratio()
             print('Checking', r.name, name, ratio)
             if ratio > 0.7:
-                return r
+                return self.extract_result(r)
         return None
