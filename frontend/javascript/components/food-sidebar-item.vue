@@ -29,7 +29,7 @@
             <div v-else class="venue-name-dummy dummy"></div>
 
             <p v-if="data.address" class="venue-address">{{ data.address }}</p>
-            <div v-else class="venue-address-dummy dummy"></div>
+            <div v-else class="venue-address-dummy" :class="{'dummy': isDummy}"></div>
             <template v-if="!isDummy">
               <div v-if="hasRequest" class="request-status">
                 <p :class="requestColor">
