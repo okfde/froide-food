@@ -1,4 +1,5 @@
 import logging
+from difflib import SequenceMatcher
 
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
@@ -6,7 +7,7 @@ from django.contrib.gis.geos import Point
 
 from django_amenities.models import Amenity
 
-from .base import BaseVenueProvider, VenueProviderException
+from .base import BaseVenueProvider
 from ..geocode import geocode, reverse_geocode
 from ..utils import is_address_bad
 
@@ -190,3 +191,20 @@ class AmenityVenueProvider(BaseVenueProvider):
                 pass
         if fixed:
             amenity.save()
+
+    def match_place(self, latlng, name):
+        radius = 100
+        point = Point(latlng[1], latlng[0])
+        results = (
+            Amenity.objects
+            .filter(geo__dwithin=(point, radius))
+            .filter(geo__distance_lte=(point, D(m=radius)))
+            .annotate(distance=Distance("geo", point))
+            .order_by("distance")
+        )[:5]
+        for r in results:
+            ratio = SequenceMatcher(None, name, r.name).ratio()
+            print('Checking', r.name, name, ratio)
+            if ratio > 0.7:
+                return r
+        return None

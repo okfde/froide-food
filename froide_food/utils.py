@@ -179,7 +179,7 @@ def get_name_and_address(venue):
     parts = descr.splitlines()
     address = '\n'.join(parts[-2:]).strip()
     if not address:
-        return
+        return {'name': name}
     return {
         'name': name,
         'address': address
@@ -200,23 +200,35 @@ def match_venue_with_provider(venue, provider):
         venue.save()
         return True
     info = get_name_and_address(venue)
-    if not info:
+    if not info.get('name'):
+        print('No name found.')
         return False
-    address = info['address']
-    point, formatted_address = geocode(address)
-    if not point:
-        return False
+    if not venue.geo:
+        if not info.get('address'):
+            print('No address found.')
+            return False
+        address = info['address']
+        point, formatted_address = geocode(address)
+        if not point:
+            print('Geocoding failed.')
+            return False
+        venue.geo = point
+        venue.save()
     venue_provider = venue_providers[provider]
-    places = venue_provider.get_places(coordinates=[
-        point.coords[1],
-        point.coords[0]
-    ], radius=200, q=info['name'])
+    places = venue_provider.match_place(
+        coordinates=[
+            venue.geo.coords[1],
+            venue.geo.coords[0]
+        ], name=info['name']
+    )
     if not places:
+        print('No match found.')
         return False
     place = places[0]
     place_point = Point(place['lng'], place['lat'])
     distance = geopy_distance(place_point, point)
-    if distance.meters > 200:
+    if distance.meters > 100:
+        print('Matches too far away.')
         return False
     venue.context[provider] = place['ident'].split(':', 1)[1]
     current, current_id = venue.ident.split(':', 1)

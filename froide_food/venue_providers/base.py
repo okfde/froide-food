@@ -61,6 +61,12 @@ class BaseVenueProvider(object):
         )
         return {r.ident: r for r in qs}
 
+    def match_place(self, latlng, name):
+        return self.get_places(
+            coordinates=latlng, radius=100,
+            q=name
+        )
+
     def get_detail(self, ident, detail=False, info=None):
         place = {
             'ident': ident
