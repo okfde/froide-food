@@ -61,6 +61,10 @@ def get_hygiene_publicbody(lat, lng):
     return pbs[0]
 
 
+def is_address_bad(addr):
+    return CITY_RE.search(addr) is None
+
+
 def get_city(place):
     if place.get('city'):
         return place['city']
@@ -168,9 +172,9 @@ def get_name_and_address(venue):
     descr = foirequest.description
     descr = descr.replace(Q1, '')
     descr = descr.replace(Q2, '').strip()
-    descr = descr.replace(name + '\n', '')
-    address = descr.strip()
-
+    descr = descr.replace(name, '').strip()
+    parts = descr.splitlines()
+    address = '\n'.join(parts[-2:]).strip()
     if not address:
         return
     return {
