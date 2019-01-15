@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 CITY_RE = re.compile(r'\d{5} ([\w -]+)')
 CITY2_RE = re.compile(r', ([\w -]+)$')
 
-TITLE_RE = re.compile(r'Kontrollbericht (?:für|zu) ([\w -]+)(?:, ([\w -]+))?$')
+TITLE_RE = re.compile(r'Kontrollbericht (?:für|zu) ([^,]+)(?:, ([\w -]+))?$')
 PLZ_RE = re.compile(r'(\d{5}) ([\w -]+)')
 
 Q1 = '1. Wann haben die beiden letzten lebensmittelrechtlichen Betriebsüberprüfungen im folgenden Betrieb stattgefunden:'
@@ -200,7 +200,7 @@ def match_venue_with_provider(venue, provider):
         venue.save()
         return True
     info = get_name_and_address(venue)
-    if not info.get('name'):
+    if not info or not info.get('name'):
         print('No name found.')
         return False
     if not venue.geo:
@@ -215,17 +215,16 @@ def match_venue_with_provider(venue, provider):
         venue.geo = point
         venue.save()
     venue_provider = venue_providers[provider]
-    places = venue_provider.match_place(
+    place = venue_provider.match_place(
         [
             venue.geo.coords[1],
             venue.geo.coords[0]
         ],
         info['name']
     )
-    if not places:
+    if not place:
         print('No match found.')
         return False
-    place = places[0]
     place_point = Point(place['lng'], place['lat'])
     distance = geopy_distance(place_point, point)
     if distance.meters > 100:
