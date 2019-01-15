@@ -175,17 +175,18 @@ class AmenityVenueProvider(BaseVenueProvider):
             return
         raw = result.raw
         fixed = False
-        if not amenity.street and raw['text']:
-            fixed = True
-            amenity.street = raw['text']
-        if not amenity.postcode and raw['postcode']:
-            fixed = True
-            amenity.postcode = raw['postcode']
-        if not amenity.housenumber and raw['address']:
-            fixed = True
-            amenity.housenumber = raw['address']
-        if not amenity.city and raw['place']:
-            fixed = True
-            amenity.city = raw['place']
+        fix_list = (
+            ('street', 'text'),
+            ('postcode', 'postcode'),
+            ('housenumber', 'address'),
+            ('city', 'place'),
+        )
+        for k, v in fix_list:
+            try:
+                if not getattr(amenity, k) and raw[v]:
+                    fixed = True
+                    setattr(amenity, k, raw[v])
+            except KeyError:
+                pass
         if fixed:
             amenity.save()
