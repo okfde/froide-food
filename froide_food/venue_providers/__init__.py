@@ -15,4 +15,4 @@ venue_providers = {
     'amenity': AmenityVenueProvider(),
 }
 
-venue_provider = venue_providers['google']
+venue_provider = venue_providers['amenity']
