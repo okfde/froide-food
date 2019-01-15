@@ -75,7 +75,7 @@ class BaseVenueProvider(object):
             except KeyError:
                 detail = True
 
-        if is_address_bad(place['address']):
+        if not place.get('address') or is_address_bad(place['address']):
             detail = True
 
         if detail:
