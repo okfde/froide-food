@@ -21,7 +21,6 @@ from froide.helper.utils import get_client_ip
 
 from .models import VenueRequestItem
 from .geocode import geocode
-from .venue_providers import venue_providers
 
 TIME_PERIOD = timedelta(days=90)
 MAX_REQUEST_COUNT = 3
@@ -188,6 +187,8 @@ def get_name_and_address(venue):
 
 
 def match_venue_with_provider(venue, provider):
+    from .venue_providers import venue_providers
+
     if venue.ident.startswith(provider):
         return True
     if venue.context.get('failed_' + provider):
