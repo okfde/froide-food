@@ -7,30 +7,45 @@ import geocoder
 logger = logging.getLogger()
 
 API_KEY = settings.FROIDE_FOOD_CONFIG.get('api_key_geocode_here')
+MAPBOX_API_KEY = settings.FROIDE_FOOD_CONFIG.get('api_key_geocode_mapbox')
 
 
-def run_geocode(search, country='DE'):
+def get_kwargs():
     if not API_KEY:
-        return
+        raise ValueError
     app_id, app_code = API_KEY.split('|')
-    kwargs = {
+    return {
         'app_id': app_id,
         'app_code': app_code,
         # 'key': API_KEY,
-        # 'language': country.lower(),
         # 'components': 'country:%s' % country,
         'headers': {
             'Accept-Language': 'de-DE'
-        }
+        },
+        'key': MAPBOX_API_KEY,
+        'language': 'de',
     }
+
+
+def get_reverse_kwargs():
+    if not MAPBOX_API_KEY:
+        raise ValueError
+    return {
+        'key': MAPBOX_API_KEY,
+        'language': 'de',
+    }
+
+
+def run_geocode(search, country='DE', address=True):
+    kwargs = get_kwargs()
     try:
-        result = geocoder.here(search, **kwargs)
+        result = geocoder.mapbox(search, **kwargs)
         latlng = None
         address = None
         if result.status != 'OK':
             raise Exception('Over query API limit')
         # Here specific
-        if result.raw['LocationType'] != 'address':
+        if address and result.raw['LocationType'] != 'address':
             # Only accept exact matches
             return
         if result and result.latlng:
@@ -42,8 +57,22 @@ def run_geocode(search, country='DE'):
         return None
 
 
-def geocode(q):
-    result = run_geocode(q + ', Deutschland')
+def reverse_geocode(latlng):
+    kwargs = get_reverse_kwargs()
+    try:
+        result = geocoder.mapbox(latlng, method='reverse', **kwargs)
+        if result.status != 'OK':
+            raise Exception('Over query API limit')
+        if result and result.address:
+            return result
+        return None
+    except Exception as e:
+        logger.exception(e)
+        return None
+
+
+def geocode(q, **kwargs):
+    result = run_geocode(q + ', Deutschland', **kwargs)
     if result is None:
         return None, None
     latlng, address = result
