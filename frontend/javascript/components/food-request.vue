@@ -120,6 +120,9 @@ export default {
     },
     currentUrl: {
       type: String
+    },
+    csrfToken: {
+      type: String
     }
   },
   mounted () {
@@ -176,9 +179,6 @@ export default {
     },
     defaultLaw () {
       return selectBestLaw(this.publicBody.laws, LAW_TYPE)
-    },
-    csrfToken () {
-      return document.querySelector('[name=csrfmiddlewaretoken]').value
     }
   },
   methods: {

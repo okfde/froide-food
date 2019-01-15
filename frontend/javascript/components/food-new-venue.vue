@@ -66,14 +66,14 @@
 
 import FoodLoader from './food-loader'
 
-function postData(url = '', data = {}) {
+function postData(url = '', data = {}, csrfToken) {
   return fetch(url, {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       cache: "no-cache",
       credentials: "same-origin", // include, *same-origin, omit
       headers: {
           "Content-Type": "application/json",
-          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          'X-CSRFToken': csrfToken
       },
       body: JSON.stringify(data),
   })
@@ -84,8 +84,8 @@ export default {
   name: 'food-new-venue',
   components: {FoodLoader},
   props: {
-    data: {
-      type: Object
+    csrfToken: {
+      type: String
     }
   },
   mounted () {
@@ -112,7 +112,7 @@ export default {
         address: `${this.address}\n${this.postcode} ${this.city}`,
         ident: 'custom',
         requests: []
-      }).then((data) => {
+      }, this.csrfToken).then((data) => {
         this.fetching = false
         if (data.error !== false) {
           console.warn('Error requesting the API')

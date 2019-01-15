@@ -3,12 +3,15 @@
     <food-request v-if="showRequestForm"
       :config="requestConfig"
       :request-form="requestForm"
-      :user-info="userInfo"
+      :user-info="user"
       :user-form="userForm"
       :data="showRequestForm"
       :current-url="currentUrl"
+      :csrf-token="csrfToken"
       @detailfetched="detailFetched"
       @requestmade="requestMade"
+      @userupdated="userUpdated"
+      @tokenupdated="tokenUpdated"
       @close="requestFormClosed"
     ></food-request>
     <div v-show="!showRequestForm" :class="{'food-map-embed': config.embed, 'modal-active': modalActive}" v-scroll="handleSidebarScroll">
@@ -178,6 +181,7 @@
           @detailfetched="detailFetched"
         ></food-detail>
         <food-new-venue v-if="showNewVenue"
+          :csrf-token="csrfToken"
           @close="showNewVenue = false"
           @detailfetched="detailFetched"
           @venuecreated="venueCreated"
@@ -336,6 +340,8 @@ export default {
       showDetail: null,
       showRequestForm: null,
       showNewVenue: false,
+      user: this.userInfo,
+      csrfToken: document.querySelector('[name=csrfmiddlewaretoken]').value,
       filters: this.config.filters,
       maxBounds: maxBounds,
       city: city.city,
@@ -880,6 +886,12 @@ export default {
         this.detailFetched(data)
       }
       this.startRequest(newVenue)
+    },
+    tokenUpdated (token) {
+      this.csrfToken = token
+    },
+    userUpdated (user) {
+      this.user = user
     }
   }
 }
