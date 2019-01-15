@@ -46,15 +46,21 @@ class BaseVenueProvider(object):
     def get_venue_mapping_for_places(self, places,
                                      coordinates=None, radius=None, **kwargs):
         ident_list = [p['ident'] for p in places]
-        query = Q(ident__in=ident_list)
+        qs = VenueRequest.objects.filter(ident__in=ident_list)
+
         if coordinates is not None:
             point = Point(coordinates[1], coordinates[0])
-            query |= Q(
-                geo__isnull=False,
-                geo__distance_lte=(point, D(m=radius or 500))
+            radius = radius or 500
+            qs = qs.union(
+                VenueRequest.objects
+                .exclude(ident__startswith=self.name+':')
+                .filter(geo__isnull=False)
+                .filter(geo__dwithin=(point, radius))
+                .filter(
+                    geo__distance_lte=(point, D(m=radius))
+                )[:50]
             )
 
-        qs = VenueRequest.objects.filter(query)
         vris = VenueRequestItem.objects.select_related('foirequest')
         qs = qs.prefetch_related(
             Prefetch('request_items', queryset=vris)
