@@ -33,6 +33,7 @@ def get_reverse_kwargs():
     return {
         'key': MAPBOX_API_KEY,
         'language': 'de',
+        'types': 'address',
     }
 
 
