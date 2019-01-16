@@ -17,16 +17,16 @@
                   <p :class="requestColor">
                     {{ requestStatus }}
                   </p>
-                  <p v-if="requestComplete">
-                    <a :href="requestUrl" target="_blank" @click.prevent="setDetail">
-                      zu den Berichten&nbsp;&rarr;
-                    </a>
-                  </p>
-                  <p v-else>
+                  <p>
                     <a v-if="requestUrl" :href="requestUrl" target="_blank">
                       zur Anfrage&nbsp;&rarr;
                     </a>
                     <span v-else>Anfrage gestellt!</span>
+                  </p>
+                  <p v-if="requestComplete">
+                    <a :href="requestUrl" target="_blank" @click.prevent="setDetail">
+                      zu den Berichten&nbsp;&rarr;
+                    </a>
                   </p>
                 </div>
                 <p v-if="canRequest">
@@ -157,7 +157,7 @@ export default {
 }
 
 .info-column {
-  padding: 8px;
+  padding: 15px;
 }
 
 .venue-img {

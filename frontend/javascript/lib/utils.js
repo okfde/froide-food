@@ -7,17 +7,21 @@ function getPlaceStatus (place) {
   if (place.requests.length === 0) {
     return 'normal'
   }
-  if (place.last_status === 'resolved') {
-    if (place.last_resolution === 'successful' ||
-        place.last_resolution === 'partially_successful') {
+  return getRequestStatus(place.last_status, place.last_resolution)
+}
+
+function getRequestStatus (status, resolution) {
+  if (status === 'resolved') {
+    if (resolution === 'successful' ||
+        resolution === 'partially_successful') {
       return 'success'
-    } else if (place.last_resolution === 'refused') {
+    } else if (resolution === 'refused') {
       return 'failure'
     } else {
       return 'complete'
     }
-  } else if (place.last_status === 'awaiting_response' ||
-             place.last_status === 'awaiting_user_confirmation') {
+  } else if (status === 'awaiting_response' ||
+             status === 'awaiting_user_confirmation') {
     return 'pending'
   }
   return 'normal'
@@ -95,6 +99,7 @@ export {
   getQueryVariable,
   renderDate,
   getPlaceStatus,
+  getRequestStatus,
   getPinURL,
   getPinColor,
   canUseLocalStorage,

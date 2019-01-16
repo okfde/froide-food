@@ -1,4 +1,4 @@
-import {renderDate, getPlaceStatus} from '../lib/utils'
+import {renderDate, getPlaceStatus, getRequestStatus} from '../lib/utils'
 
 const DAYS_BETWEEN_REQUEST = 90
 
@@ -91,8 +91,10 @@ var FoodItemMixin = {
       return this.daysSinceLastRequest > DAYS_BETWEEN_REQUEST
     },
     requestComplete () {
-      let status = getPlaceStatus(this.data)
-      return status !== 'normal' && status !== 'pending'
+      return this.data.requests.some((r) => {
+        let status = getRequestStatus(r.status, r.resolution)
+        return status !== 'normal' && status !== 'pending'
+      })
     },
     requestStatusColor () {
       let status = getPlaceStatus(this.data)

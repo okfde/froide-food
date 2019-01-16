@@ -19,32 +19,32 @@
               </div>
             </a>
             <div v-else class="image-column-inner" >
-              <div class="dummy-provider" :class="{'dummy': isDummy}"></div>
+              <div class="dummy-provider dummy" :class="{'dummy-blinker': isDummy}"></div>
             </div>
           </div>
           <div class="col info-column">
             <h5 v-if="data.name" class="venue-name">
               {{ data.name }}
             </h5>
-            <div v-else class="venue-name-dummy dummy"></div>
+            <div v-else class="venue-name-dummy dummy dummy-blinker"></div>
 
             <p v-if="data.address" class="venue-address">{{ data.address }}</p>
-            <div v-else class="venue-address-dummy" :class="{'dummy': isDummy}"></div>
+            <div v-else class="venue-address-dummy" :class="{'dummy dummy-blinker': isDummy}"></div>
             <template v-if="!isDummy">
               <div v-if="hasRequest" class="request-status">
                 <p :class="requestColor">
                   {{ requestStatus }}
                 </p>
-                <p v-if="requestComplete">
-                  <a :href="requestUrl" target="_blank" @click.prevent.stop="setDetail">
-                    zu den Berichten&nbsp;&rarr;
-                  </a>
-                </p>
-                <p v-else>
+                <p>
                   <a v-if="requestUrl" :href="requestUrl" target="_blank">
                     zur Anfrage&nbsp;&rarr;
                   </a>
                   <span v-else>Anfrage gestellt!</span>
+                </p>
+                <p v-if="requestComplete">
+                  <a :href="requestUrl" target="_blank" @click.prevent.stop="setDetail">
+                    zu den Berichten&nbsp;&rarr;
+                  </a>
                 </p>
               </div>
               <p v-if="canRequest">
@@ -56,7 +56,7 @@
             </template>
             <div v-else class="dummy-actions dummy">
             </div>
-            <div if="isFoursquare">
+            <div v-if="isFoursquare">
               <a :href="data.url" target="_blank">
                 <img :src="providerLogo" alt="" class="foursquare-logo"/>
               </a>
@@ -168,6 +168,8 @@ export default {
 .dummy {
   background-color: #ddd;
   display: block;
+}
+.dummy-blinker {
   animation: blinker 0.8s linear infinite;
 }
 
@@ -188,7 +190,7 @@ export default {
 }
 
 .venue-address-dummy {
-  margin-top: 1rem;
+  margin: 1rem 0;
   height: 3rem;
   width: 40%;
 }
