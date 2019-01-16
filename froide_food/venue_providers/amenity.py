@@ -199,7 +199,7 @@ class AmenityVenueProvider(BaseVenueProvider):
             amenity.save()
 
     def match_place(self, latlng, name):
-        radius = 100
+        radius = 30
         point = Point(latlng[1], latlng[0])
         results = (
             Amenity.objects
@@ -213,7 +213,7 @@ class AmenityVenueProvider(BaseVenueProvider):
             r_name = normalize_name(r.name)
             ratio = SequenceMatcher(None, name, r_name).ratio()
             print('Checking: ', r.name, ' | ', name, ratio)
-            if ratio > 0.7:
+            if ratio >= 0.6:
                 return self.extract_result(r)
         return None
 
