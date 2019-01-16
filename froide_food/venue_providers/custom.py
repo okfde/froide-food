@@ -55,10 +55,10 @@ class CustomVenueProvider(BaseVenueProvider):
             place['lng'] = venue.geo.coords[0]
 
     def get_place(self, ident):
-        try:
-            venue = VenueRequest.objects.get(ident=ident)
-        except VenueRequest.DoesNotExist:
+        venues = VenueRequest.objects.filter(ident=ident)
+        if not venues:
             return None
+        venue = venues[0]
         return {
             'ident': ident,
             'name': venue.name,
