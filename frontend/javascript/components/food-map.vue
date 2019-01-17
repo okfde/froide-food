@@ -49,7 +49,7 @@
           <food-filter :filters="filters" @change="filterChanged" @apply="applyFilter"></food-filter>
         </slide-up-down>
         <div class="row">
-          <div class="col-md-7 col-lg-8 order-md-2 map-column">
+          <div class="col-md-8 col-lg-9 order-md-2 map-column">
             <div class="map-container" ref="foodMap" id="food-map" :class="mapContainerClass" :style="mapContainerStyle">
 
               <div v-if="showRefresh || searching" class="redo-search">
@@ -94,7 +94,7 @@
                   layerType="base" :name="tileProvider.name" :visible="true"
                   :url="tileProvider.url" :attribution="tileProvider.attribution"/>
 
-                <l-control-zoom position="bottomright" v-if="!isTouch"/>
+                <l-control-zoom position="bottomright"/>
 
                 <l-marker v-for="marker in venues" :key="marker.id"
                     :lat-lng="marker.position" :title="marker.name"
@@ -131,7 +131,7 @@
             </p>
           </div>
 
-          <div class="col-md-5 col-lg-4 order-md-1 sidebar-column">
+          <div class="col-md-4 col-lg-3 order-md-1 sidebar-column">
             <div class="sidebar" :class="{'modal-active': modalActive}" ref="foodList" id="food-list" v-scroll.window="handleSidebarScroll">
               <template v-if="searching">
                 <food-sidebar-item v-for="data in fakeVenues"
