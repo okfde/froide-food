@@ -130,7 +130,7 @@ class BaseVenueProvider(object):
             place['last_request'] = venue.last_request
             fr = venue.last_request
             if fr is not None:
-                vris = venue.request_items.all()
+                vris = venue.request_items.filter(foirequest__isnull=False)
                 place['requests'] = [to_vri(vri) for vri in vris]
             else:
                 place['requests'] = []

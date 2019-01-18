@@ -42,7 +42,8 @@ class CustomVenueProvider(BaseVenueProvider):
             )
 
         place = venue.to_place()
-        additional_data = self.get_detail(venue.ident, detail=False)
+        provider = venue.get_venue_provider()
+        additional_data = provider.get_detail(venue.ident, detail=False)
         place.update(additional_data)
         return place
 

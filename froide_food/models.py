@@ -32,13 +32,21 @@ class VenueRequest(models.Model):
     def to_place(self):
         return {
             'ident': self.ident,
-            'lat': self.geo.coords[1],
-            'lng': self.geo.coords[0],
+            'lat': self.geo.coords[1] if self.geo else None,
+            'lng': self.geo.coords[0] if self.geo else None,
             'name': self.name,
             'address': self.address,
             'requests': [],
-            'custom': True
+            'custom': self.ident.startswith('custom:')
         }
+
+    def get_provider(self):
+        return self.ident.split(':', 1)[0]
+
+    def get_venue_provider(self):
+        from .venue_providers import venue_providers
+        provider = self.get_provider()
+        return venue_providers[provider]
 
 
 class VenueRequestItem(models.Model):
