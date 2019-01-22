@@ -652,7 +652,7 @@ export default {
         )
         radius = Math.max(Math.round(Math.min(radius, 40000) / 100) * 100, 500)
         let reqCoords = latlngToGrid(coordinates, radius)
-        locationParam = `lat=${reqCoords.lat}&lng=${reqCoords.lng}&radius=${radius}`
+        locationParam = `lat=${reqCoords.lat}&lng=${reqCoords.lng}&radius=${radius}&zoom=${this.zoom}`
       }
       this.lastQuery = this.query
       let categories = this.filterCategories

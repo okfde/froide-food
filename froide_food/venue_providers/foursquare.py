@@ -39,10 +39,10 @@ HEADERS = {
 
 class FoursquareVenueProvider(BaseVenueProvider):
     name = 'foursquare'
-    FILTERS = []
+    FILTERS = FILTERS
 
     def get_places(self, location=None, coordinates=None,
-                   q=None, categories=None, radius=None):
+                   q=None, categories=None, radius=None, **kwargs):
         params = {
             'radius': 10000,
             'limit': 50,

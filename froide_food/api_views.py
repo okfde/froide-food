@@ -88,6 +88,14 @@ class VenueViewSet(viewsets.ViewSet):
                 return Response([])
             location_kwargs = {'coordinates': (lat, lng)}
 
+        zoom = None
+        if request.GET.get('zoom'):
+            try:
+                zoom = int(request.GET['zoom'])
+            except ValueError:
+                zoom = None
+        location_kwargs['zoom'] = zoom
+
         try:
             radius = int(request.GET.get('radius'))
         except (ValueError, TypeError):

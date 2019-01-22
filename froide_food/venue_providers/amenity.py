@@ -111,9 +111,10 @@ def get_filter_mapping():
 class AmenityVenueProvider(BaseVenueProvider):
     name = 'amenity'
     FILTERS = FILTERS
+    ORDER_ZOOM_LEVEL = 15
 
     def get_places(self, location=None, coordinates=None,
-                   q=None, categories=None, radius=None):
+                   q=None, categories=None, radius=None, zoom=None):
         location_search = False
         if location is not None:
             location_search = True
@@ -126,7 +127,7 @@ class AmenityVenueProvider(BaseVenueProvider):
 
         if radius is None:
             radius = 1000
-        radius = max(10000, radius)
+        radius = max(min(10000, radius), 100)
 
         results = (
             Amenity.objects
@@ -134,12 +135,16 @@ class AmenityVenueProvider(BaseVenueProvider):
             .filter(geo__dwithin=(point, radius))
             .filter(geo__distance_lte=(point, D(m=radius)))
         )
-        if not location_search:
+        order_distance = zoom is None or zoom >= self.ORDER_ZOOM_LEVEL
+        if not location_search and order_distance:
             results = (
                 results
                 .annotate(distance=Distance("geo", point))
                 .order_by("distance")
             )
+        else:
+            results = results.order_by('?')
+
         if q is not None:
             results = results.filter(name__contains=q)
 
