@@ -50,7 +50,10 @@ class BaseVenueProvider(object):
 
         if coordinates is not None:
             point = Point(coordinates[1], coordinates[0])
-            radius = radius or 500
+            if radius:
+                radius = int(radius * 0.9)
+            else:
+                radius = 500
             qs = qs.union(
                 VenueRequest.objects
                 .exclude(ident__startswith=self.name+':')
