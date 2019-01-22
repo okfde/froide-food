@@ -167,23 +167,21 @@ def get_name_and_address(venue):
             break
     if not foirequest:
         return
+    info = {}
     title = foirequest.title
     match = TITLE_RE.search(title)
-    if not match:
-        return
-    name = match.group(1)
+    if match:
+        info['name'] = match.group(1)
     descr = foirequest.description
     descr = descr.replace(Q1, '')
     descr = descr.replace(Q2, '').strip()
-    descr = descr.replace(name, '').strip()
+    if info.get('name'):
+        descr = descr.replace(info['name'], '').strip()
     parts = descr.splitlines()
     address = '\n'.join(parts[-2:]).strip()
-    if not address:
-        return {'name': name}
-    return {
-        'name': name,
-        'address': address
-    }
+    if address:
+        info['address'] = address
+    return info
 
 
 def match_venue_with_provider(venue, provider):
@@ -201,8 +199,12 @@ def match_venue_with_provider(venue, provider):
         return True
     info = get_name_and_address(venue)
     if not info or not info.get('name'):
-        print('No name found.')
-        return False
+        if 'Kontrollbericht' not in venue.name:
+            print('No name found, using venue name', venue.name)
+            info['name'] = venue.name
+        else:
+            print('No name found, using')
+
     if not venue.geo:
         if not info.get('address'):
             print('No address found.')
