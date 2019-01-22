@@ -204,22 +204,31 @@ class AmenityVenueProvider(BaseVenueProvider):
             amenity.save()
 
     def match_place(self, latlng, name):
-        radius = 30
+        radius_thresholds = (
+            (30, 0.6),
+            (20, 0.5),
+            (10, 0.4)
+        )
+
         point = Point(latlng[1], latlng[0])
-        results = (
-            Amenity.objects
-            .filter(geo__dwithin=(point, radius))
-            .filter(geo__distance_lte=(point, D(m=radius)))
-            .annotate(distance=Distance("geo", point))
-            .order_by("distance")
-        )[:5]
-        name = normalize_name(name)
-        for r in results:
-            r_name = normalize_name(r.name)
-            ratio = SequenceMatcher(None, name, r_name).ratio()
-            print('Checking: ', r.name, ' | ', name, ratio)
-            if ratio >= 0.6:
-                return self.extract_result(r)
+        for radius, threshold in radius_thresholds:
+            print('Trying with', radius, threshold)
+            results = (
+                Amenity.objects
+                .filter(geo__dwithin=(point, radius))
+                .filter(geo__distance_lte=(point, D(m=radius)))
+                .annotate(distance=Distance("geo", point))
+                .order_by("distance")
+            )[:5]
+            name = normalize_name(name)
+            for r in results:
+                if r.distance > radius:
+                    continue
+                r_name = normalize_name(r.name)
+                ratio = SequenceMatcher(None, name, r_name).ratio()
+                print('Checking: ', r.name, ' | ', name, ratio)
+                if ratio >= threshold:
+                    return self.extract_result(r)
         return None
 
 
