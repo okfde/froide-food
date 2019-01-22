@@ -222,7 +222,7 @@ class AmenityVenueProvider(BaseVenueProvider):
             )[:5]
             name = normalize_name(name)
             for r in results:
-                if r.distance > radius:
+                if r.distance.m > radius:
                     continue
                 r_name = normalize_name(r.name)
                 ratio = SequenceMatcher(None, name, r_name).ratio()
