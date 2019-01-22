@@ -233,5 +233,5 @@ class AmenityVenueProvider(BaseVenueProvider):
 
 
 def normalize_name(name):
-    name = name.replace('Restaurant', '')
+    name = name.replace('Restaurant', '').lower()
     return name
