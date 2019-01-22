@@ -1,4 +1,5 @@
 import json
+import os
 
 from django.conf import settings
 from django.core.cache import cache
@@ -15,6 +16,130 @@ SEARCH_URL = 'https://api.foursquare.com/v2/venues/search'
 LOOKUP_URL = 'https://api.foursquare.com/v2/venues/{ident}'
 API_KEY = settings.FROIDE_FOOD_CONFIG.get('api_key_foursquare') or '|'
 CLIENT_ID, CLIENT_SECRET = API_KEY.split('|')
+
+DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'foursquare.json')
+
+
+FILTERS = [{
+    'name': 'Fleischerei/Metzgerei',
+    'icon': 'fa-paw',
+    'active': False,
+    'categories': ['4bf58dd8d48988d11d951735']
+    },
+    {
+    'name': 'Bäckerei/Konditorei',
+    'icon': 'fa-pie-chart',
+    'active': False,
+    'categories': ['4bf58dd8d48988d16a941735']
+    },
+    {
+    'name': 'Restaurant/Gaststätte',
+    'icon': 'fa-cutlery',
+    'active': False,
+    'categories': ['4d4b7105d754a06374d81259']
+    },
+    {
+    'name': 'Café/Bar',
+    'icon': 'fa-coffee',
+    'active': False,
+    'categories': ['4bf58dd8d48988d16d941735']
+    },
+    {
+    'name': 'Eisdiele',
+    'icon': 'fa-child',
+    'active': False,
+    'categories': ['4bf58dd8d48988d1d0941735']
+    },
+    {
+    'name': 'Kiosk/Spätkauf',
+    'icon': 'fa-beer',
+    'active': False,
+    'categories': ['4bf58dd8d48988d146941735']
+    },
+    {
+    'name': 'Diskothek/Club',
+    'icon': 'fa-diamond',
+    'active': False,
+    'categories': ['4d4b7105d754a06376d81259']
+    },
+    # {
+    # 'name': 'Imbiss',
+    # 'icon': 'fa-soccer-ball-o',
+    # 'active': False,
+    # 'categories': ['foodtrucks', 'foodstands']
+    # },
+    {
+    'name': 'Systemgastronomie',
+    'icon': 'fa-bars',
+    'active': False,
+    'categories': ['4bf58dd8d48988d16e941735']
+    },
+    {
+    'name': 'Hotel/Pension',
+    'icon': 'fa-bed',
+    'active': False,
+    'categories': ['4bf58dd8d48988d1fa931735']
+    },
+    {
+    'name': 'Supermarkt/Discounter',
+    'icon': 'fa-shopping-cart',
+    'active': False,
+    'categories': ['52f2ab2ebcbc57f1066b8b46']
+    },
+    {
+    'name': 'Einzelhandel',
+    'icon': 'fa-shopping-basket',
+    'active': False,
+    'categories': ['4bf58dd8d48988d1f9941735']
+    },
+    {
+    'name': 'Tankstelle',
+    'icon': 'fa-car',
+    'active': False,
+    'categories': ['4bf58dd8d48988d113951735']
+    },
+    {
+    'name': 'Kino',
+    'icon': 'fa-film',
+    'active': False,
+    'categories': ['4bf58dd8d48988d17f941735']
+    }
+]
+
+
+def get_filter_mapping():
+    for fil in FILTERS:
+        for cat in fil['categories']:
+            yield cat, cat
+
+
+def make_mapping(data, filters):
+    filter_cats = get_filter_mapping()
+
+    if not os.path.exists(DATA_PATH):
+        logger.warn('data path not found: %s', DATA_PATH)
+        return {}
+    with open(DATA_PATH) as f:
+        cats = json.load(f)['response']['categories']
+
+    yield from _get_mapping(cats, filter_cats)
+
+
+def _get_mapping(cats, filter_cats, parent=None):
+    for cat in cats:
+        parent = parent or cat['id']
+        if cat['id'] in filter_cats:
+            parent = cat['id']
+        yield cat['id'], parent
+        yield from _get_mapping(
+            cat.get('categories', []),
+            filter_cats,
+            parent=parent
+        )
+
+
+# CATEGORY_MAPPING = dict(make_mapping(DATA_PATH, FILTERS))
+CATEGORY_MAPPING = dict(get_filter_mapping())
 
 
 def make_cache_key(params, method='search'):
@@ -104,15 +229,11 @@ class FoursquareVenueProvider(BaseVenueProvider):
         ]
 
     def extract_result(self, r):
-        # cats = r['categories']
-        # category = None
-        # if cats:
-        #     category = [CATEGORY_MAPPING.get(c['alias'], None) for c in cats]
-        #     category = [c for c in category if c is not None]
-        # if category:
-        #     category = category[0]
-        # else:
-        #     category = None
+        category = ''
+        for cat in r['categories']:
+            if cat['id'] in CATEGORY_MAPPING:
+                category = CATEGORY_MAPPING[cat['id']]
+                break
 
         return {
             'ident': '%s:%s' % (self.name, r['id']),
@@ -124,6 +245,7 @@ class FoursquareVenueProvider(BaseVenueProvider):
             ),
             'address': '\n'.join(r['location']['formattedAddress'][:-1]),
             'city': r['location'].get('city', ''),
+            'category': category
         }
 
     def get_place(self, ident):
