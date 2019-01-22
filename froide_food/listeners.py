@@ -17,6 +17,7 @@ def connect_request_object(sender, **kwargs):
             'name': sender.title,
         }
     )
+    venue.update_from_provider()
     if not venue.name:
         venue.name = sender.title
     venue.last_request = timezone.now()

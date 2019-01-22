@@ -2,6 +2,7 @@ from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.contrib.postgres.fields import JSONField
+from django.contrib.gis.geos import Point
 
 from froide.publicbody.models import PublicBody
 from froide.foirequest.models import FoiRequest
@@ -47,6 +48,20 @@ class VenueRequest(models.Model):
         from .venue_providers import venue_providers
         provider = self.get_provider()
         return venue_providers[provider]
+
+    def update_from_provider(self):
+        provider = self.get_venue_provider()
+        if self.address and self.geo:
+            return
+        place = provider.get_place(self.ident)
+        if place is None:
+            return
+        if not self.address:
+            self.address = place['address']
+        if not self.geo:
+            self.geo = Point(place['lng'], place['lat'])
+        if place['name']:
+            self.name = place['name']
 
 
 class VenueRequestItem(models.Model):
