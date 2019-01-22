@@ -71,7 +71,7 @@
                     Zu Ihrem Standort
                   </template>
                   <template v-else-if="determiningGeolocation">
-                    <food-loader></food-loader>
+                    <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
                     Ihr Standort wird ermittelt...
                   </template>
                   <template v-else>
