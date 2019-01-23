@@ -121,9 +121,6 @@ export default {
     },
     currentUrl: {
       type: String
-    },
-    csrfToken: {
-      type: String
     }
   },
   mounted () {
@@ -140,6 +137,9 @@ export default {
     }
   },
   computed: {
+    csrfToken () {
+      return this.$root.csrfToken
+    },
     publicbodies () {
       return [this.data.publicbody]
     },

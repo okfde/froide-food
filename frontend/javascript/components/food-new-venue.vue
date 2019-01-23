@@ -83,11 +83,6 @@ function postData(url = '', data = {}, csrfToken) {
 export default {
   name: 'food-new-venue',
   components: {FoodLoader},
-  props: {
-    csrfToken: {
-      type: String
-    }
-  },
   mounted () {
   },
   data () {
@@ -112,7 +107,7 @@ export default {
         address: `${this.address}\n${this.postcode} ${this.city}`,
         ident: 'custom',
         requests: []
-      }, this.csrfToken).then((data) => {
+      }, this.$root.csrfToken).then((data) => {
         this.fetching = false
         if (data.error !== false) {
           console.warn('Error requesting the API')

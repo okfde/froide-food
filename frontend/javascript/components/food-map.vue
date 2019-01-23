@@ -7,7 +7,6 @@
       :user-form="userForm"
       :data="showRequestForm"
       :current-url="currentUrl"
-      :csrf-token="csrfToken"
       @detailfetched="detailFetched"
       @requestmade="requestMade"
       @userupdated="userUpdated"
@@ -189,7 +188,6 @@
           @detailfetched="detailFetched"
         ></food-detail>
         <food-new-venue v-if="showNewVenue"
-          :csrf-token="csrfToken"
           @close="showNewVenue = false"
           @detailfetched="detailFetched"
           @venuecreated="venueCreated"
@@ -342,6 +340,8 @@ export default {
       zoom = DEFAULT_ZOOM
     }
 
+    this.$root.csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+
     return {
       zoom: zoom,
       locationKnown: locationKnown,
@@ -351,7 +351,6 @@ export default {
       showRequestForm: null,
       showNewVenue: false,
       user: this.userInfo,
-      csrfToken: document.querySelector('[name=csrfmiddlewaretoken]').value,
       filters: this.config.filters,
       maxBounds: maxBounds,
       city: city.city,
@@ -936,7 +935,7 @@ export default {
       this.startRequest(newVenue)
     },
     tokenUpdated (token) {
-      this.csrfToken = token
+      this.$root.csrfToken = token
     },
     userUpdated (user) {
       this.user = user
