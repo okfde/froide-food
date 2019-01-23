@@ -30,8 +30,8 @@ class VenueRequest(models.Model):
     def __str__(self):
         return self.name
 
-    def to_place(self):
-        return {
+    def to_place(self, with_requests=False):
+        d = {
             'ident': self.ident,
             'lat': self.geo.coords[1] if self.geo else None,
             'lng': self.geo.coords[0] if self.geo else None,
@@ -40,6 +40,17 @@ class VenueRequest(models.Model):
             'requests': [],
             'custom': self.ident.startswith('custom:')
         }
+        if with_requests:
+            d.update({
+                'last_status': self.last_status,
+                'last_resolution': self.last_resolution,
+                'last_request': self.last_request,
+            })
+            fr = self.last_request
+            if fr is not None:
+                vris = self.request_items.all()
+                d['requests'] = [vri.to_request() for vri in vris]
+        return d
 
     def get_provider(self):
         return self.ident.split(':', 1)[0]
@@ -83,3 +94,22 @@ class VenueRequestItem(models.Model):
 
     def __str__(self):
         return '%s %s' % (self.venue, self.timestamp)
+
+    def to_request(self):
+        if self.foirequest.is_public():
+            return {
+                'id': self.foirequest.pk,
+                'url': self.foirequest.get_absolute_url(),
+                'status': self.foirequest.status,
+                'resolution': self.foirequest.resolution,
+                'timestamp': self.timestamp,
+                'documents': []
+            }
+        return {
+            'id': None,
+            'url': '',
+            'status': self.foirequest.status,
+            'resolution': self.foirequest.resolution,
+            'timestamp': self.timestamp,
+            'documents': []
+        }

@@ -113,6 +113,9 @@ class AmenityVenueProvider(BaseVenueProvider):
     FILTERS = FILTERS
     ORDER_ZOOM_LEVEL = 15
 
+    def get_queryset(self):
+        return Amenity.objects.all()
+
     def get_places(self, location=None, coordinates=None,
                    q=None, categories=None, radius=None, zoom=None):
         location_search = False
@@ -130,7 +133,7 @@ class AmenityVenueProvider(BaseVenueProvider):
         radius = max(min(10000, radius), 100)
 
         results = (
-            Amenity.objects
+            self.get_queryset()
             .exclude(name='')
             .filter(geo__dwithin=(point, radius))
             .filter(geo__distance_lte=(point, D(m=radius)))

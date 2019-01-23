@@ -103,8 +103,15 @@ class VenueViewSet(viewsets.ViewSet):
 
         query = request.GET.get('q')
         categories = request.GET.getlist('categories', [])
+
+        current_provider = venue_provider
+
+        only_requested = request.GET.get('requested', '') == '1'
+        if only_requested:
+            current_provider = venue_providers['requested']
+
         try:
-            places = venue_provider.search_places(
+            places = current_provider.search_places(
                 q=query,
                 radius=radius,
                 categories=categories,
