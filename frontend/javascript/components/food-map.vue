@@ -64,7 +64,7 @@
                 </button>
               </div>
 
-              <div class="map-search d-none d-md-block">
+              <div class="map-search d-none d-md-block" :class="{'map-search-full': !(showRefresh || searching)}">
                 <div class="input-group">
                   <div class="clearable-input">
                     <input type="text" v-model="query" class="form-control" placeholder="Suche nach Restaurant, Kiosk etc."  @keydown.enter.prevent="userSearch">
@@ -1033,6 +1033,7 @@ $icon-failure: #dc3545;
   right: 0;
   z-index: 2000;
   width: 50%;
+  transition: width 0.8s ease-out;
   margin-top: 1rem;
   margin-right: 1rem;
 
@@ -1044,9 +1045,16 @@ $icon-failure: #dc3545;
   }
 }
 
+.map-search-full {
+  width: 80%;
+}
+
 @media screen and (max-width: 960px){
   .map-search {
     width: 60%;
+  }
+  .map-search-full {
+    width: 90%;
   }
 }
 
