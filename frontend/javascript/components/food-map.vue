@@ -125,6 +125,8 @@
                 @close="clearSelected"
                 @startRequest="startRequest"
                 @detail="setDetail"
+                @followed="followedRequest(data, $event)"
+                @unfollowed="data.follow.follows = false"
               ></food-mapoverlay>
             </div>
           </div>
@@ -149,11 +151,14 @@
               <food-sidebar-item v-for="data in venues"
                 :key="data.ident" :data="data"
                 :config="config"
+                :user="user"
                 :selectedVenueId="selectedVenueId"
                 @select="markerClick(data, true)"
                 @detail="setDetail"
                 @startRequest="startRequest"
                 @imageLoaded="imageLoaded"
+                @followed="followedRequest(data, $event)"
+                @unfollowed="data.follow.follows = false"
               ></food-sidebar-item>
               <div class="new-venue-area" v-if="hasSearched || error">
                 <template v-if="searchEmpty">
@@ -933,6 +938,10 @@ export default {
         this.detailFetched(data)
       }
       this.startRequest(newVenue)
+    },
+    followedRequest (data, resourceUri) {
+      data.follow.follows = true
+      data.follow.resource_uri = resourceUri
     },
     tokenUpdated (token) {
       this.$root.csrfToken = token

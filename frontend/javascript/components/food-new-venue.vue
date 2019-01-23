@@ -65,20 +65,7 @@
 <script>
 
 import FoodLoader from './food-loader'
-
-function postData(url = '', data = {}, csrfToken) {
-  return fetch(url, {
-      method: "POST", // *GET, POST, PUT, DELETE, etc.
-      cache: "no-cache",
-      credentials: "same-origin", // include, *same-origin, omit
-      headers: {
-          "Content-Type": "application/json",
-          'X-CSRFToken': csrfToken
-      },
-      body: JSON.stringify(data),
-  })
-  .then(response => response.json());
-}
+import {postData} from '../lib/utils.js'
 
 export default {
   name: 'food-new-venue',

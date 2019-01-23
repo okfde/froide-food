@@ -95,6 +95,19 @@ function latlngToGrid (latlng) {
   }
 }
 
+function postData (url = '', data = {}, csrfToken) {
+  return window.fetch(url, {
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    cache: 'no-cache',
+    credentials: 'same-origin', // include, *same-origin, omit
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken
+    },
+    body: JSON.stringify(data)
+  }).then(response => response.json())
+}
+
 export {
   getQueryVariable,
   renderDate,
@@ -103,5 +116,6 @@ export {
   getPinURL,
   getPinColor,
   canUseLocalStorage,
-  latlngToGrid
+  latlngToGrid,
+  postData
 }

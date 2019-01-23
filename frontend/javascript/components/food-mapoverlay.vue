@@ -34,6 +34,12 @@
                     Hygienekontrolle anfragen&nbsp;&rarr;
                   </a>
                 </p>
+                <food-follow
+                  v-if="user"
+                  :follow="data.follow"
+                  @followed="$emit('followed', $event)"
+                  @unfollowed="$emit('unfollowed')"
+                ></food-follow>
               </div>
             </div>
             <div v-if="needsCredit" class="col-sm-5 col-6">
@@ -59,6 +65,10 @@ export default {
   props: {
     data: {
       type: Object
+    },
+    user: {
+      type: Object,
+      default: null
     },
     config: {
       type: Object

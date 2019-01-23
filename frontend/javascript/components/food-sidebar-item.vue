@@ -29,7 +29,7 @@
             <div v-else class="venue-name-dummy dummy dummy-blinker"></div>
 
             <p v-if="data.address" class="venue-address">{{ data.address }}</p>
-            <div v-else class="venue-address-dummy" :class="{'dummy dummy-blinker': isDummy}"></div>
+            <div v-else-if="isDummy" class="venue-address-dummy dummy dummy-blinker"></div>
             <template v-if="!isDummy">
               <div v-if="hasRequest" class="request-status">
                 <p :class="requestColor">
@@ -39,7 +39,7 @@
                   <a v-if="requestUrl" :href="requestUrl" target="_blank">
                     zur Anfrage&nbsp;&rarr;
                   </a>
-                  <span v-else>Anfrage gestellt!</span>
+                  <span v-else>Anfrage gestellt, Bestätigung läuft...</span>
                 </p>
                 <p v-if="requestComplete">
                   <a :href="requestUrl" target="_blank" @click.prevent.stop="setDetail">
@@ -53,6 +53,12 @@
                   anfragen&nbsp;&rarr;
                 </a>
               </p>
+              <food-follow
+                v-if="user"
+                :follow="data.follow"
+                @followed="$emit('followed', $event)"
+                @unfollowed="$emit('unfollowed')"
+              ></food-follow>
             </template>
             <div v-else class="dummy-actions dummy">
             </div>
@@ -70,13 +76,21 @@
 
 <script>
 import FoodItemMixin from '../lib/mixin'
+import FoodFollow from './food-follow.vue'
 
 export default {
   name: 'food-sidebar-item',
   mixins: [FoodItemMixin],
+  components: {
+    FoodFollow
+  },
   props: {
     data: {
       type: Object
+    },
+    user: {
+      type: Object,
+      default: null
     },
     selectedVenueId: {
       type: String
