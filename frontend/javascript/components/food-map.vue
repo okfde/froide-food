@@ -122,11 +122,12 @@
               <food-mapoverlay v-if="stacked && selectedVenue"
                 :data="selectedVenue"
                 :config="config"
+                :user="user"
                 @close="clearSelected"
                 @startRequest="startRequest"
                 @detail="setDetail"
-                @followed="followedRequest(data, $event)"
-                @unfollowed="data.follow.follows = false"
+                @followed="followedRequest(selectedVenue, $event)"
+                @unfollowed="selectedVenue.follow.follows = false"
               ></food-mapoverlay>
             </div>
           </div>

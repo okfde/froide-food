@@ -58,10 +58,14 @@
 
 <script>
 import FoodItemMixin from '../lib/mixin'
+import FoodFollow from './food-follow.vue'
 
 export default {
   name: 'food-mapoverlay',
   mixins: [FoodItemMixin],
+  components: {
+    FoodFollow
+  },
   props: {
     data: {
       type: Object
