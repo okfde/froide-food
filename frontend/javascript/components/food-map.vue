@@ -36,18 +36,21 @@
                   <span class="d-none d-sm-none d-md-inline">Ort</span>
                 </button>
               </div>
-              <div class="input-group-append" v-if="false">
+              <div class="input-group-append">
                 <button class="btn btn-outline-secondary" :class="{'active': showFilter}" @click="openFilter">
                   <i class="fa fa-gears" aria-hidden="true"></i>
                   <span class="d-none d-sm-none d-md-inline">Filter</span>
                 </button>
               </div>
             </div>
+            <slide-up-down :active="showFilter" :duration="300">
+              <div class="switch-filter">
+                <switch-button v-model="onlyRequested" color="#FFC006" @toggle="search">nur angefragte Betriebe zeigen</switch-button>
+              </div>
+              <food-filter v-if="false" :filters="filters" @change="filterChanged" @apply="applyFilter"></food-filter>
+            </slide-up-down>
           </div>
         </div>
-        <slide-up-down :active="showFilter" :duration="300">
-          <food-filter :filters="filters" @change="filterChanged" @apply="applyFilter"></food-filter>
-        </slide-up-down>
         <div class="row">
           <div class="col-md-8 col-lg-9 order-md-2 map-column">
             <div class="map-container" ref="foodMap" id="food-map" :class="mapContainerClass" :style="mapContainerStyle">
@@ -80,13 +83,18 @@
                       <span class="d-none d-lg-inline">Ort</span>
                     </button>
                   </div>
-                  <div class="input-group-append" v-if="false">
+                  <div class="input-group-append">
                     <button class="btn btn-outline-secondary" :class="{'active': showFilter}" @click="openFilter">
                       <i class="fa fa-gears" aria-hidden="true"></i>
                       <span class="d-none d-sm-none d-md-inline">Filter</span>
                     </button>
                   </div>
                 </div>
+                <slide-up-down :active="showFilter" :duration="300">
+                  <div class="switch-filter">
+                    <switch-button v-model="onlyRequested" color="#FFC006" @toggle="search">nur angefragte Betriebe zeigen</switch-button>
+                  </div>
+                </slide-up-down>
               </div>
 
               <l-map ref="map" :zoom="zoom" :center="center" :options="mapOptions" :maxBounds="maxBounds">
@@ -212,6 +220,7 @@ import FoodDetail from './food-detail'
 import FoodLoader from './food-loader'
 import FoodRequest from './food-request'
 import FoodNewVenue from './food-new-venue'
+import SwitchButton from './switch-button'
 
 import {
   getPlaceStatus, getPinURL, getPinColor,
@@ -270,7 +279,8 @@ export default {
   components: {
     LMap, LTileLayer, LControlLayers, LControlZoom, LMarker, LPopup, LTooltip,
     FoodPopup, FoodSidebarItem, FoodLocator, FoodMapoverlay, FoodLoader, FoodDetail,
-    FoodFilter, FoodRequest, FoodNewVenue, SlideUpDown
+    FoodFilter, FoodRequest, FoodNewVenue, SlideUpDown,
+    SwitchButton
   },
   data () {
     let locationKnown = false
@@ -364,6 +374,7 @@ export default {
       isTouch: L.Browser.touch && L.Browser.mobile,
       listShown: false,
       query: query || '',
+      onlyRequested: false,
       lastQuery: '',
       paramIdent: paramIdent,
       mapMoved: false,
@@ -662,52 +673,89 @@ export default {
       } else {
         cats = ''
       }
-      window.fetch(`/api/v1/venue/?q=${encodeURIComponent(this.query)}${cats}&${locationParam}`)
+      let onlyRequested = ''
+      if (this.onlyRequested) {
+        onlyRequested = '&requested=1'
+      }
+      window.fetch(`/api/v1/venue/?q=${encodeURIComponent(this.query)}${cats}&${locationParam}${onlyRequested}`)
+        .then((response) => {
+          return response.json()
+        }).then(this.searchDone(options))
+    },
+    searchDone (options) {
+      return (data) => {
+        if (data.error) {
+          console.warn('Error requesting the API')
+          this.goToMap()
+          this.location = ''
+          this.searching = false
+          this.error = true
+          this.showLocator = true
+          return
+        }
+        this.hasSearched = true
+        if (data.results.length === 0) {
+          this.searchEmpty = true
+        }
+        this.locationKnown = true
+        var requestMapping = {}
+        var hasRequests = false
+        this.venueMap = {}
+        this.venues = data.results.map((r, i) => {
+          let d = this.createVenue(r, i)
+          this.venueMap[d.id] = i
+          if (d.requests.length > 0 && d.requests[0].id !== null) {
+            hasRequests = true
+            requestMapping[d.requests[0].id] = d.id
+          }
+          if (this.paramIdent && r.ident.indexOf(this.paramIdent) !== -1) {
+            this.selectedVenueId = d.id
+          }
+          if (this.alreadyRequested[d.id]) {
+            d.requested = true
+          }
+          return d
+        })
+        if (options.location && this.venues.length > 0) {
+          let venueLocations = this.venues.map((r) => {
+            return L.latLng(r.position[0], r.position[1])
+          })
+          let bounds = L.latLngBounds(venueLocations)
+
+          if (!this.maxBounds.contains(bounds)) {
+            this.locatorErrorMessage = 'Dein Ort scheint nicht in Deutschland zu sein!'
+            this.setLocator(true)
+            return
+          }
+          this.map.fitBounds(bounds)
+        }
+        this.preventMapMoved()
+        this.searching = false
+        if (hasRequests && this.userInfo) {
+          this.getFollowers(requestMapping)
+        }
+      }
+    },
+    getFollowers (requestMapping) {
+      let requestIds = []
+      for (let key in requestMapping) {
+        requestIds.push(key)
+      }
+      let requests = requestIds.join(',')
+      window.fetch(`/api/v1/following/?request=${requests}`)
         .then((response) => {
           return response.json()
         }).then((data) => {
-          if (data.error) {
-            console.warn('Error requesting the API')
-            this.goToMap()
-            this.location = ''
-            this.searching = false
-            this.error = true
-            this.showLocator = true
-            return
-          }
-          this.hasSearched = true
-          if (data.results.length === 0) {
-            this.searchEmpty = true
-          }
-          this.locationKnown = true
-          this.venueMap = {}
-          this.venues = data.results.map((r, i) => {
-            let d = this.createVenue(r, i)
-            this.venueMap[d.id] = i
-            if (this.paramIdent && r.ident.indexOf(this.paramIdent) !== -1) {
-              this.selectedVenueId = d.id
+          data.objects.forEach((obj) => {
+            let parts = obj.request.split('/')
+            let requestId = parseInt(parts[parts.length - 2])
+            let venueId = requestMapping[requestId]
+            let venueIndex = this.venueMap[venueId]
+            let venue = this.venues[venueIndex]
+            if (venue) {
+              Vue.set(venue, 'follow', obj)
             }
-            if (this.alreadyRequested[d.id]) {
-              d.requested = true
-            }
-            return d
           })
-          if (options.location && this.venues.length > 0) {
-            let venueLocations = this.venues.map((r) => {
-              return L.latLng(r.position[0], r.position[1])
-            })
-            let bounds = L.latLngBounds(venueLocations)
-
-            if (!this.maxBounds.contains(bounds)) {
-              this.locatorErrorMessage = 'Dein Ort scheint nicht in Deutschland zu sein!'
-              this.setLocator(true)
-              return
-            }
-
-            this.map.fitBounds(bounds)
-          }
-          this.preventMapMoved()
-          this.searching = false
         })
     },
     createVenue (r, i) {
@@ -990,7 +1038,7 @@ $icon-failure: #dc3545;
 
 @media screen and (max-width: 960px){
   .map-search {
-    width: 40%;
+    width: 60%;
   }
 }
 
@@ -1016,9 +1064,12 @@ $icon-failure: #dc3545;
 @media screen and (min-width: 768px){
   .redo-search {
     left: 0;
-    width: 40%;
+    width: 30%;
     text-align: left;
     margin-left: 1rem;
+    .btn {
+      font-size: 0.85rem;
+    }
   }
 }
 
@@ -1156,6 +1207,13 @@ $icon-failure: #dc3545;
   text-align: center;
   margin-top: 15px;
   padding: 15px 0;
+}
+
+.switch-filter {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px;
+  background-color: #fff;
 }
 
 </style>
