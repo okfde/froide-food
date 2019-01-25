@@ -1,0 +1,76 @@
+{% extends CMS_TEMPLATE %}
+
+{% load humanize %}
+{% load food_tags %}
+
+{% block top_block %}{% endblock %}
+
+{% block body %}
+  <div class="container">
+    <h1>Topf Secret – Aktuelle Zahlen</h1>
+    <dl>
+      <dt>Zeitpunkt</dt>
+      <dd>{{ now | date:"SHORT_DATETIME" }}</dd>
+      <dt>Anfragen insgesamt</dt>
+      <dd>{{ total.request_count|intcomma }}</dd>
+      <dt>NutzerInnen insgesamt</dt>
+      <dd>{{ total.user_count|intcomma }}</dd>
+    </dl>
+    <h2>Nach Bundesland</h2>
+    <div class="responsive-table">
+      <table class="table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Bundesland</th>
+            <th class="text-right">Anfragen</th>
+            <th class="text-right">NutzerInnen</th>
+            <th class="text-right">Bevölkerung in Mio.</th>
+            <th class="text-right">Anfragen pro 100.000 Einwohner</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for line in by_jurisdiction %}
+            <tr>
+              <th>{{ forloop.counter }}.</th>
+              <td>{{ line.publicbody__jurisdiction__name }}</td>
+              <td class="text-right">{{ line.request_count|intcomma }}</td>
+              <td class="text-right">{{ line.user_count|intcomma }}</td>
+              <td class="text-right">{{ line.population|in_mio }}</td>
+              <td class="text-right">{{ line|request_population_ratio|intcomma }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <hr/>
+
+    <h2 class="mt-5">Top 30 Großstädte</h2>
+    <div class="responsive-table">
+      <table class="table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Bundesland</th>
+            <th class="text-right">Anfragen</th>
+            <th class="text-right">NutzerInnen</th>
+            <th class="text-right">Bevölkerung in Mio.</th>
+            <th class="text-right">Anfragen pro 100.000 Einwohner</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for line in by_region %}
+            <tr>
+              <th>{{ forloop.counter }}.</th>
+              <td>{{ line.name }}</td>
+              <td class="text-right">{{ line.request_count|intcomma }}</td>
+              <td class="text-right">{{ line.user_count|intcomma }}</td>
+              <td class="text-right">{{ line.population|in_mio }}</td>
+              <td class="text-right">{{ line|request_population_ratio|intcomma }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

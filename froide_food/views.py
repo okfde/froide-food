@@ -1,15 +1,26 @@
+import functools
 import json
+import operator
 
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.db import models
+from django.db.models import (
+    Q, Count, Sum, F, Avg, Subquery, OuterRef, CharField,
+    IntegerField
+)
 from django.conf import settings
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib import messages
+from django.utils import timezone
 
 from froide.foirequest.views import MakeRequestView
 from froide.helper.utils import get_redirect
+from froide.publicbody.models import PublicBody
+from froide.georegion.models import GeoRegion
 
 from .venue_providers import venue_provider, venue_providers
+from .models import VenueRequestItem
 from .utils import (
     get_city_from_request, make_request_url, get_request_count,
     get_hygiene_publicbody, MAX_REQUEST_COUNT
@@ -102,3 +113,145 @@ def old_make_request(request, place, ident):
         })
 
     return redirect(url)
+
+
+def stats(request):
+
+    base_stats = dict(
+        request_count=Count('*'),
+        user_count=Count('foirequest__user_id', distinct=True),
+    )
+
+    def agg_requests(qs, **extras):
+        return qs.annotate(
+            **base_stats,
+            **extras
+        ).order_by('-request_count')
+
+    city_states = ('Berlin', 'Hamburg', 'Bremen')
+    city_regions = GeoRegion.objects.filter(
+        kind__in=('borough', 'district'),
+        part_of__name__in=city_states,
+    )
+    top_regions_raw = (
+        GeoRegion.objects
+        .exclude(name__in=city_states)
+        .filter(
+            population__isnull=False, kind='district',
+            kind_detail__contains='Stadt'
+        )
+    )
+
+    top_regions = top_regions_raw.order_by('-population')[:30]
+
+    top_regions = GeoRegion.objects.filter(
+        id__in=[
+            t.id for t in top_regions] + [
+            t.id for t in city_regions
+        ]
+    ).select_related('part_of')
+
+    vris = (
+        VenueRequestItem.objects
+        .exclude(foirequest__status='awaiting_user_confirmation')
+        .filter(timestamp__year__gte=2019)
+    )
+    total = vris.aggregate(**base_stats)
+
+    by_jurisdiction = agg_requests(
+        vris.annotate(
+            population=F('publicbody__jurisdiction__region__population')
+        ).values('publicbody__jurisdiction__name', 'population'),
+    )
+
+    by_region = top_regions.annotate(
+        request_count=Count(
+            'publicbody__venuerequestitem',
+            filter=Q(publicbody__venuerequestitem__in=vris),
+            distinct=True
+        ),
+        user_count=Count(
+            'publicbody__venuerequestitem__foirequest__user_id',
+            filter=Q(publicbody__venuerequestitem__in=vris),
+            distinct=True
+        ),
+    )
+    regions = {}
+    for top in by_region:
+        if top.part_of.name in city_states:
+            name = top.part_of.name
+            regions.setdefault(name, {
+                'population': top.part_of.population
+            })
+            region = regions[name]
+        else:
+            name = top.name
+            region = {
+                'population': top.population
+            }
+            regions[name] = region
+        region['name'] = name
+        region.setdefault('request_count', 0)
+        region['request_count'] += top.request_count
+        region.setdefault('user_count', 0)
+        region['user_count'] += top.user_count
+
+    regions = list(regions.values())
+
+    # Special case SH
+    sh_regions = (
+        GeoRegion.objects
+        .filter(
+            population__isnull=False,
+            kind='district',
+            part_of__name='Schleswig-Holstein'
+        )
+    ).order_by('-population')[:5]
+    sh_regions = GeoRegion.objects.filter(
+        id__in=sh_regions
+    )
+    sh_query = functools.reduce(operator.or_, [
+        Q(venue__geo__coveredby=x.geom) for x in sh_regions
+    ])
+    sh_vris = vris.filter(sh_query).annotate(
+        region=Subquery(
+            sh_regions.filter(geom__covers=OuterRef('venue__geo'))
+            .values('name')[:1]
+        )
+    ).select_related('venue', 'foirequest')
+
+    region_map = {}
+    for vri in sh_vris:
+        for reg in sh_regions:
+            if not reg.geom.covers(vri.venue.geo):
+                continue
+            if reg.name not in region_map:
+                region = {
+                    'name': reg.name,
+                    'population': reg.population,
+                    'request_count': 0,
+                    'user_count': 0,
+                    'region_users': set()
+                }
+                region_map[reg.name] = region
+            else:
+                region = region_map[reg.name]
+            region['request_count'] += 1
+            if vri.foirequest.user_id not in region['region_users']:
+                region['user_count'] += 1
+            region['region_users'].add(vri.foirequest.user_id)
+            break
+
+    regions = regions + list(region_map.values())
+    regions = list(sorted(
+        regions,
+        key=lambda x: x['request_count'],
+        reverse=True
+        ))[:30]
+
+    return render(request, 'froide_food/stats.html', {
+        'total': total,
+        'now': timezone.now(),
+        'by_jurisdiction': by_jurisdiction,
+        'by_region': regions,
+    })
