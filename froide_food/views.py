@@ -204,11 +204,17 @@ def stats(request):
         .filter(
             population__isnull=False,
             kind='district',
+            kind_detail__contains='Stadt',
             part_of__name='Schleswig-Holstein'
         )
     ).order_by('-population')[:5]
+    hannover = GeoRegion.objects.filter(
+        name='Hannover', kind='municipality'
+    )
     sh_regions = GeoRegion.objects.filter(
-        id__in=sh_regions
+        id__in=[r.id for r in sh_regions] + [
+            r.id for r in hannover
+        ]
     )
     sh_query = functools.reduce(operator.or_, [
         Q(venue__geo__coveredby=x.geom) for x in sh_regions
