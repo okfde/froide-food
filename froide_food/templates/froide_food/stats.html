@@ -53,7 +53,6 @@
             <th></th>
             <th>Bundesland</th>
             <th class="text-right">Anfragen</th>
-            <th class="text-right">NutzerInnen</th>
             <th class="text-right">Bevölkerung in Mio.</th>
             <th class="text-right">Anfragen pro 100.000 Einwohner</th>
           </tr>
@@ -64,7 +63,6 @@
               <th>{{ forloop.counter }}.</th>
               <td>{{ line.name }}</td>
               <td class="text-right">{{ line.request_count|intcomma }}</td>
-              <td class="text-right">{{ line.user_count|intcomma }}</td>
               <td class="text-right">{{ line.population|in_mio }}</td>
               <td class="text-right">{{ line|request_population_ratio|intcomma }}</td>
             </tr>
