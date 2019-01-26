@@ -10,7 +10,7 @@
     <h1>Topf Secret – Aktuelle Zahlen</h1>
     <dl>
       <dt>Zeitpunkt</dt>
-      <dd>{{ now | date:"SHORT_DATETIME" }}</dd>
+      <dd>{{ now | date:"SHORT_DATETIME_FORMAT" }}</dd>
       <dt>Anfragen insgesamt</dt>
       <dd>{{ total.request_count|intcomma }}</dd>
       <dt>NutzerInnen insgesamt</dt>
