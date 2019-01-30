@@ -129,6 +129,7 @@ def osm_help(request):
                 venue.context.update({
                     'checked': True,
                     'action': action,
+                    'osmid': request.POST.get('osmid')
                 })
                 venue.save()
             except VenueRequest.DoesNotExist:
