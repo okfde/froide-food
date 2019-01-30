@@ -3,11 +3,10 @@ import json
 import operator
 
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.urls import reverse
-from django.db import models
 from django.db.models import (
-    Q, Count, Sum, F, Avg, Subquery, OuterRef, CharField,
-    IntegerField
+    Q, Count, F, Subquery, OuterRef
 )
 from django.conf import settings
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -16,11 +15,10 @@ from django.utils import timezone
 
 from froide.foirequest.views import MakeRequestView
 from froide.helper.utils import get_redirect
-from froide.publicbody.models import PublicBody
 from froide.georegion.models import GeoRegion
 
 from .venue_providers import venue_provider, venue_providers
-from .models import VenueRequestItem
+from .models import VenueRequest, VenueRequestItem
 from .utils import (
     get_city_from_request, make_request_url, get_request_count,
     get_hygiene_publicbody, MAX_REQUEST_COUNT
@@ -113,6 +111,44 @@ def old_make_request(request, place, ident):
         })
 
     return redirect(url)
+
+
+def osm_help(request):
+    vrs = VenueRequest.objects.exclude(
+        ident__startswith='amenity',
+        context__checked=True
+    )
+    if request.method == 'POST':
+        ACTIONS = ('osmfixed', 'notexist', 'shouldwork', 'osmmissing')
+        venue_id = request.POST.get('venue_id')
+        action = request.POST.get('action')
+
+        if action in ACTIONS:
+            try:
+                venue = vrs.get(id=venue_id)
+                venue.context.update({
+                    'checked': True,
+                    'action': action,
+                })
+                venue.save()
+            except VenueRequest.DoesNotExist:
+                pass
+        if request.is_ajax():
+            return JsonResponse({})
+        return redirect('food-osm_help')
+
+    city = request.GET.get('city')
+    if city:
+        city_q = functools.reduce(operator.and_, [
+            Q(address__contains=c.strip()) for c in city.split()
+        ])
+        vrs = vrs.filter(city_q)
+
+    vrs = vrs.order_by('?')[:30]
+    return render(request, 'froide_food/osm_help.html', {
+        'venues': vrs,
+        'city': city or ''
+    })
 
 
 def stats(request):

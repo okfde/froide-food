@@ -1,0 +1,104 @@
+{% extends CMS_TEMPLATE %}
+
+{% load l10n %}
+{% load food_tags %}
+
+{% block top_block %}{% endblock %}
+
+{% block body %}
+  <div class="container">
+    <h1>Topf Secret – Betriebe, die nicht in OSM gefunden wurden</h1>
+    <p>Hier können Sie helfen Lebensmittelbetriebe in OSM besser zu kennzeichnen.</p>
+    <p>Häufige Probleme:</p>
+    <ul>
+      <li>Betrieb hat auf OSM keinen oder einen falschen Namen</li>
+      <li>Betrieb hat nicht die richtigen Tags (<code>amenity</code> oder <code>shop</code>)
+      <li>Betrieb existiert vielleicht gar nicht (mehr)</li>
+      <li>Der Betrieb wurde fälschlicherweise in Topf Secret neu angelegt</li>
+      <li>Betrieb konnte aus anderem Grund nicht mit OSM verknüpft</li>
+    </ul>
+    <p>
+      Nutzen Sie ihr lokales Wissen und prüfen Sie die Betriebe unten mit der OSM-Karte.
+      Auf OSM können Sie dann auch Details korrigieren oder Betriebe anlegen.
+      Geben Sie uns dann gerne Feedback mit den Buttons.
+    </p>
+    <form action="" method="get" class="mt-5 mb-5">
+      <div class="form-group mb-2">
+        <label for="city">Ort/PLZ</label>
+        <input id="city" class="form-control " type="text" name="city" value="{{ city }}" placeholder="Ortsname oder PLZ"/>
+        <small class="form-text text-muted">
+          Wird in der Adresse des Betriebs gesucht
+        </small>
+      </div>
+      <p>
+        <button type="submit" class="btn btn-primary mb-2">Suchen</button>
+      </p>
+    </form>
+
+    {% if city %}
+      <p>Zufällige Auswahl an Betrieben mit dem Suchwort “{{ city }}”.</p>
+    {% else %}
+      <p>Zufällige Auswahl an Betrieben deutschlandweit.</p>
+    {% endif %}
+      
+    <div class="responsive-table">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Adresse</th>
+            <th>OpenStreetMap an dem Ort</th>
+            <th>Feedback</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for venue in venues %}
+            <tr>
+              <td>{{ venue.name }} ({{ venue.get_provider }})</td>
+              <td>{{ venue.address|linebreaksbr }}</td>
+              <td>
+                {% localize off %}
+                <a href="https://www.openstreetmap.org/#map=19/{{ venue.geo.coords.1 }}/{{ venue.geo.coords.0 }}" target="_blank" rel="noopener">
+                  auf OSM-Karte
+                </a>
+                {% endlocalize %}
+              </td>
+              <td>
+                <form action="" method="post" class="d-inline ajaxified">
+                  {% csrf_token %}
+                  <input type="hidden" name="venue_id" value="{{ venue.id }}"/>
+                  <button class="mt-1 mr-1 btn btn-sm btn-success" name="action" type="submit" value="osm_fixed">
+                      in OSM korrigiert
+                  </button>
+                </form>
+                <form action="" method="post" class="d-inline ajaxified">
+                  {% csrf_token %}
+                  <input type="hidden" name="venue_id" value="{{ venue.id }}"/>
+                  <button class="mt-1 mr-1 btn btn-sm btn-danger" name="action" type="submit" value="osm_missing">
+                      fehlt in OSM
+                  </button>
+                </form>
+                <form action="" method="post" class="d-inline ajaxified">
+                  {% csrf_token %}
+                  <input type="hidden" name="venue_id" value="{{ venue.id }}"/>
+                  <button class="mt-1 mr-1 btn btn-sm btn-warning" name="action" type="submit" value="not_exist">
+                      existiert nicht (mehr)
+                  </button>
+                </form>
+                <form action="" method="post" class="ajaxified">
+                  {% csrf_token %}
+                  <input type="hidden" name="venue_id" value="{{ venue.id }}"/>
+                  <input type="text" pattern="\d+" class="form-control mt-1 col-5" name="osmid" value="" placeholder="OSM ID"/>
+                  <button class="mt-1 mr-1 btn btn-sm btn-dark" name="action" type="submit" value="should_work">
+                      sollte schon gehen
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+{% endblock %}
