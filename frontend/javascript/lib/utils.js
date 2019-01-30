@@ -17,7 +17,7 @@ function getRequestStatus (status, resolution) {
       return 'success'
     } else if (resolution === 'refused') {
       return 'failure'
-    } else if (resolution === 'user_withdrew') {
+    } else if (resolution === 'user_withdrew' || resolution === 'user_withdrew_costs') {
       return 'withdrawn'
     } else {
       return 'complete'
@@ -52,8 +52,8 @@ function getPinColor (status, selected) {
         return '#0a8927'
       case 'failure':
         return '#be1727'
-      case 'withdrawn':
-        return '#bebebe'
+      default:
+        return '#003d7f'
     }
   } else {
     switch (status) {
@@ -66,8 +66,8 @@ function getPinColor (status, selected) {
         return '#28a745'
       case 'failure':
         return '#dc3545'
-      case 'withdrawn':
-        return '#dcdcdc'
+      default:
+        return '#007bff'
     }
   }
 }
@@ -103,9 +103,9 @@ function latlngToGrid (latlng) {
 
 function postData (url = '', data = {}, csrfToken) {
   return window.fetch(url, {
-    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    method: 'POST',
     cache: 'no-cache',
-    credentials: 'same-origin', // include, *same-origin, omit
+    credentials: 'same-origin',
     headers: {
       'Content-Type': 'application/json',
       'X-CSRFToken': csrfToken

@@ -101,18 +101,27 @@ var FoodItemMixin = {
       if (this.lastRequest === null) {
         return true
       }
+      let lastStatus = getRequestStatus(
+        this.lastRequest.status,
+        this.lastRequest.resolution
+      )
+      if (lastStatus === 'withdrawn') {
+        return true
+      }
       return this.daysSinceLastRequest > DAYS_BETWEEN_REQUEST
     },
     requestComplete () {
       return this.data.requests.some((r) => {
         let status = getRequestStatus(r.status, r.resolution)
-        return status !== 'normal' && status !== 'pending'
+        return status !== 'normal' && status !== 'pending' && status !== 'withdrawn'
       })
     },
     requestStatusColor () {
       let status = getPlaceStatus(this.data)
       switch (status) {
         case 'normal':
+          return [null, null]
+        case 'withdrawn':
           return [null, null]
         case 'success':
           return ['Anfrage erfolgreich', 'success']
