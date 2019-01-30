@@ -17,6 +17,8 @@ function getRequestStatus (status, resolution) {
       return 'success'
     } else if (resolution === 'refused') {
       return 'failure'
+    } else if (resolution === 'user_withdrew') {
+      return 'withdrawn'
     } else {
       return 'complete'
     }
@@ -50,6 +52,8 @@ function getPinColor (status, selected) {
         return '#0a8927'
       case 'failure':
         return '#be1727'
+      case 'withdrawn':
+        return '#bebebe'
     }
   } else {
     switch (status) {
@@ -62,6 +66,8 @@ function getPinColor (status, selected) {
         return '#28a745'
       case 'failure':
         return '#dc3545'
+      case 'withdrawn':
+        return '#dcdcdc'
     }
   }
 }
