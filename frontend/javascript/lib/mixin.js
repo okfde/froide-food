@@ -37,6 +37,9 @@ var FoodItemMixin = {
     isFoursquare () {
       return this.hasIdent && this.data.ident.indexOf('foursquare:') === 0
     },
+    isOsm () {
+      return this.hasIdent && this.data.ident.indexOf('amenity:') === 0
+    },
     starClass () {
       let suffix = ''
       let rating = this.data.rating
@@ -48,6 +51,16 @@ var FoodItemMixin = {
     },
     starRating () {
       return `Bewertung ${this.data.rating} Sterne`
+    },
+    osmLink () {
+      if (this.isOsm) {
+        let osmid = this.data.ident.split('_')[1]
+        if (osmid.length < 15) {
+          // IDs higher than 10^15 are converted ways/relations from osmconvert
+          return `https://www.openstreetmap.org/node/${osmid}`
+        }
+      }
+      return ''
     },
     providerLogoBg () {
       return {

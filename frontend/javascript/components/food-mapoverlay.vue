@@ -4,7 +4,15 @@
       <div class="row">
         <div class="col-12 info-column">
           <div class="mapoverlay-header">
-            <h4 class="venue-name">{{ data.name }}</h4>
+            <h4 class="venue-name">
+              {{ data.name }}
+              <small v-if="osmLink" class="float-right">
+                <a :href="osmLink" class="text-muted" target="_blank" rel="noopener">
+                  <span class="fa fa-map-o text-black-50"></span>
+                  <span class="sr-only">OpenStreetMap</span>
+                </a>
+              </small>
+            </h4>
             <button type="button" class="close" aria-label="Close" @click="$emit('close')">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -35,7 +43,7 @@
                   </a>
                 </p>
                 <food-follow
-                  v-if="user"
+                  v-if="user && !requestComplete"
                   :follow="data.follow"
                   @followed="$emit('followed', $event)"
                   @unfollowed="$emit('unfollowed')"
