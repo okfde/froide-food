@@ -141,8 +141,8 @@ def stats(request):
             kind_detail__contains='Stadt'
         )
     )
-
-    top_regions = top_regions_raw.order_by('-population')[:30]
+    REGION_COUNT = 50
+    top_regions = top_regions_raw.order_by('-population')[:REGION_COUNT]
 
     top_regions = GeoRegion.objects.filter(
         id__in=[
@@ -208,12 +208,13 @@ def stats(request):
             part_of__name='Schleswig-Holstein'
         )
     ).order_by('-population')[:5]
-    hannover = GeoRegion.objects.filter(
-        name='Hannover', kind='municipality'
+    small_regions = GeoRegion.objects.filter(
+        Q(name='Hannover', kind='municipality') |
+        Q(name='Saarbrücken', kind='municipality')
     )
     sh_regions = GeoRegion.objects.filter(
         id__in=[r.id for r in sh_regions] + [
-            r.id for r in hannover
+            r.id for r in small_regions
         ]
     )
     sh_query = functools.reduce(operator.or_, [
@@ -253,7 +254,7 @@ def stats(request):
         regions,
         key=lambda x: x['request_count'],
         reverse=True
-        ))[:30]
+        ))[:REGION_COUNT]
 
     return render(request, 'froide_food/stats.html', {
         'total': total,
