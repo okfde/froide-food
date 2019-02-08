@@ -133,7 +133,7 @@ export default {
       fetching: !this.data.full,
       lawType: LAW_TYPE,
       closedWarning: false, 
-      addressHelpText: 'Ihre Adresse wird nicht öffentlich angezeigt. Im Anfragetext widersprechen Sie der Weitergabe Ihrer Anschrift an Dritte.'
+      addressHelpText: 'Ihre Adresse wird nicht öffentlich angezeigt. <strong class="text-danger">Es kann passieren, dass die zuständige Behörde auf Nachfrage des Betriebs Ihren Namen und Ihre Anschrift an den Betrieb weiterleitet.</strong>'
     }
   },
   computed: {
