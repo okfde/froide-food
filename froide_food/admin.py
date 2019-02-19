@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 from django.contrib import admin
 from django.conf.urls import url
+from django.utils import timezone
 from django.core.exceptions import PermissionDenied
 
 from leaflet.admin import LeafletGeoAdmin
@@ -100,4 +103,30 @@ class VenueRequestAdmin(LeafletGeoAdmin):
     get_last_resolution_display.short_description = 'letztes Ergebnis'
 
 
+class VenueRequestItemAdmin(admin.ModelAdmin):
+    list_display = ('venue', 'timestamp',)
+    list_filter = ('foirequest__status',)
+    date_hierarchy = 'timestamp'
+
+    actions = ['remove_unconfirmed']
+
+    def get_querset(self, request):
+        return super().get_querset().prefetch_related(
+            'venue', 'foirequest'
+        )
+
+    def remove_unconfirmed(self, request, queryset):
+        week_ago = timezone.now() - timedelta(days=7)
+        queryset = queryset.filter(
+            timestamp__lt=week_ago,
+            foirequest__status='awaiting_user_confirmation'
+        )
+        for vri in queryset:
+            venue = vri.venue
+            vri.delete()
+            venue.update_from_items()
+    remove_unconfirmed.short_description = 'Alte unbestaetigte entfernen'
+
+
 admin.site.register(VenueRequest, VenueRequestAdmin)
+admin.site.register(VenueRequestItem, VenueRequestItemAdmin)

@@ -9,6 +9,12 @@ def connect_request_object(sender, **kwargs):
         return
     if not reference.startswith('food:'):
         return
+
+    sender.user.tags.add('food')
+    if not sender.user.is_active:
+        # First-time requester
+        sender.user.tags.add('food-first')
+
     namespace, food_place_id = reference.split(':', 1)
 
     venue, _ = VenueRequest.objects.get_or_create(

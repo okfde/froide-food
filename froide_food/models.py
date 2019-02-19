@@ -30,6 +30,21 @@ class VenueRequest(models.Model):
     def __str__(self):
         return self.name
 
+    def update_from_items(self):
+        vris = VenueRequestItem.objects.filter(venue=self)
+
+        if vris:
+            vri = vris[0]
+            self.last_request = vri.timestamp
+            self.last_status = vri.foirequest.status
+            self.last_resolution = vri.foirequest.resolution
+            self.save()
+        else:
+            self.last_request = None
+            self.last_status = ''
+            self.last_resolution = ''
+            self.save()
+
     def to_place(self, with_requests=False):
         d = {
             'ident': self.ident,
