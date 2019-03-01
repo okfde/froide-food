@@ -142,7 +142,17 @@
           </div>
 
           <div class="col-md-4 col-lg-3 order-md-1 sidebar-column">
-            <div class="sidebar" :class="{'modal-active': modalActive}" ref="foodList" id="food-list" v-scroll.window="handleSidebarScroll">
+            <div class="sidebar" :class="{'modal-active': modalActive}"
+                ref="foodList" id="food-list" v-scroll.window="handleSidebarScroll">
+              <div class="new-venue-area" v-if="hasSearched || error">
+                <template v-if="searchEmpty">
+                  <p v-if="lastQuery">Keine Betriebe mit dem Suchwort „{{ lastQuery }}“ gefunden.</p>
+                  <p v-else>Keine Betriebe an diesem Ort gefunden.</p>
+                </template>
+                <button class="btn btn-sm btn-light" @click="setNewVenue(true)">
+                  Betrieb nicht gefunden?
+                </button>
+              </div>
               <template v-if="searching">
                 <food-sidebar-item v-for="data in fakeVenues"
                   :key="data.id"
@@ -161,15 +171,6 @@
                 @followed="followedRequest(data, $event)"
                 @unfollowed="data.follow.follows = false"
               ></food-sidebar-item>
-              <div class="new-venue-area" v-if="hasSearched || error">
-                <template v-if="searchEmpty">
-                  <p v-if="lastQuery">Keine Betriebe mit dem Suchwort „{{ lastQuery }}“ gefunden.</p>
-                  <p v-else>Keine Betriebe an diesem Ort gefunden.</p>
-                </template>
-                <button class="btn btn-sm btn-light" @click="setNewVenue(true)">
-                  Betrieb nicht gefunden?
-                </button>
-              </div>
             </div>
           </div>
 
