@@ -111,6 +111,15 @@ class VenueRequestItem(models.Model):
         return '%s %s' % (self.venue, self.timestamp)
 
     def to_request(self):
+        if not self.self.foirequest:
+            return {
+                'id': None,
+                'url': '',
+                'status': '',
+                'resolution': '',
+                'timestamp': None,
+                'documents': []
+            }
         if self.foirequest.is_public():
             return {
                 'id': self.foirequest.pk,
