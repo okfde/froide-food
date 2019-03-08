@@ -111,7 +111,7 @@ class VenueRequestItem(models.Model):
         return '%s %s' % (self.venue, self.timestamp)
 
     def to_request(self):
-        if not self.self.foirequest:
+        if not self.foirequest:
             return {
                 'id': None,
                 'url': '',
