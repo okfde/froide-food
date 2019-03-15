@@ -40,6 +40,13 @@ function getPinURL (color) {
   return PINS[color]
 }
 
+const COLORS = {
+  normal: '#007bff',
+  pending: '#ffc107',
+  success: '#28a745',
+  failure: '#dc3545',
+}
+
 function getPinColor (status, selected) {
   if (selected) {
     switch (status) {
@@ -58,16 +65,16 @@ function getPinColor (status, selected) {
   } else {
     switch (status) {
       case 'normal':
-        return '#007bff'
+        return COLORS.normal
       case 'pending':
-        return '#ffc107'
+        return COLORS.pending
       case 'success':
       case 'complete':
-        return '#28a745'
+        return COLORS.success
       case 'failure':
-        return '#dc3545'
+        return COLORS.failure
       default:
-        return '#007bff'
+        return COLORS.normal
     }
   }
 }
@@ -123,5 +130,6 @@ export {
   getPinColor,
   canUseLocalStorage,
   latlngToGrid,
-  postData
+  postData,
+  COLORS
 }

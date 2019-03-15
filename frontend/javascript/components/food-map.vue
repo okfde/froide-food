@@ -102,7 +102,14 @@
                   :url="tileProvider.url" :attribution="tileProvider.attribution"/>
 
                 <l-control-zoom position="bottomright"/>
-
+                <l-control position="bottomleft" >
+                  <ul class="color-legend">
+                    <li :style="colorLegend.normal"><span>Jetzt anfragen!</span></li>
+                    <li :style="colorLegend.pending"><span>Anfrage läuft</span></li>
+                    <li :style="colorLegend.success"><span>Anfrage erfolgreich</span></li>
+                    <li :style="colorLegend.failure"><span>Anfrage abgelehnt</span></li>
+                  </ul>
+                </l-control>
                 <l-marker v-for="marker in venues" :key="marker.id"
                     :lat-lng="marker.position" :title="marker.name"
                     :draggable="false" :icon="marker.icon" :options="markerOptions"
@@ -210,7 +217,7 @@
 import 'whatwg-fetch'
 import Vue from 'vue'
 
-import { LMap, LTileLayer, LControlLayers, LControlZoom, LMarker, LPopup, LTooltip } from 'vue2-leaflet'
+import { LMap, LTileLayer, LControlLayers, LControlZoom, LControl, LMarker, LPopup, LTooltip } from 'vue2-leaflet'
 import 'leaflet.icon.glyph'
 import bbox from '@turf/bbox'
 import smoothScroll from '../lib/smoothscroll'
@@ -229,7 +236,8 @@ import SwitchButton from './switch-button'
 
 import {
   getPlaceStatus, getPinURL, getPinColor,
-  getQueryVariable, canUseLocalStorage, latlngToGrid
+  getQueryVariable, canUseLocalStorage, latlngToGrid,
+  COLORS,
 } from '../lib/utils'
 
 var getIdFromPopup = (e) => {
@@ -282,7 +290,7 @@ export default {
     }
   },
   components: {
-    LMap, LTileLayer, LControlLayers, LControlZoom, LMarker, LPopup, LTooltip,
+    LMap, LTileLayer, LControlLayers, LControlZoom, LControl, LMarker, LPopup, LTooltip,
     FoodPopup, FoodSidebarItem, FoodLocator, FoodMapoverlay, FoodLoader, FoodDetail,
     FoodFilter, FoodRequest, FoodNewVenue, SlideUpDown,
     SwitchButton
@@ -547,6 +555,14 @@ export default {
     },
     modalActive () {
       return this.showLocator || this.showDetail
+    },
+    colorLegend () {
+      return {
+        normal: `background-image: url('${getPinURL(COLORS.normal)}')`,
+        pending: `background-image: url('${getPinURL(COLORS.pending)}')`,
+        success: `background-image: url('${getPinURL(COLORS.success)}')`,
+        failure: `background-image: url('${getPinURL(COLORS.failure)}')`,
+      }
     }
   },
   methods: {
@@ -1223,7 +1239,6 @@ $icon-failure: #dc3545;
 
 .new-venue-area {
   text-align: center;
-  margin-top: 15px;
   padding: 15px 0;
 }
 
@@ -1232,6 +1247,22 @@ $icon-failure: #dc3545;
   justify-content: flex-end;
   padding: 15px;
   background-color: #fff;
+}
+
+.color-legend {
+  margin-bottom: 0;
+  padding: 0.5rem;
+  background-color: #fff;
+  list-style: none;
+}
+
+.color-legend li {
+  background-repeat: no-repeat;
+  padding-left: 1.5rem;
+}
+
+.color-legend li span {
+  color: #333;
 }
 
 </style>
