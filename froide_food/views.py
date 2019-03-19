@@ -192,9 +192,11 @@ def stats(request):
         VenueRequestItem.objects
         .exclude(
             foirequest__status='awaiting_user_confirmation',
-            foirequest__isnull=True
         )
-        .filter(timestamp__year__gte=2019)
+        .filter(
+            timestamp__year__gte=2019,
+            foirequest__isnull=False
+        )
     )
     total = vris.aggregate(**base_stats)
 
