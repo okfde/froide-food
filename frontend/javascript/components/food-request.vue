@@ -65,7 +65,7 @@
               (<a href="https://www.foodwatch.org/de/datenschutz/#topfsecret">Datenschutz</a>)
             </p>
             <div class="text-right">
-              <button type="submit" class="btn btn-lg btn-success">
+              <button type="submit" class="btn btn-lg btn-success" :disabled="submitting">
                 <i class="fa fa-angle-double-right" aria-hidden="true"></i>
                 Kontrollbericht anfragen
               </button>
@@ -133,6 +133,7 @@ export default {
       fetching: !this.data.full,
       lawType: LAW_TYPE,
       closedWarning: false, 
+      submitting: false,
       addressHelpText: 'Ihre Adresse wird nicht öffentlich angezeigt. <strong class="text-danger">Es kann passieren, dass die zuständige Behörde auf Nachfrage des Betriebs Ihren Namen und Ihre Anschrift an den Betrieb weiterleitet.</strong>'
     }
   },
@@ -187,8 +188,11 @@ export default {
       this.$emit('close')
     },
     formSubmit () {
-      this.$emit('requestMade', this.data)
-      this.$emit('close')
+      this.submitting = true
+      window.setTimeout(() => {
+        this.$emit('requestmade', this.data)
+        this.$emit('close')
+      }, 300)
     }
   }
 }
