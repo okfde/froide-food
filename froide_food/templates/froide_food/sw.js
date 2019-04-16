@@ -9,8 +9,6 @@ var PRECACHE_FILES = [
   '{% static "css/main.css" %}',
   '{% static "fonts/fontawesome-webfont.woff2" %}',
   '{% static "img/okfde.svg" %}',
-  '{% static "img/spinner.gif" %}',
-  '{% static "img/spinner.svg" %}',
   '{% static "food/manifest.json" %}',
 ];
 
