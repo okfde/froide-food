@@ -259,6 +259,9 @@ def connect_foirequest(foirequest, provider):
     if place is None:
         # create custom venue
         place = venue_providers['custom'].create(info)
+        if place is None:
+            print('Could not geolocate', foirequest.id)
+            return
         vr = VenueRequest.objects.get(ident=place['ident'])
     else:
         existing = VenueRequest.objects.filter(
