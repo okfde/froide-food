@@ -16,9 +16,13 @@ class CustomVenueProvider(BaseVenueProvider):
     name = 'custom'
 
     def create(self, data):
-        point, formatted_address = geocode(data['address'])
-        if point is None:
-            return None
+        if not data.get('geo'):
+            point, formatted_address = geocode(data['address'])
+            if point is None:
+                return None
+        else:
+            point = data['geo']
+            formatted_address = data['address']
 
         if not self.is_in_germany(point.coords):
             return None

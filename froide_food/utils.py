@@ -19,7 +19,7 @@ from froide.foirequest.models import FoiRequest
 from froide.georegion.models import GeoRegion
 from froide.helper.utils import get_client_ip
 
-from .models import VenueRequestItem
+from .models import VenueRequest, VenueRequestItem
 from .geocode import geocode
 
 TIME_PERIOD = timedelta(days=90)
@@ -33,8 +33,14 @@ CITY2_RE = re.compile(r', ([\w -]+)$')
 TITLE_RE = re.compile(r'Kontrollbericht (?:für|zu) ([^,]+)(?:, ([\w -]+))?$')
 PLZ_RE = re.compile(r'(\d{5}) ([\w -]+)')
 
-Q1 = '1. Wann haben die beiden letzten lebensmittelrechtlichen Betriebsüberprüfungen im folgenden Betrieb stattgefunden:'
-Q2 = '2. Kam es hierbei zu Beanstandungen? Falls ja, beantrage ich hiermit die Herausgabe des entsprechenden Kontrollberichts an mich.'
+Q1 = (
+    '1. Wann haben die beiden letzten lebensmittelrechtlichen '
+    'Betriebsüberprüfungen im folgenden Betrieb stattgefunden:'
+)
+Q2 = (
+    '2. Kam es hierbei zu Beanstandungen? Falls ja, beantrage ich '
+    'hiermit die Herausgabe des entsprechenden Kontrollberichts an mich.'
+)
 
 
 def get_hygiene_publicbodies(lat, lng):
@@ -111,7 +117,8 @@ def make_request_url(place, publicbody):
         'body': body.encode('utf-8'),
         'ref': ref,
         'law_type': 'VIG',
-        'redirect': '/k/lks'  # short, redirects to /kampagnen/lebensmittelkontrolle/gesendet/
+        # short URL, redirects to /kampagnen/lebensmittelkontrolle/gesendet/
+        'redirect': '/k/lks'
     }
     hide_features = (
         'hide_public', 'hide_full_text', 'hide_similar', 'hide_publicbody',
@@ -167,6 +174,10 @@ def get_name_and_address(venue):
             break
     if not foirequest:
         return
+    return get_name_and_address_from_request(foirequest)
+
+
+def get_name_and_address_from_request(foirequest):
     info = {}
     title = foirequest.title
     match = TITLE_RE.search(title)
@@ -185,8 +196,6 @@ def get_name_and_address(venue):
 
 
 def match_venue_with_provider(venue, provider):
-    from .venue_providers import venue_providers
-
     if venue.ident.startswith(provider):
         return True
     if venue.context.get('failed_' + provider):
@@ -205,40 +214,111 @@ def match_venue_with_provider(venue, provider):
         else:
             print('No name found, using')
 
+    if venue.geo:
+        info['geo'] = venue.geo
+
+    if not venue.address and info.get('address'):
+        venue.address = info['address']
+        venue.save()
+
+    place = find_place_from_info(info, provider)
+    if place is None:
+        return False
+
     if not venue.geo:
-        if not info.get('address'):
-            print('No address found.')
-            return False
-        address = info['address']
-        point, formatted_address = geocode(address)
-        if not point:
-            print('Geocoding failed.', address)
-            return False
-        venue.address = formatted_address
-        venue.geo = point
+        venue.address = info['address']
+        venue.geo = info['geo']
         venue.save()
     if not venue.address and info.get('address'):
         venue.address = info['address']
         venue.save()
-    venue_provider = venue_providers[provider]
-    place = venue_provider.match_place(
-        [
-            venue.geo.coords[1],
-            venue.geo.coords[0]
-        ],
-        info['name']
-    )
-    if not place:
-        print('No match found.')
-        return False
-    place_point = Point(place['lng'], place['lat'])
-    distance = geopy_distance(place_point, venue.geo)
-    if distance.meters > 100:
-        print('Matches too far away.')
-        return False
+
     venue.context[provider] = place['ident'].split(':', 1)[1]
     current, current_id = venue.ident.split(':', 1)
     venue.context[current] = current_id
     venue.ident = provider + ':' + venue.context[provider]
     venue.save()
     return True
+
+
+def connect_foirequest(foirequest, provider):
+    from .venue_providers import venue_providers
+
+    exists = VenueRequestItem.objects.filter(foirequest=foirequest).exists()
+    if exists:
+        print('Already connected', foirequest.id)
+        return
+
+    info = get_name_and_address_from_request(foirequest)
+    if not info.get('name') or not (info.get('address') or info.get('geo')):
+        print('Could not find name/address info', foirequest.id)
+        return
+
+    place = find_place_from_info(info, provider)
+
+    if place is None:
+        # create custom venue
+        place = venue_providers['custom'].create(info)
+        vr = VenueRequest.objects.get(ident=place['ident'])
+    else:
+        existing = VenueRequest.objects.filter(
+            ident=place['ident']
+        )
+        if len(existing) > 1:
+            print('Too many vrs for', place['ident'], foirequest.id)
+            return
+        elif existing:
+            vr = existing[0]
+        else:
+            vr = VenueRequest.objects.create(
+                ident=place['ident'],
+                name=info['name'],
+                address=info['address'],
+                geo=place['geo'],
+            )
+    foirequest.reference = 'food:' + vr.ident
+    foirequest.save()
+
+    vri = VenueRequestItem.objects.create(
+        venue=vr,
+        timestamp=foirequest.first_message,
+        foirequest=foirequest,
+        publicbody=foirequest.public_body
+    )
+    vr.update_from_items()
+    return vri
+
+
+def find_place_from_info(info, provider):
+    from .venue_providers import venue_providers
+
+    venue_provider = venue_providers[provider]
+    if not info.get('geo'):
+        if not info.get('address'):
+            print('No address found.')
+            return
+        address = info['address']
+        point, formatted_address = geocode(address)
+        if not point:
+            print('Geocoding failed.', address)
+            return
+        info['geo'] = point
+        info['address'] = formatted_address
+
+    place = venue_provider.match_place(
+        [
+            info['geo'].coords[1],
+            info['geo'].coords[0]
+        ],
+        info['name']
+    )
+    if not place:
+        print('No match found.')
+        return None
+    place_point = Point(place['lng'], place['lat'])
+    distance = geopy_distance(place_point, info['geo'])
+    if distance.meters > 100:
+        print('Matches too far away.')
+        return None
+    place['geo'] = place_point
+    return place
