@@ -39,6 +39,7 @@ setup(
         'requests',
         'geocoder',
         'geopy',
+        'fdfgen',
     ],
     include_package_data=True,
     classifiers=[

@@ -1,0 +1,94 @@
+{% extends CMS_TEMPLATE %}
+
+{% load static %}
+{% load form_helper %}
+
+{% block top_block %}{% endblock %}
+
+{% block body %}
+  <div class="container mt-3">
+
+    <div class="row mt-5 mb-5">
+      <div class="col-md-8">
+        <h2>Widerspruch gegen Bezirksamt Spandau von Berlin</h2>
+      </div>
+    </div>
+
+    {% if sent %}
+      <div class="row mb-5 justify-content-center">
+        <div class="col-md-12">
+          <p class="lead">
+            Sie müssen jetzt noch das PDF herunterladen, ausdrucken, <strong>unterschreiben</strong> und per Post an die Behörde schicken.
+          </p>
+          <p>
+            Das Porto beträgt bei 13 Seiten leider 1,45 €. Unsere Anwältin konnte sich nicht kürzer halten. 🙂
+          </p>
+          <form method="post" action="" class="disable-submit mb-3">
+            {% csrf_token %}
+            <div class="d-none">
+              {% render_form form %}
+            </div>
+            <input type="hidden" name="downloadpdf" value="1"/>
+            <p class="text-center">
+              <button type="submit" class="btn btn-lg btn-success">
+                <span class="fa fa-file-pdf-o"></span>
+                Widerspruch als PDF herunterladen
+              </button>
+            </p>
+          </form>
+
+          {% if multiple %}
+            <p>
+              Sie müssen einen Widerspruch für jeden Ihrer abgelehnten Anträge abschicken. <a href="">Zurück zum Formular.</a>
+            </p>
+          {% endif %}
+
+          {% if foirequest %}
+            <p class="mt-5">
+              Wir haben das PDF auch per Mail an die Behörde gesendet.
+              <a href="{{ foirequest.get_absolute_url }}#last">
+                Zu Ihrer Anfrage.
+              </a>
+            </p>
+          {% endif %}
+
+        </div>
+      </div>
+
+    {% else %}
+      <div class="row">
+        <div class="col-md-8">
+          <p>
+            Wenn Sie eine Ablehnung vom Bezirksamt Spandau erhalten haben, führen Sie folgende Schritte durch, um einen kostenfreien Widerspruch einzureichen.
+          </p>
+          <ol class="mt-3 mb-3">
+            <li>Füllen Sie das untenstehende Formular aus, um ein Widerspruchsschreiben zu generieren.</li>
+            <li>Der Widerspruch wird von uns vorab per E-Mail zugestellt.</li>
+            <li>
+              <strong>Wichtig:</strong> Sie müssen das generierte Schreiben ausdrucken, <strong>selbst unterschreiben</strong> und es per Post an die Behörde schicken.
+            </li>
+          </ol>
+        </div>
+      </div>
+      <div class="row mt-5 mb-5">
+        <div class="col-md-8">
+          <form method="post" action="" class="disable-submit">
+            {% csrf_token %}
+
+            {% render_form form %}
+
+            <p class="text-right">
+              <button type="submit" class="btn btn-lg btn-primary">
+                Widerspruch generieren und verschicken
+              </button>
+            </p>
+          </form>
+          <p class="mt-3">
+            Der von unserer Anwältin geschriebene Widerspruch hat 13 Seiten und muss von Ihnen unterschrieben per Post abgeschickt werden. <a href="{% static 'food/documents/widerspruch_muster_spandau.pdf' %}" target="_blank" rel="noopener">Hier können Sie ein Muster-Exemplar ansehen.</a>
+          </p>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+{% endblock %}

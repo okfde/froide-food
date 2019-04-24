@@ -1,6 +1,9 @@
 from datetime import timedelta
 import logging
+import os
 import re
+import shutil
+import tempfile
 from urllib.parse import urlencode, quote
 
 from django.urls import reverse
@@ -18,6 +21,7 @@ from froide.publicbody.models import PublicBody
 from froide.foirequest.models import FoiRequest
 from froide.georegion.models import GeoRegion
 from froide.helper.utils import get_client_ip
+from froide.helper.document import shell_call
 
 from .models import VenueRequest, VenueRequestItem
 from .geocode import geocode
@@ -325,3 +329,32 @@ def find_place_from_info(info, provider):
         return None
     place['geo'] = place_point
     return place
+
+
+def get_filled_pdf_bytes(template_file, fields):
+    from fdfgen import forge_fdf
+
+    tmppath = tempfile.mkdtemp()
+    data_file = os.path.join(tmppath, 'data.fdf')
+
+    with open(data_file, "wb") as fdf_file:
+        fdf_file.write(forge_fdf('', fields, [], [], []))
+
+    output_file = os.path.join(tmppath, 'output.pdf')
+    arguments = [
+        'pdftk',
+        template_file,
+        "fill_form",
+        data_file,
+        "output",
+        output_file,
+        'flatten'
+    ]
+    try:
+        output_bytes = shell_call(arguments, tmppath, output_file)
+        return output_bytes
+    except Exception as err:
+        logging.error("Error during PDF FDF: %s", err)
+    finally:
+        shutil.rmtree(tmppath)
+    return None
