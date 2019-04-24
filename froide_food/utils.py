@@ -331,10 +331,14 @@ def find_place_from_info(info, provider):
     return place
 
 
-def get_filled_pdf_bytes(template_file, fields):
+def get_filled_pdf_bytes(original_template, fields):
     from fdfgen import forge_fdf
 
-    tmppath = tempfile.mkdtemp()
+    tmppath = tempfile.mkdtemp(dir=os.environ.get('HOME'))
+    template_file = os.path.join(tmppath, 'template.pdf')
+
+    shutil.copy(original_template, template_file)
+
     data_file = os.path.join(tmppath, 'data.fdf')
 
     with open(data_file, "wb") as fdf_file:
