@@ -327,8 +327,8 @@ def appeal(request):
     foirequests = FoiRequest.objects.filter(
         user=request.user,
         campaign=campaign,
-        # public_body__slug='veterinar-und-lebensmittelaufsichtsamt-spandau'
-        public_body__slug='freie-und-hansestadt-hamburg-bezirksamt-eimsbuttel-fachamt-verbraucherschutz-gewerbe-und-umwelt'
+        public_body__slug='veterinar-und-lebensmittelaufsichtsamt-spandau'
+        # public_body__slug='freie-und-hansestadt-hamburg-bezirksamt-eimsbuttel-fachamt-verbraucherschutz-gewerbe-und-umwelt'
     )
 
     sent = False
