@@ -362,3 +362,10 @@ def get_filled_pdf_bytes(original_template, fields):
     finally:
         shutil.rmtree(tmppath)
     return None
+
+
+def merge_venues(queryset):
+    original = queryset.order_by('id')[0]
+    for venue in queryset.exclude(id=original.id):
+        VenueRequestItem.objects.filter(venue=venue).update(venue=original)
+        venue.delete()

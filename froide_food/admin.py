@@ -37,6 +37,7 @@ class VenueRequestAdmin(LeafletGeoAdmin):
         'get_provider'
     )
     search_fields = ('name', 'ident')
+    actions = ['merge_venues']
 
     def get_urls(self):
         urls = super(VenueRequestAdmin, self).get_urls()
@@ -102,6 +103,15 @@ class VenueRequestAdmin(LeafletGeoAdmin):
             obj.last_resolution, (obj.last_resolution,)
         )[0]
     get_last_resolution_display.short_description = 'letztes Ergebnis'
+
+    def merge_venues(self, request, queryset):
+        """
+        Set articles selected as published.
+        """
+        from .utils import merge_venues
+        merge_venues(queryset)
+
+    merge_venues.short_description = 'Merge venues'
 
 
 class VenueRequestItemAdmin(admin.ModelAdmin):
