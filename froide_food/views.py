@@ -317,6 +317,10 @@ def stats(request):
 
 
 APPEAL_TAG = 'Widerspruch'
+APPEAL_PBS = {
+    15453,  # 'veterinar-und-lebensmittelaufsichtsamt-spandau'
+    15450,  # 'veterinar-und-lebensmittelaufsichtsamt-neukolln'
+}
 
 
 def appeal(request):
@@ -327,8 +331,7 @@ def appeal(request):
     foirequests = FoiRequest.objects.filter(
         user=request.user,
         campaign=campaign,
-        public_body__slug='veterinar-und-lebensmittelaufsichtsamt-spandau'
-        # public_body__slug='freie-und-hansestadt-hamburg-bezirksamt-eimsbuttel-fachamt-verbraucherschutz-gewerbe-und-umwelt'
+        public_body_id__in=APPEAL_PBS
     )
 
     sent = False
@@ -370,10 +373,12 @@ def get_pdf_bytes(data, redacted=False):
         ('DatumBescheid', data['date_refusal'].strftime('%d.%m.%Y')),
         ('Geschaeftszeichen', data['reference'] or our_reference),
     ]
+    foirequest = data['request']
+    filename = 'widerspruch_muster_%d.pdf' % foirequest.public_body_id
     template_file = os.path.abspath(
         os.path.join(
             os.path.dirname(__file__),
-            'static', 'food', 'documents', 'widerspruch_muster_spandau.pdf'
+            'static', 'food', 'documents', filename
         )
     )
     return get_filled_pdf_bytes(template_file, fields)

@@ -12,7 +12,7 @@ urlpatterns = [
     path('embed/', embed, name='food-embed'),
     path('_stats/', stats, name='food-stats'),
     path('osm-hilfe/', osm_help, name='food-osm_help'),
-    path('widerspruch/', appeal, name='food-spandau'),
+    path('widerspruch/', appeal, name='food-appeal'),
     path('anfragen/', make_request, name='food-make_request'),
     path('sw.js', cache_page(None)(TemplateView.as_view(
         template_name='froide_food/sw.js',
