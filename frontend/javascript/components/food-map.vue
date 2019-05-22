@@ -364,6 +364,7 @@ export default {
       showFilter: false,
       showDetail: null,
       showRequestForm: null,
+      autoUpdate: true,
       showNewVenue: false,
       user: this.userInfo,
       filters: this.config.filters,
@@ -634,6 +635,9 @@ export default {
         return
       }
       this.mapMoved = true
+      if (this.autoUpdate) {
+        this.searchArea()
+      }
     },
     preventMapMoved () {
       this.autoMoved = true
@@ -659,7 +663,6 @@ export default {
       this.searching = true
       this.searchEmpty = false
       this.clearSelected()
-      this.venues = []
       this.goToMap()
       let locationParam
       if (options.location) {
@@ -722,9 +725,14 @@ export default {
         this.locationKnown = true
         var requestMapping = {}
         var hasRequests = false
+
+        this.venues = []
         this.venueMap = {}
-        this.venues = data.results.map((r, i) => {
-          let d = this.createVenue(r, i)
+
+        let newVenues = data.results.filter((r) => {
+          return this.venueMap[this.getVenueId(r)] === undefined
+        }).map((r, i) => {
+          let d = this.createVenue(r)
           this.venueMap[d.id] = i
           if (d.requests.length > 0 && d.requests[0].id !== null) {
             hasRequests = true
@@ -738,6 +746,12 @@ export default {
           }
           return d
         })
+
+        this.venues = [
+          ...this.venues,
+          ...newVenues
+        ]
+
         if (options.location && this.venues.length > 0) {
           let venueLocations = this.venues.map((r) => {
             return L.latLng(r.position[0], r.position[1])
@@ -780,10 +794,13 @@ export default {
           })
         })
     },
-    createVenue (r, i) {
+    getVenueId (venue) {
+      return venue.ident.replace(/:/g, '-')
+    },
+    createVenue (r) {
       let d = {
         position: [r.lat, r.lng],
-        id: r.ident.replace(/:/g, '-'),
+        id: this.getVenueId(r),
         full: false,
         ...r
       }
