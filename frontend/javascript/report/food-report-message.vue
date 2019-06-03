@@ -31,7 +31,7 @@
       <template v-if="attachment">
         <a :href="attachment.site_url" target="_blank">Im neuen Fenster öffnen</a>
         <div v-if="attachment.is_pdf" class="container-sm-full">
-          <iframe :src="attachmentUrl" frameborder="0" style="width: 100%; height: 90vh; border: 0;"></iframe>
+          <iframe :src="pdfViewerUrl" frameborder="0" style="width: 100%; height: 90vh; border: 0;"></iframe>
         </div>
         <embed v-else :src="attachment.file_url" style="max-width: 100%;" :type="attachment.filetype"/>
       </template>
@@ -106,8 +106,8 @@ export default {
       date.reverse()
       return date.join('.')
     },
-    attachmentUrl () {
-      return `${this.config.viewerUrl}?file=${encodeURIComponent(this.attachment.fileUrl)}`
+    pdfViewerUrl () {
+      return `${this.config.viewerUrl}?file=${encodeURIComponent(this.attachment.file_url)}`
     },
     dateList () {
       const already = {}
