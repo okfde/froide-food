@@ -4,8 +4,10 @@ from django.utils import timezone
 from django.contrib.postgres.fields import JSONField
 from django.contrib.gis.geos import Point
 
+from django_amenities.models import Amenity
+
 from froide.publicbody.models import PublicBody
-from froide.foirequest.models import FoiRequest
+from froide.foirequest.models import FoiRequest, FoiMessage, FoiAttachment
 
 
 class VenueRequest(models.Model):
@@ -101,6 +103,7 @@ class VenueRequestItem(models.Model):
                                    on_delete=models.SET_NULL)
     publicbody = models.ForeignKey(PublicBody, null=True, blank=True,
                                    on_delete=models.SET_NULL)
+    checked_date = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ('-timestamp',)
@@ -137,3 +140,37 @@ class VenueRequestItem(models.Model):
             'timestamp': self.timestamp,
             'documents': []
         }
+
+
+class FoodSafetyReport(models.Model):
+    venue = models.ForeignKey(
+        VenueRequest, null=True,
+        on_delete=models.SET_NULL
+    )
+    request_item = models.ForeignKey(
+        VenueRequestItem, null=True,
+        on_delete=models.SET_NULL
+    )
+
+    message = models.ForeignKey(
+        FoiMessage, null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
+    attachment = models.ForeignKey(
+        FoiAttachment, null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
+    amenity = models.ForeignKey(
+        Amenity, null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
+    date = models.DateField(blank=True)
+    complaints = models.BooleanField(default=False)
+    summary = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = _('food safety report')
+        verbose_name_plural = _('food safety reports')
+
+    def __str__(self):
+        return '{} - {}'.format(self.venue, self.date)
