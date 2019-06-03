@@ -80,7 +80,7 @@ export default {
       })
     },
     markUnresolved () {
-      this.addreport({
+      this.addReport({
         foirequest: this.request.id,
         unresolved: true
       })
