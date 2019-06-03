@@ -1,12 +1,28 @@
 <template>
-  <div class="container mb-5">
-    <button class="btn btn-light" @click.prevent="getNextRequest">Nächste Anfrage</button>
-    <div v-if="loading" class="spinner-border" role="status">
-      <span class="sr-only">Loading...</span>
+  <div class="container mb-5 mt-2">
+    <div class="row" v-if="request">
+      <div class="col-auto">
+        <div v-if="loading" class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <h2>
+          <a :href="request.url">{{ request.title }}</a>
+        </h2>
+        <p>Datum der Kontrollberichte in dieser Anfrage:
+          <small v-for="d in reportDates" :key="d">{{ d }},</small>
+        </p>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-secondary" @click.prevent="markUnresolved">
+          Kein Ergebnis
+        </button>
+      </div>
+      <div class="col-auto ml-auto">
+        <button class="btn btn-light" @click.prevent="getNextRequest">
+          Nächste Anfrage &rarr;
+        </button>
+      </div>
     </div>
-    <p>Datum der Kontrollberichte in dieser Anfrage:
-      <small v-for="d in reportDates" :key="d">{{ d }},</small>
-    </p>
     <food-report-request v-if="request"
       :request="request"
       :config="config"

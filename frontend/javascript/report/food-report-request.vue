@@ -1,14 +1,5 @@
 <template>
-  <div class="container mt-5">
-    <div>
-      <h2>
-        <a :href="request.url">{{ request.title }}</a>
-        <button class="btn btn-secondary" @click.prevent="markUnresolved">
-          Kein Ergebnis
-        </button>
-      </h2>
-    </div>
-
+  <div class="container mt-2">
     <food-report-message
       v-for="message in messages"
       :key="message.id"
