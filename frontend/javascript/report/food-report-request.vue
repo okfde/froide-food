@@ -54,12 +54,6 @@ export default {
         ...data,
         foirequest: this.request.id
       })
-    },
-    markUnresolved () {
-      this.$emit('addreport', {
-        foirequest: this.request.id,
-        unresolved: true
-      })
     }
   }
 }

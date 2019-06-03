@@ -79,6 +79,12 @@ export default {
         }
       })
     },
+    markUnresolved () {
+      this.addreport({
+        foirequest: this.request.id,
+        unresolved: true
+      })
+    },
     getNextRequest () {
       this.reportDates = []
       this.loading = true
