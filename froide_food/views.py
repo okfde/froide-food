@@ -464,7 +464,7 @@ def show_reports(request):
                 Q(foirequest__resolution='partially_successful'),
                 foirequest__status='resolved',
                 checked_date__isnull=True
-            ).order_by('?')
+            ).order_by('?')[:1]
             if not vri:
                 return JsonResponse({'foirequest': None})
             return JsonResponse({'foirequest': vri[0].foirequest_id})
