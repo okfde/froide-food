@@ -17,6 +17,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib import messages
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
+from django.templatetags.static import static
 
 from froide.campaign.models import Campaign
 from froide.foirequest.models import FoiRequest, FoiAttachment
@@ -32,7 +33,7 @@ from .utils import (
     get_hygiene_publicbody, MAX_REQUEST_COUNT,
     get_filled_pdf_bytes
 )
-from .forms import AppealForm
+from .forms import AppealForm, ReportForm
 
 
 def get_food_map_config(request, embed):
@@ -345,7 +346,8 @@ def appeal(request):
                 response = HttpResponse(
                     pdf_bytes, content_type='application/pdf'
                 )
-                response['Content-Disposition'] = 'attachment; filename=widerspruch.pdf'
+                dispo = 'attachment; filename=widerspruch.pdf'
+                response['Content-Disposition'] = dispo
                 return response
 
             foirequest = data['request']
@@ -447,3 +449,33 @@ Mit freundlichen Grüßen
     attachment.save()
 
     return message
+
+
+def show_reports(request):
+    if not request.user.is_authenticated:
+        return render_403(request)
+    if not request.user.has_perm('froide_food.add_foodsafetyreport'):
+        return render_403(request)
+
+    if request.is_ajax():
+        if request.method == 'GET':
+            vri = VenueRequestItem.objects.filter(
+                Q(foirequest__resolution='successful') |
+                Q(foirequest__resolution='partially_successful'),
+                foirequest__status='resolved',
+                checked_date__isnull=True
+            ).order_by('?')
+            if not vri:
+                return JsonResponse({'foirequest': None})
+            return JsonResponse({'foirequest': vri[0].foirequest_id})
+        data = json.loads(request.body.decode('utf-8'))
+        form = ReportForm(data=data)
+        if form.is_valid():
+            form.save()
+        return JsonResponse({'errors': None})
+
+    return render(request, 'froide_food/report.html', {
+        'config': json.dumps({
+            'viewerUrl': static('filingcabinet/viewer/web/viewer.html')
+        }),
+    })

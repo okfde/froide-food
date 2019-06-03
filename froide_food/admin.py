@@ -12,7 +12,7 @@ from froide.helper.admin_utils import make_nullfilter
 from froide.helper.csv_utils import export_csv_response
 from froide.account.models import User
 
-from .models import VenueRequest, VenueRequestItem
+from .models import VenueRequest, VenueRequestItem, FoodSafetyReport
 
 
 class VenueRequestItemInlineAdmin(admin.StackedInline):
@@ -139,5 +139,13 @@ class VenueRequestItemAdmin(admin.ModelAdmin):
     remove_unconfirmed.short_description = 'Alte unbestaetigte entfernen'
 
 
+class FoodSafetyReportAdmin(admin.ModelAdmin):
+    raw_id_fields = (
+        'venue', 'request_item',
+        'message', 'attachment', 'amenity',
+    )
+
+
 admin.site.register(VenueRequest, VenueRequestAdmin)
 admin.site.register(VenueRequestItem, VenueRequestItemAdmin)
+admin.site.register(FoodSafetyReport, FoodSafetyReportAdmin)

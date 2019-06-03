@@ -1,0 +1,31 @@
+{% extends CMS_TEMPLATE %}
+
+{% load static %}
+{% load sekizai_tags %}
+
+{% block top_block %}{% endblock %}
+
+{% block body %}
+  {% csrf_token %}
+  <food-map
+    id="food-report"
+    :config="{{ config }}"
+    >
+    <div class="text-center">
+      <h3>Anwendung wird geladen</h3>
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+  </food-map>
+
+{% addtoblock 'css' %}
+  <link rel="stylesheet" href="{% static 'css/foodreport.css' %}">
+{% endaddtoblock %}
+
+{% addtoblock 'js' %}
+  <script src="{% static 'js/common.js' %}" charset="utf-8"></script>
+  <script src="{% static 'js/foodreport.js' %}" charset="utf-8"></script>
+{% endaddtoblock %}
+
+{% endblock %}

@@ -169,16 +169,21 @@ class AmenityVenueProvider(BaseVenueProvider):
             'category': r.amenity
         }
 
-    def get_place(self, ident):
+    def get_object(self, ident):
         if ident.startswith('amenity:'):
             ident = ident.replace('amenity:', '')
         pk = ident.split('_')[0]
         try:
-            amenity = Amenity.objects.get(pk=pk)
-            self.fix_address(amenity)
-            return self.extract_result(amenity)
+            return Amenity.objects.get(pk=pk)
         except Amenity.DoesNotExist:
             return None
+
+    def get_place(self, ident):
+        amenity = self.get_object(ident)
+        if amenity is None:
+            return None
+        self.fix_address(amenity)
+        return self.extract_result(amenity)
 
     def fix_address(self, amenity):
         address = amenity.address
