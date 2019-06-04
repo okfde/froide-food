@@ -96,11 +96,12 @@
                 </slide-up-down>
               </div>
 
-              <l-map ref="map" :zoom="zoom" :center="center" :options="mapOptions" :maxBounds="maxBounds">
-                <l-tile-layer
-                  layerType="base" :name="tileProvider.name" :visible="true"
-                  :url="tileProvider.url" :attribution="tileProvider.attribution"/>
-
+              <l-map ref="map" :zoom.sync="zoom" :center="center" :options="mapOptions" :max-bounds="maxBounds">
+                <l-tile-layer :url="tileProvider.url"/>
+                <l-control-attribution
+                  position="bottomright"
+                  :prefix="tileProvider.attribution"
+                />
                 <l-control-zoom position="bottomright"/>
                 <l-control position="bottomleft" >
                   <ul class="color-legend">
@@ -217,7 +218,7 @@
 import 'whatwg-fetch'
 import Vue from 'vue'
 
-import { LMap, LTileLayer, LControlLayers, LControlZoom, LControl, LMarker, LPopup, LTooltip } from 'vue2-leaflet'
+import { LMap, LTileLayer, LControlLayers, LControlAttribution, LControlZoom, LControl, LMarker, LPopup, LTooltip } from 'vue2-leaflet'
 import 'leaflet.icon.glyph'
 import bbox from '@turf/bbox'
 import smoothScroll from '../lib/smoothscroll'
@@ -290,7 +291,7 @@ export default {
     }
   },
   components: {
-    LMap, LTileLayer, LControlLayers, LControlZoom, LControl, LMarker, LPopup, LTooltip,
+    LMap, LTileLayer, LControlLayers, LControlZoom, LControl, LControlAttribution, LMarker, LPopup, LTooltip,
     FoodPopup, FoodSidebarItem, FoodLocator, FoodMapoverlay, FoodLoader, FoodDetail,
     FoodFilter, FoodRequest, FoodNewVenue, SlideUpDown,
     SwitchButton
@@ -400,13 +401,19 @@ export default {
         riseOnHover: true
       },
       tileProvider: {
-        name: 'OpenStreetMap',
-        // url: `https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}${window.L.Browser.retina ? '@2x' : ''}.png`,
+        name: 'Carto',
+        url: `//cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}${window.L.Browser.retina ? '@2x' : ''}.png`,
         // url: 'https://api.mapbox.com/styles/v1/{username}/{style}/tiles/{tileSize}/{z}/{x}/{y}{r}?access_token={accessToken}',
         // url: 'https://api.tiles.mapbox.com/v4/{style}/{z}/{x}/{y}.png?access_token={accessToken}',
-        // attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        // url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>',
+        options: {
+          // style: 'mapbox.streets',
+          // username: 'okfde',
+          // tileSize: 512,
+          // r: window.L.Browser.retina ? '@2x' : '',
+          // accessToken: 'pk.eyJ1Ijoib2tmZGUiLCJhIjoiY2p3aHBpZ2wzMjVxbTQ4bWduM2YwenQ2eCJ9.kzkjyGM8xIEShOZ7ekH5AA'
+        }
       }
     }
   },
@@ -435,34 +442,35 @@ export default {
     })
   },
   mounted () {
-    this.map.attributionControl.setPrefix('')
-    this.map.on('zoomend', (e) => {
-      this.mapHasMoved()
-      this.zoom = this.map.getZoom()
-      this.recordMapPosition()
+    this.$nextTick(() => {
+      this.map.attributionControl.setPrefix('')
+      this.map.on('zoomend', (e) => {
+        this.mapHasMoved()
+        this.recordMapPosition()
+      })
+      this.map.on('moveend', (e) => {
+        this.mapHasMoved()
+        this.recordMapPosition()
+      })
+      this.map.on('click', (e) => {
+        this.clearSelected()
+      })
+      this.map.on('popupopen', (e) => {
+        let nodeId = getIdFromPopup(e)
+        this.selectedVenueId = nodeId
+      })
+      this.map.on('popupclose', (e) => {
+        this.clearSelected()
+      })
+      window.addEventListener('resize', () => {
+        this.isStacked()
+      })
+      if (!this.locationKnown) {
+        this.setLocator(true)
+      } else {
+        this.search()
+      }
     })
-    this.map.on('moveend', (e) => {
-      this.mapHasMoved()
-      this.recordMapPosition()
-    })
-    this.map.on('click', (e) => {
-      this.clearSelected()
-    })
-    this.map.on('popupopen', (e) => {
-      let nodeId = getIdFromPopup(e)
-      this.selectedVenueId = nodeId
-    })
-    this.map.on('popupclose', (e) => {
-      this.clearSelected()
-    })
-    window.addEventListener('resize', () => {
-      this.isStacked()
-    })
-    if (!this.locationKnown) {
-      this.setLocator(true)
-    } else {
-      this.search()
-    }
   },
   computed: {
     map () {
@@ -998,6 +1006,8 @@ $icon-normal: #007bff;
 $icon-pending: #ffc107;
 $icon-success: #28a745;
 $icon-failure: #dc3545;
+
+@import "~leaflet/dist/leaflet.css";
 
 .icon-normal {
   fill: $icon-normal;
