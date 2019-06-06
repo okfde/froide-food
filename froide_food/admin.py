@@ -116,7 +116,11 @@ class VenueRequestAdmin(LeafletGeoAdmin):
 
 class VenueRequestItemAdmin(admin.ModelAdmin):
     list_display = ('venue', 'timestamp',)
-    list_filter = ('foirequest__status',)
+    list_filter = (
+        'foirequest__status',
+        'foirequest__resolution',
+        make_nullfilter('checked_date', 'Wurde geprüft'),
+    )
     date_hierarchy = 'timestamp'
 
     actions = ['remove_unconfirmed']
@@ -143,6 +147,13 @@ class FoodSafetyReportAdmin(admin.ModelAdmin):
     raw_id_fields = (
         'venue', 'request_item',
         'message', 'attachment', 'amenity',
+    )
+    list_display = ('venue', 'date', 'complaints',)
+    date_hierarchy = 'date'
+
+    list_filter = (
+        'complaints',
+        make_nullfilter('attachment', 'Hat Anfrage'),
     )
 
 
