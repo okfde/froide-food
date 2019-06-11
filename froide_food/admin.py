@@ -144,6 +144,10 @@ class VenueRequestItemAdmin(admin.ModelAdmin):
 
 
 class FoodSafetyReportAdmin(admin.ModelAdmin):
+    change_list_template = (
+        'admin/froide_food/foodsafetyreport/change_list.html'
+    )
+
     raw_id_fields = (
         'venue', 'request_item',
         'message', 'attachment', 'amenity',
@@ -153,8 +157,23 @@ class FoodSafetyReportAdmin(admin.ModelAdmin):
 
     list_filter = (
         'complaints',
-        make_nullfilter('attachment', 'Hat Anfrage'),
+        make_nullfilter('attachment', 'Hat Anhang'),
     )
+
+    def changelist_view(self, request, extra_context=None):
+        response = super().changelist_view(
+            request,
+            extra_context=extra_context,
+        )
+        try:
+            qs = response.context_data['cl'].queryset
+        except (AttributeError, KeyError):
+            return response
+
+        response.context_data['distinct_venues'] = (
+            qs.distinct('venue').order_by('venue').count()
+        )
+        return response
 
 
 admin.site.register(VenueRequest, VenueRequestAdmin)
