@@ -4,6 +4,7 @@
       v-for="message in messages"
       :key="message.id"
       :message="message"
+      :request="request"
       :config="config"
       @addreport="addReport"
     ></food-report-message>

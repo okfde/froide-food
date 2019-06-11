@@ -29,7 +29,10 @@
         </li>
       </ul>
       <template v-if="attachment">
-        <a :href="attachment.site_url" target="_blank">Im neuen Fenster öffnen</a>
+        <div class="mb-1">
+            <a :href="attachment.site_url" target="_blank">Im neuen Fenster öffnen</a>
+            <a :href="attachmentRedactionUrl" target="_blank" class="btn btn-small btn-dark">Schwärzen</a>
+        </div>
         <div v-if="attachment.is_pdf" class="container-sm-full">
           <iframe :src="pdfViewerUrl" frameborder="0" style="width: 100%; height: 90vh; border: 0;"></iframe>
         </div>
@@ -87,7 +90,10 @@ export default {
     },
     message: {
       type: Object
-    }
+    },
+    request: {
+      type: Object
+    },
   },
   mounted () {
   },
@@ -108,6 +114,9 @@ export default {
     },
     pdfViewerUrl () {
       return `${this.config.viewerUrl}?file=${encodeURIComponent(this.attachment.file_url)}`
+    },
+    attachmentRedactionUrl () {
+        return `/anfrage/${this.request.slug}/redact/${this.attachment.id}/`
     },
     dateList () {
       const already = {}
