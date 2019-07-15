@@ -149,6 +149,8 @@ class VenueViewSet(viewsets.ViewSet):
             })
         except (ValueError, KeyError):
             place = provider.get_detail(pk, detail=True)
+        except VenueProviderException:
+            place = None
 
         if place is None:
             return Response({'result': None, 'error': True})
