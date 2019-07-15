@@ -90,6 +90,8 @@ def make_request(request):
         return redirect('food-index')
 
     place = venue_providers[provider].get_place(ident)
+    if place is None:
+        return redirect('food-index')
 
     return get_redirect(request, default='food-index', params={
         'query': place['name'],
