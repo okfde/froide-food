@@ -268,6 +268,7 @@ const GERMANY_BOUNDS = [
 const DETAIL_ZOOM_LEVEL = 12
 const DEFAULT_ZOOM = 6
 const DEFAULT_POS = [51.00289959043832, 10.245523452758789]
+const MIN_DISTANCE_MOVED_REFRESH = 800 // in meters
 
 export default {
   name: 'food-map',
@@ -380,6 +381,7 @@ export default {
       venues: [],
       searching: false,
       hasSearched: false,
+      searchCenter: null,
       searchEmpty: false,
       error: false,
       locatorErrorMessage: '',
@@ -395,6 +397,7 @@ export default {
       paramIdent: paramIdent,
       mapMoved: false,
       autoMoved: false,
+      autoMovedTimeout: null,
       alreadyRequested: {},
       tooltipOffset: L.point([-10, -50]),
       markerOptions: {
@@ -449,6 +452,13 @@ export default {
         this.recordMapPosition()
       })
       this.map.on('moveend', (e) => {
+        if (this.searchCenter !== null) {
+          let currentPosition = this.map.getCenter()
+          let distance = this.searchCenter.distanceTo(currentPosition)
+          if (distance < MIN_DISTANCE_MOVED_REFRESH) {
+            return
+          }
+        }
         this.mapHasMoved()
         this.recordMapPosition()
       })
@@ -641,9 +651,6 @@ export default {
     },
     mapHasMoved() {
       if (this.autoMoved) {
-        window.requestAnimationFrame(() => {
-          this.autoMoved = false
-        })
         return
       }
       this.mapMoved = true
@@ -653,6 +660,13 @@ export default {
     },
     preventMapMoved () {
       this.autoMoved = true
+      if (this.autoMovedTimeout !== null) {
+        window.clearTimeout(this.autoMovedTimeout)
+      }
+      this.autoMovedTimeout = window.setTimeout(() => {
+        this.autoMoved = false
+        this.autoMovedTimeout = null
+      }, 1500)
     },
     userSearch () {
       if (this.query.match(/^\d{5}$/)) {
@@ -672,6 +686,11 @@ export default {
     search (options = {}) {
       this.mapMoved = false
       this.error = false
+      if (this.searching) {
+        // we are already searching
+        return
+      }
+      this.searchCenter = this.map.getCenter()
       this.searching = true
       this.searchEmpty = false
       this.clearSelected()
@@ -863,6 +882,7 @@ export default {
         this.goToMap()
       }
       Vue.set(marker, 'icon', this.getIcon(marker))
+      this.preventMapMoved()
     },
     imageLoaded (data) {
       Vue.set(data, 'imageLoaded', true)
@@ -909,6 +929,7 @@ export default {
       if (isMapTop !== this.isMapTop) {
         window.setTimeout(() => {
           this.map.invalidateSize()
+          this.preventMapMoved()
         }, 1000)
         this.preventMapMoved()
       }
