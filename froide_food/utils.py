@@ -21,7 +21,7 @@ from froide.publicbody.models import PublicBody
 from froide.foirequest.models import FoiRequest
 from froide.georegion.models import GeoRegion
 from froide.helper.utils import get_client_ip
-from froide.helper.document import shell_call
+from froide.helper.shell_utils import shell_call
 
 from .models import VenueRequest, VenueRequestItem
 from .geocode import geocode
