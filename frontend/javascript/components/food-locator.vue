@@ -42,7 +42,7 @@
               </div>
               <div class="input-group">
                 <div class="clearable-input">
-                  <input type="text" class="form-control" v-model="location" placeholder="Ort oder PLZ" @keydown.enter.prevent="locationLookup" :autofocus="!isMobile">
+                  <input type="text" class="form-control" v-model="location" placeholder="Ort oder PLZ" @keydown.enter.prevent="locationLookup">
                   <span class="clearer fa fa-close" v-if="location.length > 0" @click.stop="location = ''"></span>
                 </div>
                 <div class="input-group-append">
