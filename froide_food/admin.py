@@ -157,6 +157,7 @@ class FoodSafetyReportAdmin(admin.ModelAdmin):
 
     list_filter = (
         'complaints',
+        'disgusting',
         make_nullfilter('attachment', 'Hat Anhang'),
     )
 
