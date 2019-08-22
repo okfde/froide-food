@@ -166,6 +166,7 @@ class FoodSafetyReport(models.Model):
     )
     date = models.DateField(blank=True)
     complaints = models.BooleanField(default=False)
+    disgusting = models.BooleanField(default=False)
     summary = models.TextField(blank=True)
 
     class Meta:

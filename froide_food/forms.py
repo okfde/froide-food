@@ -82,6 +82,7 @@ class ReportForm(forms.Form):
     reportdate = forms.DateField(required=False)
     unresolved = forms.BooleanField(required=False)
     complaints = forms.BooleanField(required=False)
+    disgusting = forms.BooleanField(required=False)
     attachment = forms.ModelChoiceField(
         required=False,
         queryset=FoiAttachment.objects.all()
@@ -131,6 +132,7 @@ class ReportForm(forms.Form):
                 'message': data['message'],
                 'attachment': data['attachment'],
                 'amenity': amenity,
-                'complaints': data['complaints']
+                'complaints': data['complaints'],
+                'disgusting': data['disgusting']
             }
         )

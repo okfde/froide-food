@@ -8,6 +8,9 @@
       <button class="btn btn-danger" @click.prevent="addReport">
         Beanstandungen
       </button>
+      <button class="btn btn-warning" @click.prevent="addReportDisgusting">
+        Ekel-Alarm!
+      </button>
       <button class="btn btn-success" @click.prevent="addReportNoComplains">
         Keine Beanstandungen
       </button>
@@ -100,6 +103,8 @@ export default {
   data () {
     return {
       attachment: null,
+      disgusting: false,
+      complaints: false,
       reportdate: ''
     }
   },
@@ -141,23 +146,38 @@ export default {
         alert('Fehlendes Datum')
         return
       }
+      this.complaints = true
+      this.disgusting = false
       console.log(this.reportdate)
-      this.emitReport(true)
+      this.emitReport()
     },
     addReportNoComplains () {
       if (this.reportdate === '') {
         alert('Fehlendes Datum')
         return
       }
+      this.complaints = false
+      this.disgusting = false
       console.log(this.reportdate)
-      this.emitReport(false)
+      this.emitReport()
     },
-    emitReport(complaints) {
+    addReportDisgusting () {
+      if (this.reportdate === '') {
+        alert('Fehlendes Datum')
+        return
+      }
+      this.complaints = true
+      this.disgusting = true
+      console.log(this.reportdate)
+      this.emitReport()
+    },
+    emitReport() {
       this.$emit('addreport', {
         reportdate: this.reportdate,
         attachment: this.attachment ? this.attachment.id : null,
         message: this.message.id,
-        complaints: complaints
+        complaints: this.complaints,
+        disgusting: this.disgusting
       })
     },
     setDate(datestr) {
