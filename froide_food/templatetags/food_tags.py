@@ -1,5 +1,7 @@
 from django import template
 
+from ..models import FoodAuthorityStatus
+
 register = template.Library()
 
 
@@ -17,3 +19,16 @@ def request_population_ratio(value):
 @register.filter
 def in_mio(value):
     return round(value / 1_000_000, 2)
+
+
+@register.inclusion_tag('froide_food/_authority_status.html')
+def food_authority_status(foirequest):
+    try:
+        food_authority_status = FoodAuthorityStatus.objects.get(
+            publicbodies=foirequest.public_body
+        )
+    except FoodAuthorityStatus.DoesNotExist:
+        return {}
+    return {
+        'food_authority_status': food_authority_status
+    }

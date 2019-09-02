@@ -12,7 +12,9 @@ from froide.helper.admin_utils import make_nullfilter
 from froide.helper.csv_utils import export_csv_response
 from froide.account.models import User
 
-from .models import VenueRequest, VenueRequestItem, FoodSafetyReport
+from .models import (
+    VenueRequest, VenueRequestItem, FoodSafetyReport, FoodAuthorityStatus
+)
 
 
 class VenueRequestItemInlineAdmin(admin.StackedInline):
@@ -177,6 +179,11 @@ class FoodSafetyReportAdmin(admin.ModelAdmin):
         return response
 
 
+class FoodAuthorityStatusAdmin(admin.ModelAdmin):
+    raw_id_fields = ('publicbodies',)
+
+
 admin.site.register(VenueRequest, VenueRequestAdmin)
 admin.site.register(VenueRequestItem, VenueRequestItemAdmin)
 admin.site.register(FoodSafetyReport, FoodSafetyReportAdmin)
+admin.site.register(FoodAuthorityStatus, FoodAuthorityStatusAdmin)

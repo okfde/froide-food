@@ -175,3 +175,17 @@ class FoodSafetyReport(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.venue, self.date)
+
+
+class FoodAuthorityStatus(models.Model):
+    publicbodies = models.ManyToManyField(PublicBody)
+    cooperative = models.BooleanField(default=False)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = _('food authority status')
+        verbose_name_plural = _('food authority stati')
+
+    def __str__(self):
+        return self.title

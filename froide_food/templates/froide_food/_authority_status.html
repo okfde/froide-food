@@ -1,0 +1,11 @@
+{% load markup %}
+{% if food_authority_status %}
+
+<div class="alert {% if food_authority_status.cooperative %}alert-info{% else %}alert-warning{% endif %}">
+  <h3>{{ food_authority_status.title }}</h3>
+
+  {{ food_authority_status.description|markdown }}
+
+</div>
+
+{% endif %}
