@@ -149,7 +149,7 @@ class AmenityVenueProvider(BaseVenueProvider):
             results = results.order_by('?')
 
         if q is not None:
-            results = results.filter(name__contains=q)
+            results = results.filter(name__icontains=q.lower())
 
         results = results[:100]
 

@@ -43,8 +43,8 @@ class BaseVenueProvider(object):
         point = Point(*coords)
         return self.bounds.covers(point)
 
-    def get_venue_mapping_for_places(self, places,
-                                     coordinates=None, radius=None, **kwargs):
+    def get_venue_mapping_for_places(self, places, coordinates=None,
+                                     radius=None, q=None, **kwargs):
         ident_list = [p['ident'] for p in places]
         qs = VenueRequest.objects.filter(ident__in=ident_list)
 
@@ -54,14 +54,21 @@ class BaseVenueProvider(object):
                 radius = int(radius * 0.9)
             else:
                 radius = 500
-            qs = qs.union(
+
+            other_qs = (
                 VenueRequest.objects
                 .exclude(ident__startswith=self.name+':')
                 .filter(geo__isnull=False)
                 .filter(geo__dwithin=(point, radius))
                 .filter(
                     geo__distance_lte=(point, D(m=radius))
-                )[:50]
+                )
+            )
+            if q is not None:
+                other_qs = other_qs.filter(name__icontains=q.lower())
+            other_qs = other_qs[:50]
+            qs = qs.union(
+                other_qs
             )
 
         vris = VenueRequestItem.objects.select_related('foirequest')
