@@ -9,7 +9,7 @@ from django_amenities.models import Amenity
 
 from .base import BaseVenueProvider
 from ..geocode import geocode, reverse_geocode
-from ..utils import is_address_bad
+from ..utils import is_address_bad, normalize_name
 
 logger = logging.getLogger('froide')
 
@@ -213,9 +213,9 @@ class AmenityVenueProvider(BaseVenueProvider):
 
     def match_place(self, latlng, name):
         radius_thresholds = (
-            (30, 0.6),
-            (20, 0.5),
-            (10, 0.4)
+            (30, 0.8),
+            (20, 0.7),
+            (10, 0.6)
         )
 
         point = Point(latlng[1], latlng[0])
@@ -229,17 +229,22 @@ class AmenityVenueProvider(BaseVenueProvider):
                 .order_by("distance")
             )[:5]
             name = normalize_name(name)
-            for r in results:
-                if r.distance.m > radius:
-                    continue
-                r_name = normalize_name(r.name)
-                ratio = SequenceMatcher(None, name, r_name).ratio()
-                print('Checking: ', r.name, ' | ', name, ratio)
-                if ratio >= threshold:
-                    return self.extract_result(r)
+            matches = list(
+                rank_match_results(results, name, radius, threshold)
+            )
+            if matches:
+                # Sort by ratio, highest first
+                matches.sort(key=lambda x: x[0], reverse=True)
+                return self.extract_result(matches[0][1])
         return None
 
 
-def normalize_name(name):
-    name = name.replace('Restaurant', '').lower()
-    return name
+def rank_match_results(results, name, radius, threshold):
+    for r in results:
+        if r.distance.m > radius:
+            continue
+        r_name = normalize_name(r.name)
+        ratio = SequenceMatcher(None, name, r_name).ratio()
+        print('Checking: ', r.name, ' | ', name, ratio)
+        if ratio >= threshold:
+            yield ratio, r

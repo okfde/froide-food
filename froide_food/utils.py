@@ -1,4 +1,5 @@
 from datetime import timedelta
+from difflib import SequenceMatcher
 import logging
 import os
 import re
@@ -168,6 +169,11 @@ def get_request_count(request, pb):
 
 
 def get_name_and_address(venue):
+    if 'Kontrollbericht' not in venue.name and venue.address:
+        return {
+            'name': venue.name,
+            'address': venue.address
+        }
     vris = VenueRequestItem.objects.filter(venue=venue)
     if not vris:
         return
@@ -199,19 +205,22 @@ def get_name_and_address_from_request(foirequest):
     return info
 
 
-def match_venue_with_provider(venue, provider):
+def match_venue_with_provider(venue, provider, allow_failed=False):
     if venue.ident.startswith(provider):
         return True
-    if venue.context.get('failed_' + provider):
+    if not allow_failed and venue.context.get('failed_' + provider):
         return False
     if provider in venue.context:
         current, current_id = venue.ident.split(':', 1)
         venue.context[current] = current_id
         venue.ident = provider + ':' + venue.context[provider]
         venue.save()
+        check_and_merge_venue(venue)
         return True
     info = get_name_and_address(venue)
-    if not info or not info.get('name'):
+    if not info:
+        return False
+    if not info.get('name'):
         if 'Kontrollbericht' not in venue.name:
             print('No name found, using venue name', venue.name)
             info['name'] = venue.name
@@ -242,6 +251,7 @@ def match_venue_with_provider(venue, provider):
     venue.context[current] = current_id
     venue.ident = provider + ':' + venue.context[provider]
     venue.save()
+    check_and_merge_venue(venue)
     return True
 
 
@@ -364,8 +374,37 @@ def get_filled_pdf_bytes(original_template, fields):
     return None
 
 
+def check_and_merge_venue(venue):
+    queryset = VenueRequest.objects.filter(ident=venue.ident)
+    count = queryset.count()
+    if count > 1:
+        return merge_venues(queryset)
+    return venue
+
+
 def merge_venues(queryset):
     original = queryset.order_by('id')[0]
+    context = {}
     for venue in queryset.exclude(id=original.id):
+        context.update(venue.context)
         VenueRequestItem.objects.filter(venue=venue).update(venue=original)
         venue.delete()
+    original.context = context
+    original.update_from_items()
+    return original
+
+
+def normalize_name(name):
+    name = name.replace('Restaurant', '').lower()
+    return name
+
+
+def names_similar(name_1, name_2, threshold=0.7):
+    name_1 = normalize_name(name_1)
+    name_2 = normalize_name(name_2)
+    if not name_1 or not name_2:
+        return False
+    if name_1 in name_2 or name_2 in name_1:
+        return True
+    ratio = SequenceMatcher(None, name_1, name_2).ratio()
+    return ratio >= threshold
