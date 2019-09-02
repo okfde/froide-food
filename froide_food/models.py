@@ -38,8 +38,9 @@ class VenueRequest(models.Model):
         if vris:
             vri = vris[0]
             self.last_request = vri.timestamp
-            self.last_status = vri.foirequest.status
-            self.last_resolution = vri.foirequest.resolution
+            if vri.foirequest:
+                self.last_status = vri.foirequest.status
+                self.last_resolution = vri.foirequest.resolution
             self.save()
         else:
             self.last_request = None
