@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('publicbody', '0028_auto_20190527_1410'),
+        ('publicbody', '0026_publicbody_wikidata_item'),
         ('froide_food', '0013_foodsafetyreport_disgusting'),
     ]
 
