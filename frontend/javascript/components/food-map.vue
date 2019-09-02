@@ -168,7 +168,7 @@
                 </food-sidebar-item>
               </template>
               <food-sidebar-item v-for="data in venues"
-                :key="data.ident" :data="data"
+                :key="data.id" :data="data"
                 :config="config"
                 :user="user"
                 :selectedVenueId="selectedVenueId"
@@ -758,13 +758,17 @@ export default {
         var hasRequests = false
 
         this.venues = []
-        this.venueMap = {}
-
+        let duplicates = {}
         let newVenues = data.results.filter((r) => {
-          return this.venueMap[this.getVenueId(r)] === undefined
+          const vid = this.getVenueId(r)
+          // Filter out duplicates
+          if (duplicates[vid] === undefined) {
+            duplicates[vid] = true
+            return true
+          }
+          return false
         }).map((r, i) => {
           let d = this.createVenue(r)
-          this.venueMap[d.id] = i
           if (d.requests.length > 0 && d.requests[0].id !== null) {
             hasRequests = true
             requestMapping[d.requests[0].id] = d.id
@@ -782,6 +786,8 @@ export default {
           ...this.venues,
           ...newVenues
         ]
+        this.venueMap = {}
+        this.venues.forEach((d, i) => this.venueMap[d.id] = i)
 
         if (options.location && this.venues.length > 0) {
           let venueLocations = this.venues.map((r) => {
