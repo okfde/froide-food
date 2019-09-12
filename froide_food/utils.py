@@ -48,6 +48,12 @@ Q2 = (
 )
 
 
+def get_all_food_safety_agencies():
+    return PublicBody.objects.filter(
+        categories__name='Lebensmittelüberwachung',
+    )
+
+
 def get_hygiene_publicbodies(lat, lng):
     point = Point(lng, lat)
 
@@ -60,8 +66,7 @@ def get_hygiene_publicbodies(lat, lng):
     if not regions:
         raise ValueError('Dieser Ort scheint nicht in Deutschland zu sein!')
 
-    return PublicBody.objects.filter(
-        categories__name='Lebensmittelüberwachung',
+    return get_all_food_safety_agencies().filter(
         regions__in=regions
     )
 

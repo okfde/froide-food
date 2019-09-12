@@ -1,10 +1,11 @@
+from collections import Counter, defaultdict
 import functools
 from io import BytesIO
 import json
 import operator
 import os
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.db.models import (
@@ -31,7 +32,7 @@ from .models import VenueRequest, VenueRequestItem
 from .utils import (
     get_city_from_request, make_request_url, get_request_count,
     get_hygiene_publicbody, MAX_REQUEST_COUNT,
-    get_filled_pdf_bytes
+    get_filled_pdf_bytes, get_all_food_safety_agencies
 )
 from .forms import AppealForm, ReportForm
 
@@ -162,6 +163,43 @@ def osm_help(request):
     return render(request, 'froide_food/osm_help.html', {
         'venues': vrs,
         'city': city or ''
+    })
+
+
+def requests_in_region(request, slug):
+    region = get_object_or_404(GeoRegion, slug=slug)
+
+    regions = region.get_descendants()
+    pbs = get_all_food_safety_agencies().filter(
+        regions__in=regions
+    ).distinct().prefetch_related('regions')
+    vris = VenueRequestItem.objects.filter(
+        publicbody__in=pbs,
+        timestamp__year__gte=2019
+    )
+    total = vris.count()
+    by_region = Counter(vris.values_list('publicbody_id', flat=True))
+    pb_map = defaultdict(list)
+
+    for pb in pbs:
+        pb.request_count = by_region[pb.id]
+        r = pb.regions.all()[0]
+        pb.region = r
+        pb.center = r.geom.centroid
+
+    for vri in vris.select_related('venue'):
+        pb_map[vri.publicbody_id].append(vri)
+    for pb in pbs:
+        pb.requests = pb_map[pb.id]
+
+    pbs = sorted(pbs, key=lambda x: x.request_count, reverse=True)
+
+    return render(request, 'froide_food/by_regions.html', {
+        'region': region,
+        'total': total,
+        'pbs': pbs,
+        'vris': vris,
+        'center': region.geom.centroid,
     })
 
 

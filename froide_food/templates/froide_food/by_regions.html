@@ -1,0 +1,43 @@
+{% extends CMS_TEMPLATE %}
+
+{% load humanize %}
+{% load sekizai_tags %}
+
+{% block top_block %}{% endblock %}
+
+{% block body %}
+
+<div class="container">
+<h2>
+  {{ total|intcomma }} Anfragen nach Hygienekontrollberichten in {{ region.name }}
+</h2>
+
+<h3>Nach {{ pbs.0.region.kind_detail }}</h3>
+<ol>
+{% for pb in pbs %}
+  <li>
+    {{ pb.region.name }}: {{ pb.request_count|intcomma }} Anfragen
+  </li>
+{% endfor %}
+</ol>
+
+{% for pb in pbs %}
+
+<h3>{{ pb.region.name }}</h3>
+
+<ul>
+  {% for r in pb.requests %}
+    <li>
+      <a href="/a/{{ r.foirequest_id }}">
+        {{ r.venue.name }} am {{ r.timestamp | date:"SHORT_DATE_FORMAT" }}
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+
+{% endfor %}
+
+
+</div>
+
+{% endblock %}
