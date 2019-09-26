@@ -98,6 +98,12 @@ FILTERS = [
         'icon': 'fa-film',
         'active': False,
         'categories': ['cinema']
+    },
+    {
+        'name': 'Hotel',
+        'icon': 'fa-bed',
+        'active': False,
+        'categories': ['hotel', 'hostel']
     }
 ]
 
