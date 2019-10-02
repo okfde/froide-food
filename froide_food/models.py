@@ -24,6 +24,10 @@ class VenueRequest(models.Model):
     geo = models.PointField(null=True, blank=True, geography=True)
 
     context = JSONField(blank=True, default=dict)
+    amenity = models.ForeignKey(
+        Amenity, null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
 
     class Meta:
         verbose_name = _('Venue Request')
@@ -91,6 +95,8 @@ class VenueRequest(models.Model):
             self.geo = Point(place['lng'], place['lat'])
         if place['name']:
             self.name = place['name']
+        if provider.name == 'amenity':
+            self.amenity = provider.get_object()
 
 
 class VenueRequestItem(models.Model):
