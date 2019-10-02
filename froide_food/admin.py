@@ -24,6 +24,7 @@ class VenueRequestItemInlineAdmin(admin.StackedInline):
 
 class VenueRequestAdmin(LeafletGeoAdmin):
     display_raw = True
+    raw_id_fields = ('amenity',)
     inlines = [
         VenueRequestItemInlineAdmin
     ]
