@@ -96,7 +96,7 @@ class VenueRequest(models.Model):
         if place['name']:
             self.name = place['name']
         if provider.name == 'amenity':
-            self.amenity = provider.get_object()
+            self.amenity = provider.get_object(self.ident)
 
 
 class VenueRequestItem(models.Model):
