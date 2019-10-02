@@ -32,7 +32,8 @@ class VenueRequestAdmin(LeafletGeoAdmin):
     list_filter = (
         'last_status', 'last_resolution',
         make_nullfilter('last_request', 'Hat Anfrage'),
-        make_nullfilter('geo', 'Hat eigene Koordinate')
+        make_nullfilter('geo', 'Hat eigene Koordinate'),
+        'amenity__amenity'
     )
     list_display = (
         'name', 'last_request',
