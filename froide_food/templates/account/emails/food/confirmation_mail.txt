@@ -5,7 +5,7 @@ danke, dass Sie eine Anfrage über das Projekt „Topf Secret“ von foodwatch u
 Um Ihre Anfrage abzusenden, klicken Sie bitte auf den folgenden Bestätigungs-Link:
 
 
-{{ url }}
+{{ action_url }}
 
 ----
 
