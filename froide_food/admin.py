@@ -126,6 +126,7 @@ class VenueRequestItemAdmin(admin.ModelAdmin):
         make_nullfilter('checked_date', 'Wurde geprüft'),
     )
     date_hierarchy = 'timestamp'
+    raw_id_fields = ('venue', 'foirequest', 'publicbody')
 
     actions = ['remove_unconfirmed']
 
