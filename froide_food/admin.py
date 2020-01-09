@@ -10,7 +10,7 @@ from leaflet.admin import LeafletGeoAdmin
 from froide.foirequest.models import FoiRequest
 from froide.helper.admin_utils import make_nullfilter
 from froide.helper.csv_utils import export_csv_response
-from froide.account.models import User
+from froide.account.models import User, UserTag
 
 from .models import (
     VenueRequest, VenueRequestItem, FoodSafetyReport, FoodAuthorityStatus
@@ -57,39 +57,18 @@ class VenueRequestAdmin(LeafletGeoAdmin):
             raise PermissionDenied
         if not request.user.is_superuser:
             raise PermissionDenied
-        fr_ids = set(
-            VenueRequestItem.objects
-            .filter(timestamp__year__gte=2019)
-            .values_list('foirequest_id', flat=True)
-        )
-        # -first_message, so last value overwrites user_id
-        first_req_timestamp = dict(
-            FoiRequest.objects
-            .filter(id__in=fr_ids)
-            .order_by('-first_message')
-            .values_list('user_id', 'first_message')
-        )
+        four_months_ago = timezone.now() - timedelta(days=4 * 31)
 
         queryset = User.objects.filter(
-            id__in=list(first_req_timestamp.keys()),
             is_active=True,
-            date_joined__year__gte=2019,
+            tags__in=UserTag.objects.filter(slug='food-first'),
+            date_joined__gte=four_months_ago,
         )
-
-        def generator(queryset):
-            for u in queryset:
-                f = u.foirequest_set.all().order_by('first_message')[0]
-
-                if f.id not in fr_ids:
-                    continue
-                diff = abs((first_req_timestamp[u.id] - u.date_joined).seconds)
-                if diff < 2:
-                    yield u
 
         fields = (
             'id', "first_name", "last_name", "email", 'date_joined'
         )
-        stream = User.export_csv(generator(queryset), fields=fields)
+        stream = User.export_csv(queryset, fields=fields)
         return export_csv_response(stream)
 
     def get_last_status_display(self, obj):
