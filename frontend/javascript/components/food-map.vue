@@ -160,6 +160,9 @@
                 <button class="btn btn-sm btn-light" @click="setNewVenue(true)">
                   Betrieb nicht gefunden?
                 </button>
+                <a class="btn btn-sm btn-light ml-1" target="_blank" href="/kampagnen/lebensmittelkontrolle/faq/#falsch">
+                  Daten falsch?
+                </a>
               </div>
               <template v-if="searching">
                 <food-sidebar-item v-for="data in fakeVenues"
