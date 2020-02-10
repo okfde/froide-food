@@ -89,13 +89,13 @@ class VenueRequest(models.Model):
         place = provider.get_place(self.ident)
         if place is None:
             return
-        if not self.address:
+        if place['address']:
             self.address = place['address']
-        if not self.geo:
+        if place['lng']:
             self.geo = Point(place['lng'], place['lat'])
         if place['name']:
             self.name = place['name']
-        if provider.name == 'amenity':
+        if not self.amenity and provider.name == 'amenity':
             self.amenity = provider.get_object(self.ident)
 
 

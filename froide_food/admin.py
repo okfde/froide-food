@@ -15,6 +15,7 @@ from froide.account.models import User, UserTag
 from .models import (
     VenueRequest, VenueRequestItem, FoodSafetyReport, FoodAuthorityStatus
 )
+from .utils import check_and_merge_venue
 
 
 class VenueRequestItemInlineAdmin(admin.StackedInline):
@@ -33,6 +34,7 @@ class VenueRequestAdmin(LeafletGeoAdmin):
         'last_status', 'last_resolution',
         make_nullfilter('last_request', 'Hat Anfrage'),
         make_nullfilter('geo', 'Hat eigene Koordinate'),
+        make_nullfilter('amenity', 'Hat OSM-Betrieb'),
         'amenity__amenity'
     )
     list_display = (
@@ -93,6 +95,14 @@ class VenueRequestAdmin(LeafletGeoAdmin):
         """
         from .utils import merge_venues
         merge_venues(queryset)
+
+    def save_model(self, request, obj, form, change):
+        if not obj.ident.startswith('amenity:') and obj.amenity:
+            # Setting amenity on venue request
+            obj.ident = 'amenity:%s' % obj.amenity.ident
+            obj.update_from_provider()
+            check_and_merge_venue(obj)
+        super().save_model(request, obj, form, change)
 
     merge_venues.short_description = 'Merge venues'
 
