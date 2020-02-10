@@ -32,17 +32,12 @@
           </div>
           <div class="row justify-content-lg-center">
             <div :class="{'col-lg-6 col-md-7': geolocationAvailable, 'col-lg-12': !geolocationAvailable}">
-              <div class="input-group" v-if="false">
-                <input type="text" pattern="\d*" class="form-control postcode-input" v-model="postcode" placeholder="PLZ" maxlength="5" @keydown.enter.prevent="postcodeLookup">
-                <div class="input-group-append">
-                  <button class="btn" :class="{'btn-success': validPostcode, 'btn-outline-secondary': !validPostcode}" type="button" @click.prevent="postcodeLookup">
-                    Auf geht’s!
-                  </button>
-                </div>
-              </div>
               <div class="input-group">
                 <div class="clearable-input">
-                  <input type="text" class="form-control" v-model="location" placeholder="Ort oder PLZ" @keydown.enter.prevent="locationLookup">
+                  <input type="text" class="form-control" v-model="location"
+                    placeholder="Ort oder PLZ"
+                    @keydown.enter.prevent="locationLookup"
+                    ref="locationInput">
                   <span class="clearer fa fa-close" v-if="location.length > 0" @click.stop="location = ''"></span>
                 </div>
                 <div class="input-group-append">
@@ -127,6 +122,11 @@ export default {
     geolocationDisabled: {
       type: Boolean,
       default: false
+    }
+  },
+  mounted () {
+    if (this.$refs.locationInput) {
+      this.$refs.locationInput.focus()
     }
   },
   data () {
