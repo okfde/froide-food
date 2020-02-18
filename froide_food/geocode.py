@@ -12,7 +12,7 @@ logger = logging.getLogger()
 
 API_KEY = settings.FROIDE_FOOD_CONFIG.get('api_key_geocode_here')
 MAPBOX_API_KEY = settings.FROIDE_FOOD_CONFIG.get('api_key_geocode_mapbox')
-PLZ_RE = re.compile(r'(\d{5})')
+PLZ_RE = re.compile(r'^(\d{5})$')
 
 
 def get_kwargs():
@@ -96,7 +96,7 @@ def geocode_plz(plz):
 
 
 def geocode(q, **kwargs):
-    match = PLZ_RE.search(q)
+    match = PLZ_RE.match(q.strip())
     if match:
         return geocode_plz(match.group(1))
     result = run_geocode(q + ', Deutschland', **kwargs)
