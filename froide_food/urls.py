@@ -4,7 +4,7 @@ from django.views.decorators.cache import cache_page
 
 from .views import (
     index, embed, make_request, stats, osm_help,
-    appeal, show_reports, requests_in_region
+    show_reports, requests_in_region
 )
 
 urlpatterns = [
@@ -13,7 +13,6 @@ urlpatterns = [
     path('_stats/', stats, name='food-stats'),
     path('_reports/', show_reports, name='food-report'),
     path('osm-hilfe/', osm_help, name='food-osm_help'),
-    path('widerspruch/', appeal, name='food-appeal'),
     path('region/<slug>/', requests_in_region, name='food-requests_in_region'),
     path('anfragen/', make_request, name='food-make_request'),
     path('sw.js', cache_page(None)(TemplateView.as_view(

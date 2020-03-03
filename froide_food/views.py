@@ -1,29 +1,21 @@
 from collections import Counter, defaultdict
 import functools
-from io import BytesIO
 import json
 import operator
-import os
 
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.urls import reverse
 from django.db.models import (
     Q, Count, F, Subquery, OuterRef
 )
 from django.conf import settings
-from django.core.files.base import ContentFile
-from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib import messages
 from django.utils import timezone
-from django.utils.datastructures import MultiValueDict
 from django.templatetags.static import static
 
-from froide.campaign.models import Campaign
-from froide.foirequest.models import FoiRequest, FoiAttachment
 from froide.foirequest.views import MakeRequestView
-from froide.foirequest.forms import SendMessageForm
 from froide.helper.utils import get_redirect, render_403
 from froide.georegion.models import GeoRegion
 
@@ -32,9 +24,9 @@ from .models import VenueRequest, VenueRequestItem
 from .utils import (
     get_city_from_request, make_request_url, get_request_count,
     get_hygiene_publicbody, MAX_REQUEST_COUNT,
-    get_filled_pdf_bytes, get_all_food_safety_agencies
+    get_all_food_safety_agencies
 )
-from .forms import AppealForm, ReportForm
+from .forms import ReportForm
 
 
 def get_food_map_config(request, embed):
@@ -355,140 +347,6 @@ def stats(request):
         'by_jurisdiction': by_jurisdiction,
         'by_region': regions,
     })
-
-
-APPEAL_TAG = 'Widerspruch'
-APPEAL_PBS = {
-    15453,  # 'veterinar-und-lebensmittelaufsichtsamt-spandau'
-    15450,  # 'veterinar-und-lebensmittelaufsichtsamt-neukolln'
-}
-
-
-def appeal(request):
-    if not request.user.is_authenticated:
-        return render_403(request)
-
-    campaign = Campaign.objects.get(slug='topf-secret')
-    foirequests = FoiRequest.objects.filter(
-        user=request.user,
-        campaign=campaign,
-        public_body_id__in=APPEAL_PBS
-    )
-
-    sent = False
-    foirequest = None
-    if request.method == 'POST':
-        form = AppealForm(request.user, foirequests, request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            if request.POST.get('downloadpdf'):
-                pdf_bytes = get_pdf_bytes(data)
-                response = HttpResponse(
-                    pdf_bytes, content_type='application/pdf'
-                )
-                dispo = 'attachment; filename=widerspruch.pdf'
-                response['Content-Disposition'] = dispo
-                return response
-
-            foirequest = data['request']
-            already_sent = foirequest.foimessage_set.filter(
-                tags__name=APPEAL_TAG).exists()
-            if not already_sent:
-                send_appeal_message(foirequest, data)
-            sent = True
-    else:
-        form = AppealForm(request.user, foirequests)
-
-    return render(request, 'froide_food/appeal.html', {
-        'form': form,
-        'foirequest': foirequest,
-        'multiple': len(foirequests) > 1,
-        'sent': sent
-    })
-
-
-def get_pdf_bytes(data, redacted=False):
-    our_reference = '[#%s]' % data['request'].id
-    fields = [
-        ('Name', '' if redacted else data['address'].replace('\r\n', '\n')),
-        ('Datum', timezone.now().date().strftime('%d.%m.%Y')),
-        ('DatumBescheid', data['date_refusal'].strftime('%d.%m.%Y')),
-        ('Geschaeftszeichen', data['reference'] or our_reference),
-    ]
-    foirequest = data['request']
-    filename = 'widerspruch_muster_%d.pdf' % foirequest.public_body_id
-    template_file = os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__),
-            'static', 'food', 'documents', filename
-        )
-    )
-    return get_filled_pdf_bytes(template_file, fields)
-
-
-def send_appeal_message(foirequest, data):
-    message = '''Sehr geehrte Damen und Herren,
-
-anbei finden Sie vorab per E-Mail mein Widerspruch gegen Ihren Bescheid vom {date}.
-
-Mit freundlichen Grüßen
-{name}
-'''.format(
-        date=data['date_refusal'].strftime('%d.%m.%Y'),
-        name=foirequest.user.get_full_name()
-    )
-    pdf_bytes = get_pdf_bytes(data)
-    letter_file = BytesIO(pdf_bytes)
-    letter = InMemoryUploadedFile(
-        file=letter_file,
-        field_name='files',
-        name='widerspruch.pdf',
-        content_type='application/pdf',
-        size=len(pdf_bytes),
-        charset=None,
-        content_type_extra=None
-    )
-    message_form = SendMessageForm(
-        data={
-            'sendmessage-to': '0',
-            'sendmessage-subject': 'Widerspruch gegen Ihren Bescheid',
-            'sendmessage-message': message,
-            'sendmessage-address': foirequest.user.address
-        },
-        files=MultiValueDict({
-            'sendmessage-files': [letter]
-        }),
-        foirequest=foirequest,
-        message_ready=True,
-        prefix='sendmessage',
-    )
-    message_form.is_valid()
-    message = message_form.save()
-    message.tags.add(APPEAL_TAG)
-
-    attachment = message.attachments[0]
-
-    redacted_pdf_bytes = get_pdf_bytes(data, redacted=True)
-
-    att = FoiAttachment(
-        belongs_to=message,
-        name='widerspruch_geschwaerzt.pdf',
-        is_redacted=True,
-        filetype='application/pdf',
-        approved=True,
-        can_approve=True
-    )
-    pdf_file = ContentFile(redacted_pdf_bytes)
-    att.size = pdf_file.size
-    att.file.save(att.name, pdf_file)
-    att.approve_and_save()
-
-    attachment.redacted = att
-    attachment.can_approve = False
-    attachment.approved = False
-    attachment.save()
-
-    return message
 
 
 def show_reports(request):
