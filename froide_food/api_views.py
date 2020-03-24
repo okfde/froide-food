@@ -74,7 +74,6 @@ class CreateVenueThrottle(UserRateThrottle):
 
 
 class VenueViewSet(viewsets.ViewSet):
-    authentication_classes = ()
     permission_classes = ()
 
     # @method_decorator(cache_page(60*5))
