@@ -48,6 +48,11 @@ class BaseVenueProvider(object):
         ident_list = [p['ident'] for p in places]
         qs = VenueRequest.objects.filter(ident__in=ident_list)
 
+        vris = VenueRequestItem.objects.select_related('foirequest')
+        qs = qs.prefetch_related(
+            Prefetch('request_items', queryset=vris)
+        )
+
         if coordinates is not None:
             point = Point(coordinates[1], coordinates[0])
             if radius:
@@ -67,14 +72,14 @@ class BaseVenueProvider(object):
             if q is not None:
                 other_qs = other_qs.filter(name__icontains=q.lower())
             other_qs = other_qs[:50]
+            other_qs = other_qs.prefetch_related(
+                Prefetch('request_items', queryset=vris)
+            )
+
             qs = qs.union(
                 other_qs
             )
 
-        vris = VenueRequestItem.objects.select_related('foirequest')
-        qs = qs.prefetch_related(
-            Prefetch('request_items', queryset=vris)
-        )
         return {r.ident: r for r in qs}
 
     def match_place(self, latlng, name):
