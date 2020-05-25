@@ -66,7 +66,7 @@ self.addEventListener('install', function(event) {
 });
 
 const fetchOptions = {
-  mode: 'cors',
+  mode: 'no-cors',
   credentials: 'omit',
 }
 
