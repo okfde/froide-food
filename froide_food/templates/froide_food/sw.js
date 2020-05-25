@@ -68,7 +68,6 @@ self.addEventListener('install', function(event) {
 const fetchOptions = {
   mode: 'cors',
   credentials: 'omit',
-  referrer: 'no-referrer'
 }
 
 self.addEventListener('fetch', function(event) {
