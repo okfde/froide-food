@@ -12,7 +12,7 @@ var PRECACHE_FILES = [
   '{% static "food/manifest.json" %}',
 ];
 
-STATIC_FILES = PRECACHE_FILES.slice();
+var STATIC_FILES = PRECACHE_FILES.slice();
 STATIC_FILES = STATIC_FILES.concat([
   '{% static "food/images/yelp_stars.png" %}',
   '{% static "food/images/yelp_stars@2x.png" %}',
@@ -66,8 +66,7 @@ self.addEventListener('install', function(event) {
 });
 
 const fetchOptions = {
-  mode: 'no-cors',
-  credentials: 'omit',
+  mode: 'cors'
 }
 
 self.addEventListener('fetch', function(event) {
