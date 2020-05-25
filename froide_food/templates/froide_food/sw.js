@@ -39,7 +39,7 @@ STATIC_FILES = STATIC_FILES.concat([
 
 var MAIN_DOMAIN = '{{ SITE_URL }}';
 var STATIC_URL = '{{ STATIC_URL }}';
-var MEDIA_URL = '{{ STATIC_URL }}';
+var MEDIA_URL = '{{ MEDIA_URL }}';
 var STATIC_HTTP = STATIC_FILES[0].indexOf('http') === 0;
 
 var matchUrl = /^(.*)(\.[a-f0-9]{12})\.(jpg|png|js|json|svg|gif|css)$/;
@@ -65,10 +65,6 @@ self.addEventListener('install', function(event) {
   );
 });
 
-const fetchOptions = {
-  mode: 'cors'
-}
-
 self.addEventListener('fetch', function(event) {
   if (event.request.method !== 'GET') {
     return
@@ -79,6 +75,12 @@ self.addEventListener('fetch', function(event) {
   event.respondWith(
     caches.open(CACHE_NAME).then(function(cache) {
       return cache.match(event.request).then(function (response) {
+        var fetchOptions = {
+          mode: 'no-cors'
+        }
+        if (event.request.url.indexOf('.woff2') !== -1) {
+          fetchOptions.mode = 'cors'
+        }
         return response || fetch(event.request, fetchOptions).then(function(response) {
           cache.put(event.request, response.clone());
           return response;
