@@ -31,6 +31,11 @@ class FroideFoodConfig(AppConfig):
             basename='venue'
         )
 
+        from django_amenities import registry
+        from .updater import FoodUpdater
+
+        registry.register(FoodUpdater())
+
 
 def export_user_data(user):
     from froide.foirequest.models.request import get_absolute_domain_short_url
