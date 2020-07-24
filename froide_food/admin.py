@@ -35,7 +35,7 @@ class VenueRequestAdmin(LeafletGeoAdmin):
         make_nullfilter('last_request', 'Hat Anfrage'),
         make_nullfilter('geo', 'Hat eigene Koordinate'),
         make_nullfilter('amenity', 'Hat OSM-Betrieb'),
-        'amenity__amenity'
+        'amenity__category'
     )
     list_display = (
         'name', 'last_request',

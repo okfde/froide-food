@@ -120,7 +120,7 @@ class AmenityVenueProvider(BaseVenueProvider):
     ORDER_ZOOM_LEVEL = 15
 
     def get_queryset(self):
-        return Amenity.objects.all()
+        return Amenity.objects.filter(topics__contains=['food'])
 
     def get_places(self, location=None, coordinates=None,
                    q=None, categories=None, radius=None, zoom=None):
@@ -172,7 +172,7 @@ class AmenityVenueProvider(BaseVenueProvider):
             'name': r.name,
             'address': r.address,
             'city': r.city,
-            'category': r.amenity
+            'category': r.category
         }
 
     def get_object(self, ident):
