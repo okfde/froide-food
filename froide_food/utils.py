@@ -143,6 +143,8 @@ def get_city_from_request(request):
     if not ip:
         logger.warning('No IP found on request: %s', request)
         return
+    if ip == '127.0.0.1':
+        return
 
     try:
         g = GeoIP2()
