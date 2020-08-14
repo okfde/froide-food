@@ -149,7 +149,7 @@ def get_city_from_request(request):
     try:
         g = GeoIP2()
     except Exception as e:
-        logger.exception(e)
+        logger.warn(e)
         return
     try:
         result = g.city(ip)
