@@ -1,13 +1,16 @@
 from django.conf import settings
 # from django.utils.decorators import method_decorator
 # from django.views.decorators.cache import cache_page
+from django.contrib.gis.geos import Point
 
 from rest_framework import serializers, viewsets, status
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from froide.publicbody.api_views import PublicBodySerializer
 from froide.foirequest.api_views import throttle_action
+from froide.georegion.models import GeoRegion
 
 from .venue_providers import (
     venue_provider, venue_providers, VenueProviderException
@@ -75,6 +78,29 @@ class CreateVenueThrottle(UserRateThrottle):
 
 class VenueViewSet(viewsets.ViewSet):
     permission_classes = ()
+
+    @action(detail=False, methods=['get'])
+    def extra_info_for_point(self, request):
+        try:
+            lat = float(request.GET.get('lat'))
+        except (ValueError, TypeError):
+            raise ValueError
+        try:
+            lng = float(request.GET.get('lng'))
+        except (ValueError, TypeError):
+            raise ValueError
+        if lat and lng:
+            pankow = GeoRegion.objects.filter(name="Pankow",
+                                              part_of__name="Berlin",
+                                              kind="borough")
+            point = Point(lng, lat)
+            if pankow.first().geom.covers(point):
+                return Response({
+                    'extra_info': 'Pankow veröffentlicht seine Kontrollberichte!',
+                    'url': 'https://pankow.lebensmittel-kontrollergebnisse.de/'
+                })
+        return Response({})
+
 
     # @method_decorator(cache_page(60*5))
     def list(self, request):
