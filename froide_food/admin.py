@@ -173,6 +173,7 @@ class FoodSafetyReportAdmin(admin.ModelAdmin):
 
 class FoodAuthorityStatusAdmin(admin.ModelAdmin):
     raw_id_fields = ('publicbodies',)
+    list_display = ('title', 'cooperative',)
 
 
 admin.site.register(VenueRequest, VenueRequestAdmin)

@@ -11,7 +11,16 @@
               zurück
             </button>
           </div>
-          <food-recommend v-if="showWarning"
+          <template v-if="data.authority_cooperative">
+            <h3>{{ data.authority_title }}</h3>
+            <div class="fake-markdown" v-html="authorityDescriptionHtml"></div>
+            <p class="mt-5">
+              <button class="btn btn-light" @click="$emit('close')">
+                zurück zur Karte
+              </button>
+            </p>
+          </template>
+          <food-recommend v-else-if="showWarning"
             :user="userInfo"
             :publicbody="publicBody"
             :place-name="data.name"
@@ -132,7 +141,7 @@ export default {
     return {
       fetching: !this.data.full,
       lawType: LAW_TYPE,
-      closedWarning: false, 
+      closedWarning: false,
       submitting: false,
       addressHelpText: 'Ihre Adresse wird nicht öffentlich angezeigt. <strong class="text-danger">Es kann passieren, dass die zuständige Behörde auf Nachfrage des Betriebs Ihren Namen und Ihre Anschrift an den Betrieb weiterleitet.</strong>'
     }
@@ -181,6 +190,9 @@ export default {
     },
     defaultLaw () {
       return selectBestLaw(this.publicBody.laws, LAW_TYPE)
+    },
+    authorityDescriptionHtml () {
+      return this.data.authority_description.replace(/\[(.+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
     }
   },
   methods: {
@@ -216,5 +228,9 @@ export default {
     50% {
       opacity: 0.25;
     }
+  }
+
+  .fake-markdown {
+    white-space: pre-line
   }
 </style>

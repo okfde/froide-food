@@ -1001,6 +1001,9 @@ export default {
           f.userRequestCount = data.userRequestCount
           f.icon = this.getIcon(data)
           f.full = true
+          f.authority_cooperative = data.authority_cooperative || false
+          f.authority_title = data.authority_title || ''
+          f.authority_description = data.authority_description || ''
           return f
         }
         return f

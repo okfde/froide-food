@@ -12,6 +12,7 @@ from froide.foirequest.api_views import throttle_action
 from .venue_providers import (
     venue_provider, venue_providers, VenueProviderException
 )
+from .models import FoodAuthorityStatus
 from .utils import (
     get_hygiene_publicbodies, make_request_url, get_request_count
 )
@@ -52,6 +53,10 @@ class VenueSerializer(serializers.Serializer):
     publicbody = PublicBodySerializer(required=False)
     makeRequestURL = serializers.CharField(required=False)
     userRequestCount = serializers.IntegerField(required=False)
+
+    authority_title = serializers.CharField(required=False)
+    authority_description = serializers.CharField(required=False)
+    authority_cooperative = serializers.BooleanField(default=False)
 
 
 def get_lat_lng(request):
@@ -162,9 +167,17 @@ class VenueViewSet(viewsets.ViewSet):
                 'jurisdiction',
                 'categories',
                 'laws',
-                'laws__combined'
+                'laws__combined',
             )
             place['publicbody'] = pbs[0]
+            authority_status = FoodAuthorityStatus.objects.filter(
+                publicbodies=place['publicbody']
+            ).first()
+            if authority_status:
+                place['authority_title'] = authority_status.title
+                place['authority_description'] = authority_status.description
+                place['authority_cooperative'] = authority_status.cooperative
+
             place['userRequestCount'] = get_request_count(
                 request, place['publicbody']
             )
