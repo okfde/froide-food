@@ -1,7 +1,6 @@
 from django.contrib.gis.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-from django.contrib.postgres.fields import JSONField
 from django.contrib.gis.geos import Point
 
 from django_amenities.models import Amenity
@@ -23,7 +22,7 @@ class VenueRequest(models.Model):
     address = models.TextField(blank=True)
     geo = models.PointField(null=True, blank=True, geography=True)
 
-    context = JSONField(blank=True, default=dict)
+    context = models.JSONField(blank=True, default=dict)
     amenity = models.ForeignKey(
         Amenity, null=True, blank=True,
         on_delete=models.SET_NULL
