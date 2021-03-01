@@ -4,9 +4,13 @@ from django.utils import timezone
 from django.contrib.gis.geos import Point
 
 from django_amenities.models import Amenity
+from dateutil.relativedelta import relativedelta
 
 from froide.publicbody.models import PublicBody
 from froide.foirequest.models import FoiRequest, FoiMessage, FoiAttachment
+
+
+REPORT_ALLOWED_AGE = relativedelta(years=5)
 
 
 class VenueRequest(models.Model):
@@ -148,6 +152,14 @@ class VenueRequestItem(models.Model):
         }
 
 
+class FoodSafetyReportManager(models.Manager):
+    def get_expired_reports(self):
+        now = timezone.now()
+        ago = now - REPORT_ALLOWED_AGE
+
+        return self.filter(complaints=True, date__lt=ago)
+
+
 class FoodSafetyReport(models.Model):
     venue = models.ForeignKey(
         VenueRequest, null=True,
@@ -174,6 +186,8 @@ class FoodSafetyReport(models.Model):
     complaints = models.BooleanField(default=False)
     disgusting = models.BooleanField(default=False)
     summary = models.TextField(blank=True)
+
+    objects = FoodSafetyReportManager()
 
     class Meta:
         verbose_name = _('food safety report')

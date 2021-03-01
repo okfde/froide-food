@@ -378,3 +378,28 @@ def names_similar(name_1, name_2, threshold=0.7):
         return True
     ratio = SequenceMatcher(None, name_1, name_2).ratio()
     return ratio >= threshold
+
+
+def depublish_old_reports():
+    from froide.foirequest.models import FoiEvent
+
+    from .models import FoodSafetyReport
+
+    old_reports = FoodSafetyReport.objects.get_expired_reports()
+
+    need_cleanup = old_reports.filter(attachment__can_approve=True)
+
+    for report in need_cleanup:
+        if report.attachment:
+            report.attachment.can_approve = False
+            report.attachment.approved = False
+            report.attachment.save()
+
+            FoiEvent.objects.create_event(
+                FoiEvent.EVENTS.ATTACHMENT_DEPUBLISHED,
+                report.message.request,
+                message=report.message,
+                user=None,
+                **{'reason': 'Automatically depublished after 5 years.'}
+            )
+            report.message.tags.add('food-depublished')
