@@ -386,7 +386,6 @@ def depublish_old_reports():
     from .models import FoodSafetyReport
 
     old_reports = FoodSafetyReport.objects.get_expired_reports()
-
     need_cleanup = old_reports.filter(attachment__can_approve=True)
 
     for report in need_cleanup:
@@ -395,11 +394,17 @@ def depublish_old_reports():
             report.attachment.approved = False
             report.attachment.save()
 
-            FoiEvent.objects.create_event(
-                FoiEvent.EVENTS.ATTACHMENT_DEPUBLISHED,
-                report.message.request,
-                message=report.message,
-                user=None,
-                **{'reason': 'Automatically depublished after 5 years.'}
-            )
-            report.message.tags.add('food-depublished')
+        if report.message is None:
+            continue
+
+        report.message.tags.add('food-depublished')
+        report.message.content_hidden = True
+        report.message.save()
+
+        FoiEvent.objects.create_event(
+            FoiEvent.EVENTS.ATTACHMENT_DEPUBLISHED,
+            report.message.request,
+            message=report.message,
+            user=None,
+            **{'reason': 'Automatically depublished after 5 years.'}
+        )
