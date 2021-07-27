@@ -4,10 +4,7 @@
       <div class="container-fluid">
         <div class="row">
           <div v-if="isDummy" class="col-3 col-md-4 image-column">
-            <a v-if="data.url" class="image-column-inner-link" :href="data.url" target="_blank" rel="noopener">
-              <div v-else class="dummy-image"></div>
-            </a>
-            <div v-else class="image-column-inner" >
+            <div class="image-column-inner" >
               <div class="dummy-provider dummy" :class="{'dummy-blinker': isDummy}"></div>
             </div>
           </div>
