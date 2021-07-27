@@ -12,7 +12,7 @@
             </button>
           </div>
           <div class="row">
-            <div :class="{'col-sm-7 col-6': needsCredit, 'col-12': !needsCredit}">
+            <div class="col-12">
               <p class="venue-address">{{ data.address }}</p>
               <div class="clearfix mt-3">
                 <div v-if="hasRequest" class="request-status">
@@ -43,13 +43,6 @@
                   @unfollowed="$emit('unfollowed')"
                 ></food-follow>
               </div>
-            </div>
-            <div v-if="needsCredit" class="col-sm-5 col-6">
-              <a :href="data.url" target="_blank" rel="noopener" class="provider-credit">
-                <div class="provider-logo" :style="providerLogoBg"></div>
-                <div :class="starClass" :title="starRating"></div>
-                <small class="review-count">{{ data.review_count }} Beiträge</small>
-              </a>
             </div>
           </div>
         </div>
@@ -135,8 +128,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-@import "../../styles/yelp_stars";
 
 .food-mapoverlay {
   position: absolute;

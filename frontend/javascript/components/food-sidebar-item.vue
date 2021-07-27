@@ -3,20 +3,9 @@
     <div class="sidebar-item-inner" :class="{requested: hasRequest, highlighted: isSelected}" @click="$emit('select', data)">
       <div class="container-fluid">
         <div class="row">
-          <div v-if="isDummy || isYelp" class="col-3 col-md-4 image-column">
+          <div v-if="isDummy" class="col-3 col-md-4 image-column">
             <a v-if="data.url" class="image-column-inner-link" :href="data.url" target="_blank" rel="noopener">
-              <template v-if="data.image">
-                <img v-if="data.imageLoaded" :src="data.image" alt="Yelp venue image" class="venue-img img-fluid"/>
-                <lazy-component v-else>
-                  <img :src="data.image" @load="$emit('imageLoaded', data)" alt="Yelp venue image" class="venue-img img-fluid img-loading"/>
-                </lazy-component>
-              </template>
               <div v-else class="dummy-image"></div>
-              <div v-if="needsCredit" class="image-column-provider">
-                <div class="provider-logo" :style="providerLogoBg"></div>
-                <div :class="starClass" :title="starRating"></div>
-                <small class="review-count">{{ data.review_count }} Beiträge</small>
-              </div>
             </a>
             <div v-else class="image-column-inner" >
               <div class="dummy-provider dummy" :class="{'dummy-blinker': isDummy}"></div>
@@ -68,11 +57,6 @@
             </template>
             <div v-else class="dummy-actions dummy">
             </div>
-            <div v-if="isFoursquare">
-              <a :href="data.url" target="_blank">
-                <img :src="providerLogo" alt="" class="foursquare-logo"/>
-              </a>
-            </div>
           </div>
         </div>
       </div>
@@ -109,8 +93,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-@import "../../styles/yelp_stars";
 
 .sidebar-item {
   padding: 0;

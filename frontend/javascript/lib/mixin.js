@@ -16,9 +16,6 @@ var FoodItemMixin = {
     isSelected () {
       return this.data.id === this.selectedVenueId
     },
-    needsCredit () {
-      return this.isYelp
-    },
     isCustom () {
       return !!this.data.custom
     },
@@ -40,18 +37,6 @@ var FoodItemMixin = {
     isOsm () {
       return this.hasIdent && this.data.ident.indexOf('amenity:') === 0
     },
-    starClass () {
-      let suffix = ''
-      let rating = this.data.rating
-      if (rating !== Math.floor(rating)) {
-        suffix = '-half'
-        rating = Math.floor(rating)
-      }
-      return 'yelp-stars yelp-stars--small-' + rating + suffix
-    },
-    starRating () {
-      return `Bewertung ${this.data.rating} Sterne`
-    },
     osmLink () {
       if (this.isOsm) {
         let osmid = this.data.ident.split('_')[1]
@@ -61,16 +46,6 @@ var FoodItemMixin = {
         }
       }
       return ''
-    },
-    providerLogoBg () {
-      return {
-        backgroundImage: `url('${this.$root.config.staticUrl}food/images/yelp_logo.png')`
-      }
-    },
-    providerLogo () {
-      if (this.isFoursquare) {
-        return `${this.$root.config.staticUrl}food/images/powered-by-foursquare-blue.svg`
-      }
     },
     lastRequest () {
       if (this.data.requests && this.data.requests.length > 0) {

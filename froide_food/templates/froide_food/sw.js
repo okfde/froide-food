@@ -14,9 +14,6 @@ var PRECACHE_FILES = [
 
 var STATIC_FILES = PRECACHE_FILES.slice();
 STATIC_FILES = STATIC_FILES.concat([
-  '{% static "food/images/yelp_stars.png" %}',
-  '{% static "food/images/yelp_stars@2x.png" %}',
-  '{% static "food/images/yelp_logo.png" %}',
   '{% static "food/icons/favicon.ico" %}',
 
   '{% static "food/icons/apple-touch-icon.png" %}',

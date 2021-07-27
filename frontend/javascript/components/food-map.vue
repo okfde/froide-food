@@ -241,7 +241,7 @@ import SwitchButton from './switch-button'
 import {
   getPlaceStatus, getPinURL, getPinColor,
   getQueryVariable, canUseLocalStorage, latlngToGrid,
-  COLORS,
+  COLORS
 } from '../lib/utils'
 
 var getIdFromPopup = (e) => {
@@ -295,9 +295,25 @@ export default {
     }
   },
   components: {
-    LMap, LTileLayer, LControlLayers, LControlZoom, LControl, LControlAttribution, LMarker, LPopup, LTooltip,
-    FoodPopup, FoodSidebarItem, FoodLocator, FoodMapoverlay, FoodLoader, FoodDetail,
-    FoodFilter, FoodRequest, FoodNewVenue, SlideUpDown,
+    LMap,
+    LTileLayer,
+    LControlLayers,
+    LControlZoom,
+    LControl,
+    LControlAttribution,
+    LMarker,
+    LPopup,
+    LTooltip,
+    FoodPopup,
+    FoodSidebarItem,
+    FoodLocator,
+    FoodMapoverlay,
+    FoodLoader,
+    FoodDetail,
+    FoodFilter,
+    FoodRequest,
+    FoodNewVenue,
+    SlideUpDown,
     SwitchButton
   },
   data () {
@@ -428,12 +444,12 @@ export default {
     var self = this
 
     if ('serviceWorker' in navigator) {
-      let scope = this.config.swUrl.replace(/^(.*\/)[\w\.]+$/, '$1')
-      navigator.serviceWorker.register(this.config.swUrl, {scope: scope}).then(function(reg) {
-        console.log('ServiceWorker registration successful!', reg.scope);
-      }).catch(function(err) {
-        console.log('ServiceWorker registration failed: ', err);
-      });
+      let scope = this.config.swUrl.replace(/^(.*\/)[\w.]+$/, '$1')
+      navigator.serviceWorker.register(this.config.swUrl, {scope: scope}).then(function (reg) {
+        console.log('ServiceWorker registration successful!', reg.scope)
+      }).catch(function (err) {
+        console.log('ServiceWorker registration failed: ', err)
+      })
     }
 
     Vue.directive('focusmarker', {
@@ -491,7 +507,7 @@ export default {
     },
     currentUrl () {
       let url = `${this.config.appUrl}?latlng=${this.center[0]},${this.center[1]}`
-      
+
       if (this.selectedVenueId) {
         url += `&ident=${encodeURIComponent(this.selectedVenue.ident)}`
         url += `&query=${encodeURIComponent(this.selectedVenue.name)}`
@@ -575,7 +591,7 @@ export default {
     fakeVenues () {
       let a = []
       for (let i = 0; i < 50; i += 1) {
-        a.push({id: 'fake-' + i});
+        a.push({id: 'fake-' + i})
       }
       return a
     },
@@ -587,7 +603,7 @@ export default {
         normal: `background-image: url('${getPinURL(COLORS.normal)}')`,
         pending: `background-image: url('${getPinURL(COLORS.pending)}')`,
         success: `background-image: url('${getPinURL(COLORS.success)}')`,
-        failure: `background-image: url('${getPinURL(COLORS.failure)}')`,
+        failure: `background-image: url('${getPinURL(COLORS.failure)}')`
       }
     }
   },
@@ -652,7 +668,7 @@ export default {
         this.goToMap()
       }
     },
-    mapHasMoved() {
+    mapHasMoved () {
       if (this.autoMoved) {
         return
       }
@@ -790,7 +806,9 @@ export default {
           ...newVenues
         ]
         this.venueMap = {}
-        this.venues.forEach((d, i) => this.venueMap[d.id] = i)
+        this.venues.forEach((d, i) => {
+          this.venueMap[d.id] = i
+        })
 
         if (options.location && this.venues.length > 0) {
           let venueLocations = this.venues.map((r) => {
@@ -882,7 +900,7 @@ export default {
         if (sidebarItem) {
           if (sidebarItem.scrollIntoView) {
             let scrollDifference = Math.abs(sidebarItem.getBoundingClientRect().top - window.pageYOffset)
-            sidebarItem.scrollIntoView({behavior: scrollDifference < 2000 ? 'smooth': 'instant', 'block': 'nearest'})
+            sidebarItem.scrollIntoView({behavior: scrollDifference < 2000 ? 'smooth' : 'instant', 'block': 'nearest'})
           } else {
             window.scrollTo(0, sidebarItem.offsetTop)
           }
@@ -910,7 +928,8 @@ export default {
       smoothScroll({x: 0, y: y + y2 + 5, el: this.scrollContainer}, 300)
     },
     isStacked () {
-      return this.stacked = (window.innerWidth < 768)
+      this.stacked = window.innerWidth < 768
+      return this.stacked
     },
     handleSidebarScroll (evt, el) {
       if (this.modalActive) {
@@ -973,7 +992,7 @@ export default {
         this.goToMap()
       }
     },
-    setNewVenue(show) {
+    setNewVenue (show) {
       this.showNewVenue = show
       if (show) {
         this.goToMap()
