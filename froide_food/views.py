@@ -372,8 +372,4 @@ def show_reports(request):
             form.save()
         return JsonResponse({'errors': None})
 
-    return render(request, 'froide_food/report.html', {
-        'config': json.dumps({
-            'viewerUrl': static('filingcabinet/viewer/web/viewer.html')
-        }),
-    })
+    return render(request, 'froide_food/report.html')

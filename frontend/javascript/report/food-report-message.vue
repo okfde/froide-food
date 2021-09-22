@@ -37,7 +37,7 @@
             <a :href="attachmentRedactionUrl" target="_blank" class="btn btn-small btn-dark">Schwärzen</a>
         </div>
         <div v-if="attachment.is_pdf" class="container-sm-full">
-          <iframe :src="pdfViewerUrl" frameborder="0" style="width: 100%; height: 90vh; border: 0;"></iframe>
+          <iframe :src="attachment.file_url" frameborder="0" style="width: 100%; height: 90vh; border: 0;"></iframe>
         </div>
         <embed v-else :src="attachment.file_url" style="max-width: 100%;" :type="attachment.filetype"/>
       </template>
@@ -116,9 +116,6 @@ export default {
       let date = this.message.timestamp.split('T')[0].split('-')
       date.reverse()
       return date.join('.')
-    },
-    pdfViewerUrl () {
-      return `${this.config.viewerUrl}?file=${encodeURIComponent(this.attachment.file_url)}`
     },
     attachmentRedactionUrl () {
         return `/anfrage/${this.request.slug}/redact/${this.attachment.id}/`
