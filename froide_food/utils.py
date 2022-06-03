@@ -393,6 +393,8 @@ def depublish_old_reports():
             report.attachment.can_approve = False
             report.attachment.approved = False
             report.attachment.save()
+            if report.attachment.document:
+                report.attachment.document.unpublish_delayed()
 
         if report.message is None:
             continue
