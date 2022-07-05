@@ -97,11 +97,7 @@
               </div>
 
               <l-map ref="map" :zoom.sync="zoom" :center="center" :options="mapOptions" :max-bounds="maxBounds">
-                <l-tile-layer :url="tileProvider.url"/>
-                <l-control-attribution
-                  position="bottomright"
-                  :prefix="tileProvider.attribution"
-                />
+                <l-tile-layer :url="tileProvider.url" :attribution="tileProvider.attribution"/>
                 <l-control-zoom position="bottomright"/>
                 <l-control position="bottomleft" >
                   <ul class="color-legend">
