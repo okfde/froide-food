@@ -23,6 +23,9 @@ class FoodUpdater:
             venues = VenueRequest.objects.filter(ident=ident)
             if len(venues) > 1:
                 venue = merge_venues(venues)
+            elif not venues:
+                safe_update_osm_ids.add(osm_id)
+                continue
             else:
                 venue = venues[0]
             if venue.name != amenity.name:
