@@ -2,7 +2,7 @@ import '../styles/main.scss'
 
 import Vue from 'vue'
 
-import {renderComponent} from 'froide/frontend/javascript/lib/vue-helper'
+import {renderComponent} from '~froide/frontend/javascript/lib/vue-helper'
 
 import FoodReport from './report/food-report'
 

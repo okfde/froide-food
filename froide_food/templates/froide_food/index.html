@@ -1,7 +1,6 @@
 {% extends base_template %}
 
 {% load static %}
-{% load sekizai_tags %}
 
 {% block meta %}
 <meta name="keywords" content="Hygienekontrolle Hygienekontrollbericht Lebensmittelüberwachung Verbraucherinformationsgesetz" />
@@ -69,20 +68,6 @@
     </div>
   </food-map>
 
-{% addtoblock 'css' %}
-  <link rel="stylesheet" href="{% static 'css/common.css' %}">
-{% endaddtoblock %}
-
-{% addtoblock 'css' %}
-  <link rel="stylesheet" href="{% static 'css/food.css' %}">
-{% endaddtoblock %}
-
-{% addtoblock 'js' %}
-  <script src="{% static 'js/common.js' %}" charset="utf-8"></script>
-{% endaddtoblock %}
-{% addtoblock 'js' %}
-  <script src="{% static 'js/food.js' %}" charset="utf-8"></script>
-{% endaddtoblock %}
-
+  {% include "cms/_frontend.html" with entry_point="food.js" %}
 
 {% endblock %}

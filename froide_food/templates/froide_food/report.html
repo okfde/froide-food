@@ -1,7 +1,6 @@
 {% extends CMS_TEMPLATE %}
 
 {% load static %}
-{% load sekizai_tags %}
 
 {% block top_block %}{% endblock %}
 
@@ -19,14 +18,6 @@
     </div>
   </food-map>
 
-{% addtoblock 'css' %}
-  <link rel="stylesheet" href="{% static 'css/common.css' %}">
-  <link rel="stylesheet" href="{% static 'css/foodreport.css' %}">
-{% endaddtoblock %}
-
-{% addtoblock 'js' %}
-  <script src="{% static 'js/common.js' %}" charset="utf-8"></script>
-  <script src="{% static 'js/foodreport.js' %}" charset="utf-8"></script>
-{% endaddtoblock %}
+  {% include "cms/_frontend.html" with entry_point="foodreport.js" %}
 
 {% endblock %}
