@@ -1,6 +1,6 @@
 <template>
   <div class="spinner-border" role="status">
-    <span class="sr-only">Wird geladen...</span>
+    <span class="visually-hidden">Wird geladen...</span>
   </div>
 </template>
 

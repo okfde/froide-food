@@ -23,10 +23,10 @@
           <tr>
             <th></th>
             <th>Bundesland</th>
-            <th class="text-right">Anfragen</th>
-            <th class="text-right">NutzerInnen</th>
-            <th class="text-right">Bevölkerung in Mio.</th>
-            <th class="text-right">Anfragen pro 100.000 Einwohner</th>
+            <th class="text-end">Anfragen</th>
+            <th class="text-end">NutzerInnen</th>
+            <th class="text-end">Bevölkerung in Mio.</th>
+            <th class="text-end">Anfragen pro 100.000 Einwohner</th>
           </tr>
         </thead>
         <tbody>
@@ -34,10 +34,10 @@
             <tr>
               <th>{{ forloop.counter }}.</th>
               <td>{{ line.publicbody__jurisdiction__name }}</td>
-              <td class="text-right">{{ line.request_count|intcomma }}</td>
-              <td class="text-right">{{ line.user_count|intcomma }}</td>
-              <td class="text-right">{{ line.population|in_mio }}</td>
-              <td class="text-right">{{ line|request_population_ratio|intcomma }}</td>
+              <td class="text-end">{{ line.request_count|intcomma }}</td>
+              <td class="text-end">{{ line.user_count|intcomma }}</td>
+              <td class="text-end">{{ line.population|in_mio }}</td>
+              <td class="text-end">{{ line|request_population_ratio|intcomma }}</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -52,9 +52,9 @@
           <tr>
             <th></th>
             <th>Bundesland</th>
-            <th class="text-right">Anfragen</th>
-            <th class="text-right">Bevölkerung in Mio.</th>
-            <th class="text-right">Anfragen pro 100.000 Einwohner</th>
+            <th class="text-end">Anfragen</th>
+            <th class="text-end">Bevölkerung in Mio.</th>
+            <th class="text-end">Anfragen pro 100.000 Einwohner</th>
           </tr>
         </thead>
         <tbody>
@@ -62,9 +62,9 @@
             <tr>
               <th>{{ forloop.counter }}.</th>
               <td>{{ line.name }}</td>
-              <td class="text-right">{{ line.request_count|intcomma }}</td>
-              <td class="text-right">{{ line.population|in_mio }}</td>
-              <td class="text-right">{{ line|request_population_ratio|intcomma }}</td>
+              <td class="text-end">{{ line.request_count|intcomma }}</td>
+              <td class="text-end">{{ line.population|in_mio }}</td>
+              <td class="text-end">{{ line|request_population_ratio|intcomma }}</td>
             </tr>
           {% endfor %}
         </tbody>

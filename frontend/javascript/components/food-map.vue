@@ -23,19 +23,19 @@
                 <input type="text" v-model="query" :class="{'search-query-active': !!lastQuery}" class="form-control" placeholder="Restaurant, Supermarkt, Kiosk etc." @keydown.enter.prevent="userSearch">
                 <span class="clearer fa fa-close" v-if="query.length > 0" @click="clearSearch"></span>
               </div>
-              <div class="input-group-append">
+              <div class="">
                 <button class="btn btn-outline-secondary" type="button" @click="userSearch">
                   <i class="fa fa-search" aria-hidden="true"></i>
                   <span class="d-none d-sm-none d-md-inline">Suchen</span>
                 </button>
               </div>
-              <div class="input-group-append mr-auto">
+              <div class=" me-auto">
                 <button class="btn btn-outline-secondary" @click="setLocator(true)">
                   <i class="fa fa-location-arrow" aria-hidden="true"></i>
                   <span class="d-none d-sm-none d-md-inline">Ort</span>
                 </button>
               </div>
-              <div class="input-group-append">
+              <div class="">
                 <button class="btn btn-outline-secondary" :class="{'active': showFilter}" @click="openFilter">
                   <i class="fa fa-gears" aria-hidden="true"></i>
                   <span class="d-none d-sm-none d-md-inline">Filter</span>
@@ -70,19 +70,19 @@
                     <input type="text" v-model="query" :class="{'search-query-active': !!lastQuery}" class="form-control" placeholder="Suche nach Restaurant, Kiosk etc."  @keydown.enter.prevent="userSearch">
                     <span class="clearer fa fa-close" v-if="query.length > 0" @click="clearSearch"></span>
                   </div>
-                  <div class="input-group-append">
+                  <div class="">
                     <button class="btn btn-outline-secondary" type="button" @click="userSearch">
                       <i class="fa fa-search" aria-hidden="true"></i>
                       <span class="d-none d-sm-none d-lg-inline">Suchen</span>
                     </button>
                   </div>
-                  <div class="input-group-append">
+                  <div class="">
                     <button class="btn btn-outline-secondary" @click="setLocator(true)">
                       <i class="fa fa-location-arrow" aria-hidden="true"></i>
                       <span class="d-none d-lg-inline">Ort</span>
                     </button>
                   </div>
-                  <div class="input-group-append">
+                  <div class="">
                     <button class="btn btn-outline-secondary" :class="{'active': showFilter}" @click="openFilter">
                       <i class="fa fa-gears" aria-hidden="true"></i>
                       <span class="d-none d-sm-none d-md-inline">Filter</span>
@@ -156,7 +156,7 @@
                 <button class="btn btn-sm btn-light" @click="setNewVenue(true)">
                   Betrieb nicht gefunden?
                 </button>
-                <a class="btn btn-sm btn-light ml-1" target="_blank" href="/kampagnen/lebensmittelkontrolle/faq/#falsch">
+                <a class="btn btn-sm btn-light ms-1" target="_blank" href="/kampagnen/lebensmittelkontrolle/faq/#falsch">
                   Daten falsch?
                 </a>
               </div>
@@ -1055,7 +1055,7 @@ $icon-pending: #ffc107;
 $icon-success: #28a745;
 $icon-failure: #dc3545;
 
-@import "~leaflet/dist/leaflet.css";
+@import "leaflet/dist/leaflet.css";
 
 .icon-normal {
   fill: $icon-normal;
@@ -1304,8 +1304,8 @@ $icon-failure: #dc3545;
   position: relative;
   flex: 1 1 auto;
   width: 1%;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+  border-top-end-radius: 0;
+  border-bottom-end-radius: 0;
   margin-bottom: 0;
 }
 .clearer {

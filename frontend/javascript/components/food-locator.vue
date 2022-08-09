@@ -40,7 +40,7 @@
                     ref="locationInput">
                   <span class="clearer fa fa-close" v-if="location.length > 0" @click.stop="location = ''"></span>
                 </div>
-                <div class="input-group-append">
+                <div class="">
                   <button class="btn" :class="{'btn-success': validLocation, 'btn-outline-secondary': !validLocation}" type="button" @click.prevent="locationLookup" :disabled="!validLocation">
                     Auf geht’s!
                   </button>
@@ -60,20 +60,22 @@
                 <strong>oder</strong>
               </div>
               <div class="col-md-4 col-lg-5">
-                <button class="btn btn-primary btn-block" @click.prevent="requestGeolocation" :disabled="determiningGeolocation">
-                  <template v-if="geolocationDetermined">
-                    <i class="fa fa-dot-circle-o" aria-hidden="true"></i>
-                    Zu Ihrem Standort
-                  </template>
-                  <template v-else-if="determiningGeolocation">
-                    <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
-                    Ihr Standort wird ermittelt...
-                  </template>
-                  <template v-else>
-                    <i class="fa fa-location-arrow" aria-hidden="true"></i>
-                    Ihren Standort ermitteln
-                  </template>
-                </button>
+                <div class="d-grid">
+                  <button class="btn btn-primary" @click.prevent="requestGeolocation" :disabled="determiningGeolocation">
+                    <template v-if="geolocationDetermined">
+                      <i class="fa fa-dot-circle-o" aria-hidden="true"></i>
+                      Zu Ihrem Standort
+                    </template>
+                    <template v-else-if="determiningGeolocation">
+                      <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                      Ihr Standort wird ermittelt...
+                    </template>
+                    <template v-else>
+                      <i class="fa fa-location-arrow" aria-hidden="true"></i>
+                      Ihren Standort ermitteln
+                    </template>
+                  </button>
+                </div>
               </div>
             </template>
           </div>
@@ -251,8 +253,8 @@ export default {
     position: relative;
     flex: 1 1 auto;
     width: 1%;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+    border-top-end-radius: 0;
+    border-bottom-end-radius: 0;
     margin-bottom: 0;
   }
   .clearer {

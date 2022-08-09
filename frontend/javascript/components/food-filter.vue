@@ -17,10 +17,12 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-12 ml-auto col-md-3 mb-3">
-        <button class="btn btn-block btn-success" @click="$emit('apply')">
-          Filter anwenden
-        </button>
+      <div class="col-12 ms-auto col-md-3 mb-3">
+        <div class="d-grid">
+          <button class="btn btn-success" @click="$emit('apply')">
+            Filter anwenden
+          </button>
+        </div>
       </div>
     </div>
   </div>

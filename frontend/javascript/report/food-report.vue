@@ -3,7 +3,7 @@
     <div class="row" v-if="request">
       <div class="col-auto">
         <div v-if="loading" class="spinner-border" role="status">
-          <span class="sr-only">Loading...</span>
+          <span class="visually-hidden">Loading...</span>
         </div>
         <h2>
           <a :href="request.url">{{ request.title }}</a>
@@ -17,7 +17,7 @@
           Kein Ergebnis
         </button>
       </div>
-      <div class="col-auto ml-auto">
+      <div class="col-auto ms-auto">
         <button class="btn btn-light" @click.prevent="getNextRequest">
           Nächste Anfrage &rarr;
         </button>
@@ -35,7 +35,7 @@
 
 import FoodReportRequest from './food-report-request'
 
-import {getData, postData} from 'froide/frontend/javascript/lib/api.js'
+import {getData, postData} from '~froide/frontend/javascript/lib/api.js'
 
 export default {
   name: 'food-report',

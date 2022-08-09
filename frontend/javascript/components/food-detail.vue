@@ -19,7 +19,7 @@
                   <li v-for="req in data.requests" :key="req.id">
                     <h5>
                         Anfrage vom {{ req.timestamp | date }}
-                        <small class="ml-3">
+                        <small class="ms-3">
                           <a :href="req.url" target="_blank">
                             zur Anfrage&nbsp;&rarr;
                           </a>

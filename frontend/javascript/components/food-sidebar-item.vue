@@ -11,10 +11,10 @@
           <div class="col info-column">
             <h5 v-if="data.name" class="venue-name">
               {{ data.name }}
-              <small v-if="osmLink" class="float-right">
+              <small v-if="osmLink" class="float-end">
                 <a :href="osmLink" class="text-muted" target="_blank" rel="noopener">
                   <span class="fa fa-map-o text-black-50"></span>
-                  <span class="sr-only">OpenStreetMap</span>
+                  <span class="visually-hidden">OpenStreetMap</span>
                 </a>
               </small>
             </h5>

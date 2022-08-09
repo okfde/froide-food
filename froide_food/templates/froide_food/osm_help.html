@@ -23,7 +23,7 @@
       Geben Sie uns dann gerne Feedback mit den Buttons.
     </p>
     <form action="" method="get" class="mt-5 mb-5">
-      <div class="form-group mb-2">
+      <div class="mb-3 mb-2">
         <label for="city">Ort/PLZ</label>
         <input id="city" class="form-control " type="text" name="city" value="{{ city }}" placeholder="Ortsname oder PLZ"/>
         <small class="form-text text-muted">
@@ -67,21 +67,21 @@
                 <form action="" method="post" class="d-inline ajaxified">
                   {% csrf_token %}
                   <input type="hidden" name="venue_id" value="{{ venue.id }}"/>
-                  <button class="mt-1 mr-1 btn btn-sm btn-success" name="action" type="submit" value="osm_fixed">
+                  <button class="mt-1 me-1 btn btn-sm btn-success" name="action" type="submit" value="osm_fixed">
                       in OSM korrigiert
                   </button>
                 </form>
                 <form action="" method="post" class="d-inline ajaxified">
                   {% csrf_token %}
                   <input type="hidden" name="venue_id" value="{{ venue.id }}"/>
-                  <button class="mt-1 mr-1 btn btn-sm btn-danger" name="action" type="submit" value="osm_missing">
+                  <button class="mt-1 me-1 btn btn-sm btn-danger" name="action" type="submit" value="osm_missing">
                       fehlt in OSM
                   </button>
                 </form>
                 <form action="" method="post" class="d-inline ajaxified">
                   {% csrf_token %}
                   <input type="hidden" name="venue_id" value="{{ venue.id }}"/>
-                  <button class="mt-1 mr-1 btn btn-sm btn-warning" name="action" type="submit" value="not_exist">
+                  <button class="mt-1 me-1 btn btn-sm btn-warning" name="action" type="submit" value="not_exist">
                       existiert nicht (mehr)
                   </button>
                 </form>
@@ -89,7 +89,7 @@
                   {% csrf_token %}
                   <input type="hidden" name="venue_id" value="{{ venue.id }}"/>
                   <input type="text" pattern="\d+" class="form-control mt-1 col-5" name="osmid" value="" placeholder="OSM ID"/>
-                  <button class="mt-1 mr-1 btn btn-sm btn-dark" name="action" type="submit" value="should_work">
+                  <button class="mt-1 me-1 btn btn-sm btn-dark" name="action" type="submit" value="should_work">
                       sollte schon gehen
                   </button>
                 </form>

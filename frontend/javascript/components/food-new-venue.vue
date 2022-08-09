@@ -26,29 +26,29 @@
                   Falls der Betrieb, dessen Hygienekontrollbericht Sie anfragen wollen, nicht gelistet wird,
                   können Sie hier die Details des Betriebs eintragen.
                 </p>
-                <div class="form-group">
+                <div class="mb-3">
                   <label for="new-venue-name">Der Name des Betriebs</label>
                   <input v-model="name" type="text" class="form-control" id="new-venue-name" aria-describedby="new-venue-name-help" placeholder="Name" required>
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                   <label for="new-venue-address">Adresse</label>
                   <input v-model="address" type="text" class="form-control" id="new-venue-address" placeholder="z.B. Hauptstr. 5" required>
                 </div>
                 <div class="row">
                   <div class="col">
-                    <div class="form-group">
+                    <div class="mb-3">
                       <label for="new-venue-plz">PLZ</label>
                       <input v-model="postcode" id="new-venue-plz" type="text" class="form-control" pattern="[0-9]{5}" required>
                     </div>
                   </div>
                   <div class="col">
-                    <div class="form-group">
+                    <div class="mb-3">
                       <label for="new-venue-ort">Ort</label>
                       <input v-model="city" id="new-venue-ort" type="text" class="form-control" placeholder="z.B. Berlin" required>
                     </div>
                   </div>
                 </div>
-                <p class="text-right">
+                <p class="text-end">
                   <button type="submit" class="btn btn-primary">
                     Betrieb finden und Anfrage stellen
                   </button>

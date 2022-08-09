@@ -6,7 +6,7 @@
           <food-loader></food-loader>
         </div>
         <template v-else>
-          <div class="text-right">
+          <div class="text-end">
             <button class="btn btn-sm btn-light" @click="$emit('close')">
               zurück
             </button>
@@ -69,11 +69,11 @@
             <user-terms v-if="!userInfo"
               :form="userForm"
             ></user-terms>
-            <p v-if="!userInfo" class="small text-right">
+            <p v-if="!userInfo" class="small text-end">
               Sie erhalten im Rahmen der Aktion „Topf Secret“ einmalig eine separate E-Mail von foodwatch.
               (<a href="https://www.foodwatch.org/de/datenschutz/#topfsecret">Datenschutz</a>)
             </p>
-            <div class="text-right">
+            <div class="text-end">
               <button type="submit" class="btn btn-lg btn-success" :disabled="submitting">
                 <i class="fa fa-angle-double-right" aria-hidden="true"></i>
                 Kontrollbericht anfragen
@@ -87,10 +87,10 @@
 </template>
 
 <script>
-import RequestForm from 'froide/frontend/javascript/components/makerequest/request-form.vue'
-import UserRegistration from 'froide/frontend/javascript/components/makerequest/user-registration.vue'
-import UserTerms from 'froide/frontend/javascript/components/makerequest/user-terms.vue'
-import {selectBestLaw} from 'froide/frontend/javascript/lib/law-select'
+import RequestForm from '~froide/frontend/javascript/components/makerequest/request-form.vue'
+import UserRegistration from '~froide/frontend/javascript/components/makerequest/user-registration.vue'
+import UserTerms from '~froide/frontend/javascript/components/makerequest/user-terms.vue'
+import {selectBestLaw} from '~froide/frontend/javascript/lib/law-select'
 
 import FoodLoader from './food-loader'
 import FoodRecommend from './food-recommend'
