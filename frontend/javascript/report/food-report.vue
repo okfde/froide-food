@@ -8,7 +8,8 @@
         <h2>
           <a :href="request.url">{{ request.title }}</a>
         </h2>
-        <p>Datum der Kontrollberichte in dieser Anfrage:
+        <p>
+          Datum der Kontrollberichte in dieser Anfrage:
           <small v-for="d in reportDates" :key="d">{{ d }},</small>
         </p>
       </div>
@@ -23,19 +24,18 @@
         </button>
       </div>
     </div>
-    <food-report-request v-if="request"
+    <food-report-request
+      v-if="request"
       :request="request"
       :config="config"
-      @addreport="addReport"
-    ></food-report-request>
+      @addreport="addReport"></food-report-request>
   </div>
 </template>
 
 <script>
-
 import FoodReportRequest from './food-report-request'
 
-import {getData, postData} from '~froide/frontend/javascript/lib/api.js'
+import { getData, postData } from '~froide/frontend/javascript/lib/api.js'
 
 export default {
   name: 'food-report',
@@ -46,14 +46,16 @@ export default {
   props: {
     config: {
       type: Object
-    },
+    }
   },
-  mounted () {
+  mounted() {
     this.getNextRequest()
   },
-  data () {
-    this.$root.csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
-    
+  data() {
+    this.$root.csrfToken = document.querySelector(
+      '[name=csrfmiddlewaretoken]'
+    ).value
+
     return {
       request: null,
       loading: false,
@@ -61,13 +63,12 @@ export default {
     }
   },
   computed: {
-    csrfToken () {
+    csrfToken() {
       return this.$root.csrfToken
-    },
-
+    }
   },
   methods: {
-    addReport (data) {
+    addReport(data) {
       if (data.reportdate) {
         this.reportDates.push(data.reportdate)
       }
@@ -79,13 +80,13 @@ export default {
         }
       })
     },
-    markUnresolved () {
+    markUnresolved() {
       this.addReport({
         foirequest: this.request.id,
         unresolved: true
       })
     },
-    getNextRequest () {
+    getNextRequest() {
       this.reportDates = []
       this.loading = true
       getData('').then((response) => {
@@ -103,23 +104,22 @@ export default {
 }
 </script>
 
-
 <style lang="scss" scoped>
-  .loading {
-    height: 100vh;
-    padding-top: 30%;
-    background-color: #fff;
-    // animation: blinker 0.8s linear infinite;
-    text-align: center;
-  }
+.loading {
+  height: 100vh;
+  padding-top: 30%;
+  background-color: #fff;
+  // animation: blinker 0.8s linear infinite;
+  text-align: center;
+}
 
-  .loading img {
-    width: 10%;
-  }
+.loading img {
+  width: 10%;
+}
 
-  @keyframes blinker {
-    50% {
-      opacity: 0.25;
-    }
+@keyframes blinker {
+  50% {
+    opacity: 0.25;
   }
+}
 </style>

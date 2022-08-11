@@ -1,6 +1,7 @@
 <template>
   <div>
-    <food-request v-if="showRequestForm"
+    <food-request
+      v-if="showRequestForm"
       :config="requestConfig"
       :request-form="requestForm"
       :user-info="user"
@@ -11,32 +12,54 @@
       @requestmade="requestMade"
       @userupdated="userUpdated"
       @tokenupdated="tokenUpdated"
-      @close="requestFormClosed"
-    ></food-request>
-    <div v-show="!showRequestForm" :class="{'food-map-embed': config.embed, 'modal-active': modalActive}" v-scroll="handleSidebarScroll">
-      <div class="food-map-container container-fluid" ref="foodMapContainer" id="food-map-container" :class="{'is-embed': config.embed}">
-
+      @close="requestFormClosed"></food-request>
+    <div
+      v-show="!showRequestForm"
+      :class="{ 'food-map-embed': config.embed, 'modal-active': modalActive }"
+      v-scroll="handleSidebarScroll">
+      <div
+        class="food-map-container container-fluid"
+        ref="foodMapContainer"
+        id="food-map-container"
+        :class="{ 'is-embed': config.embed }">
         <div class="searchbar d-block d-md-none" id="searchbar">
           <div class="searchbar-inner">
             <div class="input-group">
               <div class="clearable-input">
-                <input type="text" v-model="query" :class="{'search-query-active': !!lastQuery}" class="form-control" placeholder="Restaurant, Supermarkt, Kiosk etc." @keydown.enter.prevent="userSearch">
-                <span class="clearer fa fa-close" v-if="query.length > 0" @click="clearSearch"></span>
+                <input
+                  type="text"
+                  v-model="query"
+                  :class="{ 'search-query-active': !!lastQuery }"
+                  class="form-control"
+                  placeholder="Restaurant, Supermarkt, Kiosk etc."
+                  @keydown.enter.prevent="userSearch" />
+                <span
+                  class="clearer fa fa-close"
+                  v-if="query.length > 0"
+                  @click="clearSearch"></span>
               </div>
               <div class="">
-                <button class="btn btn-outline-secondary" type="button" @click="userSearch">
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  @click="userSearch">
                   <i class="fa fa-search" aria-hidden="true"></i>
                   <span class="d-none d-sm-none d-md-inline">Suchen</span>
                 </button>
               </div>
-              <div class=" me-auto">
-                <button class="btn btn-outline-secondary" @click="setLocator(true)">
+              <div class="me-auto">
+                <button
+                  class="btn btn-outline-secondary"
+                  @click="setLocator(true)">
                   <i class="fa fa-location-arrow" aria-hidden="true"></i>
                   <span class="d-none d-sm-none d-md-inline">Ort</span>
                 </button>
               </div>
               <div class="">
-                <button class="btn btn-outline-secondary" :class="{'active': showFilter}" @click="openFilter">
+                <button
+                  class="btn btn-outline-secondary"
+                  :class="{ active: showFilter }"
+                  @click="openFilter">
                   <i class="fa fa-gears" aria-hidden="true"></i>
                   <span class="d-none d-sm-none d-md-inline">Filter</span>
                 </button>
@@ -44,46 +67,83 @@
             </div>
             <slide-up-down :active="showFilter" :duration="300">
               <div class="switch-filter">
-                <switch-button v-model="onlyRequested" color="#FFC006" @toggle="search">nur angefragte Betriebe zeigen</switch-button>
+                <switch-button
+                  v-model="onlyRequested"
+                  color="#FFC006"
+                  @toggle="search"
+                  >nur angefragte Betriebe zeigen</switch-button
+                >
               </div>
-              <food-filter v-if="false" :filters="filters" @change="filterChanged" @apply="applyFilter"></food-filter>
+              <food-filter
+                v-if="false"
+                :filters="filters"
+                @change="filterChanged"
+                @apply="applyFilter"></food-filter>
             </slide-up-down>
           </div>
         </div>
         <div class="row">
           <div class="col-md-8 col-lg-9 order-md-2 map-column">
-            <div class="map-container" ref="foodMap" id="food-map" :class="mapContainerClass" :style="mapContainerStyle">
-
+            <div
+              class="map-container"
+              ref="foodMap"
+              id="food-map"
+              :class="mapContainerClass"
+              :style="mapContainerStyle">
               <div v-if="showRefresh || searching" class="redo-search">
-                <button v-if="showRefresh" class="btn btn-dark" @click="searchArea">
+                <button
+                  v-if="showRefresh"
+                  class="btn btn-dark"
+                  @click="searchArea">
                   Im aktuellen Bereich suchen
                 </button>
-                <button v-if="searching" class="btn btn-secondary btn-sm disabled">
+                <button
+                  v-if="searching"
+                  class="btn btn-secondary btn-sm disabled">
                   <food-loader></food-loader>
                   Suche läuft&hellip;
                 </button>
               </div>
 
-              <div class="map-search d-none d-md-block" :class="{'map-search-full': !(showRefresh || searching)}">
+              <div
+                class="map-search d-none d-md-block"
+                :class="{ 'map-search-full': !(showRefresh || searching) }">
                 <div class="input-group">
                   <div class="clearable-input">
-                    <input type="text" v-model="query" :class="{'search-query-active': !!lastQuery}" class="form-control" placeholder="Suche nach Restaurant, Kiosk etc."  @keydown.enter.prevent="userSearch">
-                    <span class="clearer fa fa-close" v-if="query.length > 0" @click="clearSearch"></span>
+                    <input
+                      type="text"
+                      v-model="query"
+                      :class="{ 'search-query-active': !!lastQuery }"
+                      class="form-control"
+                      placeholder="Suche nach Restaurant, Kiosk etc."
+                      @keydown.enter.prevent="userSearch" />
+                    <span
+                      class="clearer fa fa-close"
+                      v-if="query.length > 0"
+                      @click="clearSearch"></span>
                   </div>
                   <div class="">
-                    <button class="btn btn-outline-secondary" type="button" @click="userSearch">
+                    <button
+                      class="btn btn-outline-secondary"
+                      type="button"
+                      @click="userSearch">
                       <i class="fa fa-search" aria-hidden="true"></i>
                       <span class="d-none d-sm-none d-lg-inline">Suchen</span>
                     </button>
                   </div>
                   <div class="">
-                    <button class="btn btn-outline-secondary" @click="setLocator(true)">
+                    <button
+                      class="btn btn-outline-secondary"
+                      @click="setLocator(true)">
                       <i class="fa fa-location-arrow" aria-hidden="true"></i>
                       <span class="d-none d-lg-inline">Ort</span>
                     </button>
                   </div>
                   <div class="">
-                    <button class="btn btn-outline-secondary" :class="{'active': showFilter}" @click="openFilter">
+                    <button
+                      class="btn btn-outline-secondary"
+                      :class="{ active: showFilter }"
+                      @click="openFilter">
                       <i class="fa fa-gears" aria-hidden="true"></i>
                       <span class="d-none d-sm-none d-md-inline">Filter</span>
                     </button>
@@ -91,39 +151,68 @@
                 </div>
                 <slide-up-down :active="showFilter" :duration="300">
                   <div class="switch-filter">
-                    <switch-button v-model="onlyRequested" color="#FFC006" @toggle="search">nur angefragte Betriebe zeigen</switch-button>
+                    <switch-button
+                      v-model="onlyRequested"
+                      color="#FFC006"
+                      @toggle="search"
+                      >nur angefragte Betriebe zeigen</switch-button
+                    >
                   </div>
                 </slide-up-down>
               </div>
 
-              <l-map ref="map" :zoom.sync="zoom" :center="center" :options="mapOptions" :max-bounds="maxBounds">
-                <l-tile-layer :url="tileProvider.url" :attribution="tileProvider.attribution"/>
-                <l-control-zoom position="bottomright"/>
-                <l-control position="bottomleft" >
+              <l-map
+                ref="map"
+                :zoom.sync="zoom"
+                :center="center"
+                :options="mapOptions"
+                :max-bounds="maxBounds">
+                <l-tile-layer
+                  :url="tileProvider.url"
+                  :attribution="tileProvider.attribution" />
+                <l-control-zoom position="bottomright" />
+                <l-control position="bottomleft">
                   <ul class="color-legend">
-                    <li :style="colorLegend.normal"><span>Jetzt anfragen!</span></li>
-                    <li :style="colorLegend.pending"><span>Anfrage läuft</span></li>
-                    <li :style="colorLegend.success"><span>Anfrage erfolgreich</span></li>
-                    <li :style="colorLegend.failure"><span>Anfrage abgelehnt</span></li>
+                    <li :style="colorLegend.normal">
+                      <span>Jetzt anfragen!</span>
+                    </li>
+                    <li :style="colorLegend.pending">
+                      <span>Anfrage läuft</span>
+                    </li>
+                    <li :style="colorLegend.success">
+                      <span>Anfrage erfolgreich</span>
+                    </li>
+                    <li :style="colorLegend.failure">
+                      <span>Anfrage abgelehnt</span>
+                    </li>
                   </ul>
                 </l-control>
-                <l-marker v-for="marker in venues" :key="marker.id"
-                    :lat-lng="marker.position" :title="marker.name"
-                    :draggable="false" :icon="marker.icon" :options="markerOptions"
-                    @click="markerClick(marker, false)"
-                    @touchstart.prevent="markerClick(marker, false)" v-focusmarker>
-                  <l-tooltip :content="marker.name" :options="tooltipOptions" v-if="!isMobile"/>
+                <l-marker
+                  v-for="marker in venues"
+                  :key="marker.id"
+                  :lat-lng="marker.position"
+                  :title="marker.name"
+                  :draggable="false"
+                  :icon="marker.icon"
+                  :options="markerOptions"
+                  @click="markerClick(marker, false)"
+                  @touchstart.prevent="markerClick(marker, false)"
+                  v-focusmarker>
+                  <l-tooltip
+                    :content="marker.name"
+                    :options="tooltipOptions"
+                    v-if="!isMobile" />
                   <l-popup :options="popupOptions" v-if="!isMobile">
                     <food-popup
                       :data="marker"
                       :config="config"
                       @startRequest="startRequest"
-                      @detail="setDetail"/>
+                      @detail="setDetail" />
                   </l-popup>
                 </l-marker>
-
               </l-map>
-              <food-mapoverlay v-if="stacked && selectedVenue"
+              <food-mapoverlay
+                v-if="stacked && selectedVenue"
                 :data="selectedVenue"
                 :config="config"
                 :user="user"
@@ -131,43 +220,60 @@
                 @startRequest="startRequest"
                 @detail="setDetail"
                 @followed="followedRequest(selectedVenue, $event)"
-                @unfollowed="selectedVenue.follow.follows = false"
-              ></food-mapoverlay>
+                @unfollowed="
+                  selectedVenue.follow.follows = false
+                "></food-mapoverlay>
             </div>
           </div>
 
           <div class="col-12 d-block d-md-none divider-column" id="divider">
             <p v-if="listShown" class="divider-button">
-              <a @click.prevent="goToMap" @touchend.prevent="goToMap">zurück zur Karte</a>
+              <a @click.prevent="goToMap" @touchend.prevent="goToMap"
+                >zurück zur Karte</a
+              >
             </p>
             <p v-else class="divider-button">
-              <a @click.prevent="goToList" @touchend.prevent="goToList">zur Liste</a>
+              <a @click.prevent="goToList" @touchend.prevent="goToList"
+                >zur Liste</a
+              >
             </p>
           </div>
 
           <div class="col-md-4 col-lg-3 order-md-1 sidebar-column">
-            <div class="sidebar" :class="{'modal-active': modalActive}"
-                ref="foodList" id="food-list" v-scroll.window="handleSidebarScroll">
+            <div
+              class="sidebar"
+              :class="{ 'modal-active': modalActive }"
+              ref="foodList"
+              id="food-list"
+              v-scroll.window="handleSidebarScroll">
               <div class="new-venue-area" v-if="hasSearched || error">
                 <template v-if="searchEmpty">
-                  <p v-if="lastQuery">Keine Betriebe mit dem Suchwort „{{ lastQuery }}“ gefunden.</p>
+                  <p v-if="lastQuery">
+                    Keine Betriebe mit dem Suchwort „{{ lastQuery }}“ gefunden.
+                  </p>
                   <p v-else>Keine Betriebe an diesem Ort gefunden.</p>
                 </template>
                 <button class="btn btn-sm btn-light" @click="setNewVenue(true)">
                   Betrieb nicht gefunden?
                 </button>
-                <a class="btn btn-sm btn-light ms-1" target="_blank" href="/kampagnen/lebensmittelkontrolle/faq/#falsch">
+                <a
+                  class="btn btn-sm btn-light ms-1"
+                  target="_blank"
+                  href="/kampagnen/lebensmittelkontrolle/faq/#falsch">
                   Daten falsch?
                 </a>
               </div>
               <template v-if="searching">
-                <food-sidebar-item v-for="data in fakeVenues"
+                <food-sidebar-item
+                  v-for="data in fakeVenues"
                   :key="data.id"
                   :data="data">
                 </food-sidebar-item>
               </template>
-              <food-sidebar-item v-for="data in venues"
-                :key="data.id" :data="data"
+              <food-sidebar-item
+                v-for="data in venues"
+                :key="data.id"
+                :data="data"
                 :config="config"
                 :user="user"
                 :selectedVenueId="selectedVenueId"
@@ -176,13 +282,12 @@
                 @startRequest="startRequest"
                 @imageLoaded="imageLoaded"
                 @followed="followedRequest(data, $event)"
-                @unfollowed="data.follow.follows = false"
-              ></food-sidebar-item>
+                @unfollowed="data.follow.follows = false"></food-sidebar-item>
             </div>
           </div>
-
         </div>
-        <food-locator v-if="showLocator"
+        <food-locator
+          v-if="showLocator"
           :defaultPostcode="postcode"
           :defaultLocation="locationName"
           :exampleCity="city"
@@ -194,18 +299,17 @@
           @close="setLocator(false)"
           @postcodeChosen="postcodeChosen"
           @coordinatesChosen="coordinatesChosen"
-          @locationChosen="locationChosen"
-          ></food-locator>
-        <food-detail v-if="showDetail"
+          @locationChosen="locationChosen"></food-locator>
+        <food-detail
+          v-if="showDetail"
           :data="showDetail"
           @close="showDetail = null"
-          @detailfetched="detailFetched"
-        ></food-detail>
-        <food-new-venue v-if="showNewVenue"
+          @detailfetched="detailFetched"></food-detail>
+        <food-new-venue
+          v-if="showNewVenue"
           @close="showNewVenue = false"
           @detailfetched="detailFetched"
-          @venuecreated="venueCreated"
-        ></food-new-venue>
+          @venuecreated="venueCreated"></food-new-venue>
       </div>
     </div>
   </div>
@@ -214,10 +318,21 @@
 <script>
 /* global L */
 
-import 'whatwg-fetch'
 import Vue from 'vue'
 
-import { LMap, LTileLayer, LControlLayers, LControlAttribution, LControlZoom, LControl, LMarker, LPopup, LTooltip } from 'vue2-leaflet'
+import 'leaflet/dist/leaflet.css'
+
+import {
+  LMap,
+  LTileLayer,
+  LControlLayers,
+  LControlAttribution,
+  LControlZoom,
+  LControl,
+  LMarker,
+  LPopup,
+  LTooltip
+} from 'vue2-leaflet'
 import 'leaflet.icon.glyph'
 import bbox from '@turf/bbox'
 import smoothScroll from '../lib/smoothscroll'
@@ -235,8 +350,12 @@ import FoodNewVenue from './food-new-venue'
 import SwitchButton from './switch-button'
 
 import {
-  getPlaceStatus, getPinURL, getPinColor,
-  getQueryVariable, canUseLocalStorage, latlngToGrid,
+  getPlaceStatus,
+  getPinURL,
+  getPinColor,
+  getQueryVariable,
+  canUseLocalStorage,
+  latlngToGrid,
   COLORS
 } from '../lib/utils'
 
@@ -293,10 +412,8 @@ export default {
   components: {
     LMap,
     LTileLayer,
-    LControlLayers,
     LControlZoom,
     LControl,
-    LControlAttribution,
     LMarker,
     LPopup,
     LTooltip,
@@ -312,7 +429,7 @@ export default {
     SlideUpDown,
     SwitchButton
   },
-  data () {
+  data() {
     let locationKnown = false
 
     let zoom = null
@@ -331,17 +448,16 @@ export default {
 
     if (latlng) {
       let parts = latlng.split(',')
-      center = [
-        parseFloat(parts[0]),
-        parseFloat(parts[1])
-      ]
+      center = [parseFloat(parts[0]), parseFloat(parts[1])]
       if (center[0] && center[1]) {
         zoom = DETAIL_ZOOM_LEVEL
       }
     }
 
     if (canUseLocalStorage(window)) {
-      requestsMade = JSON.parse(window.localStorage.getItem('froide-food:requestsmade'))
+      requestsMade = JSON.parse(
+        window.localStorage.getItem('froide-food:requestsmade')
+      )
       zoom = parseInt(window.localStorage.getItem('froide-food:zoom'))
       if (center === null) {
         center = JSON.parse(window.localStorage.getItem('froide-food:center'))
@@ -372,7 +488,9 @@ export default {
       zoom = DEFAULT_ZOOM
     }
 
-    this.$root.csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    this.$root.csrfToken = document.querySelector(
+      '[name=csrfmiddlewaretoken]'
+    ).value
 
     return {
       zoom: zoom,
@@ -420,11 +538,14 @@ export default {
       },
       tileProvider: {
         name: 'Carto',
-        url: `//cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}${window.L.Browser.retina ? '@2x' : ''}.png`,
+        url: `//cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}${
+          window.L.Browser.retina ? '@2x' : ''
+        }.png`,
         // url: 'https://api.mapbox.com/styles/v1/{username}/{style}/tiles/{tileSize}/{z}/{x}/{y}{r}?access_token={accessToken}',
         // url: 'https://api.tiles.mapbox.com/v4/{style}/{z}/{x}/{y}.png?access_token={accessToken}',
         // url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>',
+        attribution:
+          '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>',
         options: {
           // style: 'mapbox.streets',
           // username: 'okfde',
@@ -435,17 +556,20 @@ export default {
       }
     }
   },
-  created () {
+  created() {
     this.$root.config = this.config
     var self = this
 
     if ('serviceWorker' in navigator) {
       let scope = this.config.swUrl.replace(/^(.*\/)[\w.]+$/, '$1')
-      navigator.serviceWorker.register(this.config.swUrl, {scope: scope}).then(function (reg) {
-        console.log('ServiceWorker registration successful!', reg.scope)
-      }).catch(function (err) {
-        console.log('ServiceWorker registration failed: ', err)
-      })
+      navigator.serviceWorker
+        .register(this.config.swUrl, { scope: scope })
+        .then(function (reg) {
+          console.log('ServiceWorker registration successful!', reg.scope)
+        })
+        .catch(function (err) {
+          console.log('ServiceWorker registration failed: ', err)
+        })
     }
 
     Vue.directive('focusmarker', {
@@ -459,7 +583,7 @@ export default {
       }
     })
   },
-  mounted () {
+  mounted() {
     this.$nextTick(() => {
       this.map.attributionControl.setPrefix('')
       this.map.on('zoomend', (e) => {
@@ -498,10 +622,10 @@ export default {
     })
   },
   computed: {
-    map () {
+    map() {
       return this.$refs.map.mapObject
     },
-    currentUrl () {
+    currentUrl() {
       let url = `${this.config.appUrl}?latlng=${this.center[0]},${this.center[1]}`
 
       if (this.selectedVenueId) {
@@ -512,10 +636,10 @@ export default {
       }
       return url
     },
-    isMobile () {
+    isMobile() {
       return this.stacked || L.Browser.mobile
     },
-    iconCategoryMapping () {
+    iconCategoryMapping() {
       let filterIconMapping = {}
       this.filters.forEach((f) => {
         f.categories.forEach((c) => {
@@ -524,7 +648,7 @@ export default {
       })
       return filterIconMapping
     },
-    filterCategories () {
+    filterCategories() {
       let filterCats = []
       this.filters.forEach((f) => {
         if (f.active) {
@@ -538,7 +662,7 @@ export default {
       }
       return filterCats
     },
-    mapOptions () {
+    mapOptions() {
       return {
         scrollWheelZoom: !this.isMobile,
         doubleClickZoom: true,
@@ -546,55 +670,58 @@ export default {
         maxZoom: 18
       }
     },
-    tooltipOptions () {
+    tooltipOptions() {
       return {
         offset: L.point(0, -40),
         direction: 'top'
       }
     },
-    dividerSwitchHeight () {
+    dividerSwitchHeight() {
       return window.innerHeight / 2
     },
-    selectedVenue () {
+    selectedVenue() {
       if (this.selectedVenueId) {
         return this.venues[this.venueMap[this.selectedVenueId]]
       }
       return null
     },
-    popupOptions () {
+    popupOptions() {
       return {
         autoPanPaddingTopLeft: L.point([5, 85]),
         maxWidth: Math.round(window.innerWidth * 0.7)
       }
     },
-    showRefresh () {
+    showRefresh() {
       return this.mapMoved && this.zoom >= 10
     },
-    scrollContainer () {
-      return this.config.embed ? document.querySelector('.food-map-embed') : window
+    scrollContainer() {
+      return this.config.embed
+        ? document.querySelector('.food-map-embed')
+        : window
     },
-    mapContainerClass () {
+    mapContainerClass() {
       if (this.isMapTop && !this.stacked) {
         return 'map-full-height'
       }
+      return ''
     },
-    mapContainerStyle () {
+    mapContainerStyle() {
       if (this.mapHeight === null) {
         return ''
       }
       return `height: ${this.mapHeight}px`
     },
-    fakeVenues () {
+    fakeVenues() {
       let a = []
       for (let i = 0; i < 50; i += 1) {
-        a.push({id: 'fake-' + i})
+        a.push({ id: 'fake-' + i })
       }
       return a
     },
-    modalActive () {
+    modalActive() {
       return this.showLocator || this.showDetail
     },
-    colorLegend () {
+    colorLegend() {
       return {
         normal: `background-image: url('${getPinURL(COLORS.normal)}')`,
         pending: `background-image: url('${getPinURL(COLORS.pending)}')`,
@@ -604,11 +731,12 @@ export default {
     }
   },
   methods: {
-    coordinatesChosen (latlng) {
+    coordinatesChosen(latlng) {
       let center = L.latLng(latlng)
       if (!this.maxBounds.contains(center)) {
         this.geolocationDisabled = true
-        this.locatorErrorMessage = 'Dein Ort scheint nicht in Deutschland zu sein!'
+        this.locatorErrorMessage =
+          'Dein Ort scheint nicht in Deutschland zu sein!'
         this.setLocator(true)
         return
       }
@@ -616,19 +744,21 @@ export default {
       this.locatorErrorMessage = ''
       this.locationKnown = true
       this.map.setView(center, DETAIL_ZOOM_LEVEL)
-      this.search({coordinates: center})
+      this.search({ coordinates: center })
       this.preventMapMoved()
     },
-    locationChosen (location) {
+    locationChosen(location) {
       this.locationName = location
-      this.search({location: location})
+      this.search({ location: location })
     },
-    postcodeChosen (postcode) {
+    postcodeChosen(postcode) {
       window.localStorage.setItem('froide-food:postcode', postcode)
-      window.fetch(`/api/v1/georegion/?kind=zipcode&name=${postcode}&limit=1`)
+      window
+        .fetch(`/api/v1/georegion/?kind=zipcode&name=${postcode}&limit=1`)
         .then((response) => {
           return response.json()
-        }).then((data) => {
+        })
+        .then((data) => {
           if (data['meta']['total_count'] === 0) {
             return
           }
@@ -642,11 +772,11 @@ export default {
           let coords = geoRegion.centroid.coordinates
           let center = L.latLng([coords[1], coords[0]])
           this.map.fitBounds(bounds)
-          this.search({coordinates: center, bounds})
+          this.search({ coordinates: center, bounds })
           this.preventMapMoved()
         })
     },
-    filterChanged (filter) {
+    filterChanged(filter) {
       this.filters = this.filters.map((f) => {
         if (f.name === filter.name) {
           f.active = !f.active
@@ -654,17 +784,17 @@ export default {
         return f
       })
     },
-    applyFilter () {
+    applyFilter() {
       this.showFilter = false
       this.search()
     },
-    openFilter () {
+    openFilter() {
       this.showFilter = !this.showFilter
       if (this.isMobile) {
         this.goToMap()
       }
     },
-    mapHasMoved () {
+    mapHasMoved() {
       if (this.autoMoved) {
         return
       }
@@ -673,7 +803,7 @@ export default {
         this.searchArea()
       }
     },
-    preventMapMoved () {
+    preventMapMoved() {
       this.autoMoved = true
       if (this.autoMovedTimeout !== null) {
         window.clearTimeout(this.autoMovedTimeout)
@@ -683,7 +813,7 @@ export default {
         this.autoMovedTimeout = null
       }, 1500)
     },
-    userSearch () {
+    userSearch() {
       if (this.query.match(/^\d{5}$/)) {
         let p = this.query
         this.query = ''
@@ -691,14 +821,14 @@ export default {
       }
       this.search()
     },
-    clearSearch () {
+    clearSearch() {
       this.query = ''
       this.search()
     },
-    searchArea () {
+    searchArea() {
       this.search()
     },
-    search (options = {}) {
+    search(options = {}) {
       this.mapMoved = false
       this.error = false
       if (this.searching) {
@@ -723,14 +853,8 @@ export default {
           bounds = this.map.getBounds()
         }
         let radius = Math.min(
-          this.map.distance(
-            bounds.getNorthEast(),
-            bounds.getNorthWest()
-          ),
-          this.map.distance(
-            bounds.getNorthEast(),
-            bounds.getSouthEast()
-          )
+          this.map.distance(bounds.getNorthEast(), bounds.getNorthWest()),
+          this.map.distance(bounds.getNorthEast(), bounds.getSouthEast())
         )
         radius = Math.max(Math.round(Math.min(radius, 40000) / 100) * 100, 500)
         let reqCoords = latlngToGrid(coordinates, radius)
@@ -748,12 +872,18 @@ export default {
       if (this.onlyRequested) {
         onlyRequested = '&requested=1'
       }
-      window.fetch(`/api/v1/venue/?q=${encodeURIComponent(this.query)}${cats}&${locationParam}${onlyRequested}`)
+      window
+        .fetch(
+          `/api/v1/venue/?q=${encodeURIComponent(
+            this.query
+          )}${cats}&${locationParam}${onlyRequested}`
+        )
         .then((response) => {
           return response.json()
-        }).then(this.searchDone(options))
+        })
+        .then(this.searchDone(options))
     },
-    searchDone (options) {
+    searchDone(options) {
       return (data) => {
         if (data.error) {
           console.warn('Error requesting the API')
@@ -774,33 +904,32 @@ export default {
 
         this.venues = []
         let duplicates = {}
-        let newVenues = data.results.filter((r) => {
-          const vid = this.getVenueId(r)
-          // Filter out duplicates
-          if (duplicates[vid] === undefined) {
-            duplicates[vid] = true
-            return true
-          }
-          return false
-        }).map((r, i) => {
-          let d = this.createVenue(r)
-          if (d.requests.length > 0 && d.requests[0].id !== null) {
-            hasRequests = true
-            requestMapping[d.requests[0].id] = d.id
-          }
-          if (this.paramIdent && r.ident.indexOf(this.paramIdent) !== -1) {
-            this.selectedVenueId = d.id
-          }
-          if (this.alreadyRequested[d.id]) {
-            d.requested = true
-          }
-          return d
-        })
+        let newVenues = data.results
+          .filter((r) => {
+            const vid = this.getVenueId(r)
+            // Filter out duplicates
+            if (duplicates[vid] === undefined) {
+              duplicates[vid] = true
+              return true
+            }
+            return false
+          })
+          .map((r, i) => {
+            let d = this.createVenue(r)
+            if (d.requests.length > 0 && d.requests[0].id !== null) {
+              hasRequests = true
+              requestMapping[d.requests[0].id] = d.id
+            }
+            if (this.paramIdent && r.ident.indexOf(this.paramIdent) !== -1) {
+              this.selectedVenueId = d.id
+            }
+            if (this.alreadyRequested[d.id]) {
+              d.requested = true
+            }
+            return d
+          })
 
-        this.venues = [
-          ...this.venues,
-          ...newVenues
-        ]
+        this.venues = [...this.venues, ...newVenues]
         this.venueMap = {}
         this.venues.forEach((d, i) => {
           this.venueMap[d.id] = i
@@ -813,7 +942,8 @@ export default {
           let bounds = L.latLngBounds(venueLocations)
 
           if (!this.maxBounds.contains(bounds)) {
-            this.locatorErrorMessage = 'Dein Ort scheint nicht in Deutschland zu sein!'
+            this.locatorErrorMessage =
+              'Dein Ort scheint nicht in Deutschland zu sein!'
             this.setLocator(true)
             return
           }
@@ -826,16 +956,18 @@ export default {
         }
       }
     },
-    getFollowers (requestMapping) {
+    getFollowers(requestMapping) {
       let requestIds = []
       for (let key in requestMapping) {
         requestIds.push(key)
       }
       let requests = requestIds.join(',')
-      window.fetch(`/api/v1/following/?request=${requests}`)
+      window
+        .fetch(`/api/v1/following/?request=${requests}`)
         .then((response) => {
           return response.json()
-        }).then((data) => {
+        })
+        .then((data) => {
           data.objects.forEach((obj) => {
             let parts = obj.request.split('/')
             let requestId = parseInt(parts[parts.length - 2])
@@ -848,10 +980,10 @@ export default {
           })
         })
     },
-    getVenueId (venue) {
+    getVenueId(venue) {
       return venue.ident.replace(/:/g, '-')
     },
-    createVenue (r) {
+    createVenue(r) {
       let d = {
         position: [r.lat, r.lng],
         id: this.getVenueId(r),
@@ -861,7 +993,7 @@ export default {
       d.icon = this.getIcon(d)
       return d
     },
-    getIcon (r) {
+    getIcon(r) {
       let status = getPlaceStatus(r)
       let selected = this.selectedVenueId === r.id
       let color = getPinColor(status, selected)
@@ -873,7 +1005,7 @@ export default {
         iconUrl: iconUrl
       })
     },
-    clearSelected () {
+    clearSelected() {
       if (this.selectedVenueId === null) {
         return
       }
@@ -884,7 +1016,7 @@ export default {
         Vue.set(marker, 'icon', this.getIcon(marker))
       }
     },
-    markerClick (marker, pan) {
+    markerClick(marker, pan) {
       this.clearSelected()
       if (pan) {
         this.map.panTo(marker.position)
@@ -895,8 +1027,13 @@ export default {
         let sidebarItem = document.getElementById(sidebarId)
         if (sidebarItem) {
           if (sidebarItem.scrollIntoView) {
-            let scrollDifference = Math.abs(sidebarItem.getBoundingClientRect().top - window.pageYOffset)
-            sidebarItem.scrollIntoView({behavior: scrollDifference < 2000 ? 'smooth' : 'instant', 'block': 'nearest'})
+            let scrollDifference = Math.abs(
+              sidebarItem.getBoundingClientRect().top - window.pageYOffset
+            )
+            sidebarItem.scrollIntoView({
+              behavior: scrollDifference < 2000 ? 'smooth' : 'instant',
+              block: 'nearest'
+            })
           } else {
             window.scrollTo(0, sidebarItem.offsetTop)
           }
@@ -907,27 +1044,27 @@ export default {
       Vue.set(marker, 'icon', this.getIcon(marker))
       this.preventMapMoved()
     },
-    imageLoaded (data) {
+    imageLoaded(data) {
       Vue.set(data, 'imageLoaded', true)
     },
-    goToMap () {
+    goToMap() {
       let fmc = this.$refs.foodMapContainer
       if (fmc.getBoundingClientRect().top > 0) {
         return
       }
       let y = fmc.offsetTop
-      smoothScroll({x: 0, y: y, el: this.scrollContainer}, 300)
+      smoothScroll({ x: 0, y: y, el: this.scrollContainer }, 300)
     },
-    goToList () {
+    goToList() {
       let y = this.$refs.foodMapContainer.offsetTop
       let y2 = this.$refs.foodMap.getBoundingClientRect().height
-      smoothScroll({x: 0, y: y + y2 + 5, el: this.scrollContainer}, 300)
+      smoothScroll({ x: 0, y: y + y2 + 5, el: this.scrollContainer }, 300)
     },
-    isStacked () {
+    isStacked() {
       this.stacked = window.innerWidth < 768
       return this.stacked
     },
-    handleSidebarScroll (evt, el) {
+    handleSidebarScroll(evt, el) {
       if (this.modalActive) {
         return
       }
@@ -966,7 +1103,7 @@ export default {
         }
       }
     },
-    recordMapPosition () {
+    recordMapPosition() {
       let latlng = this.map.getCenter()
       this.center = [latlng.lat, latlng.lng]
       let zoom = this.map.getZoom()
@@ -976,37 +1113,37 @@ export default {
       window.localStorage.setItem('froide-food:zoom', zoom)
       window.localStorage.setItem('froide-food:center', JSON.stringify(latlng))
     },
-    setDetail (data) {
+    setDetail(data) {
       this.showDetail = data
       if (data) {
         this.goToMap()
       }
     },
-    setLocator (data) {
+    setLocator(data) {
       this.showLocator = data
       if (data) {
         this.goToMap()
       }
     },
-    setNewVenue (show) {
+    setNewVenue(show) {
       this.showNewVenue = show
       if (show) {
         this.goToMap()
       }
     },
-    startRequest (data) {
+    startRequest(data) {
       this.markerClick(data, true)
       this.showRequestForm = data
       this.goToMap()
     },
-    requestFormClosed () {
+    requestFormClosed() {
       this.showRequestForm = null
       this.goToMap()
     },
-    requestMade (data) {
+    requestMade(data) {
       this.alreadyRequested[data.id] = true
     },
-    detailFetched (data) {
+    detailFetched(data) {
       this.venues = this.venues.map((f) => {
         if (f.ident === data.ident) {
           f.requests = data.requests
@@ -1024,7 +1161,7 @@ export default {
         return f
       })
     },
-    venueCreated (data) {
+    venueCreated(data) {
       let newVenue = this.createVenue(data)
       if (this.venueMap[newVenue.id] === undefined) {
         this.venues.push(newVenue)
@@ -1034,14 +1171,14 @@ export default {
       }
       this.startRequest(newVenue)
     },
-    followedRequest (data, resourceUri) {
+    followedRequest(data, resourceUri) {
       data.follow.follows = true
       data.follow.resource_uri = resourceUri
     },
-    tokenUpdated (token) {
+    tokenUpdated(token) {
       this.$root.csrfToken = token
     },
-    userUpdated (user) {
+    userUpdated(user) {
       this.user = user
     }
   }
@@ -1049,40 +1186,37 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 $icon-normal: #007bff;
 $icon-pending: #ffc107;
 $icon-success: #28a745;
 $icon-failure: #dc3545;
 
-@import "leaflet/dist/leaflet.css";
-
 .icon-normal {
   fill: $icon-normal;
 }
 .icon-normal.selected {
-  fill: darken($icon-normal, 30%)
+  fill: darken($icon-normal, 30%);
 }
 
 .icon-pending {
   fill: $icon-pending;
 }
 .icon-pending.selected {
-  fill: darken($icon-pending, 30%)
+  fill: darken($icon-pending, 30%);
 }
 
 .icon-success {
   fill: $icon-normal;
 }
 .icon-success.selected {
-  fill: darken($icon-success, 30%)
+  fill: darken($icon-success, 30%);
 }
 
 .icon-failure {
   fill: $icon-failure;
 }
 .icon-failure.selected {
-  fill: darken($icon-failure, 30%)
+  fill: darken($icon-failure, 30%);
 }
 
 .food-wrapper {
@@ -1096,11 +1230,11 @@ $icon-failure: #dc3545;
   overflow: scroll;
 
   &.modal-active {
-    overflow: hidden;  
+    overflow: hidden;
   }
 }
 
-@media screen and (min-width: 768px){
+@media screen and (min-width: 768px) {
   .food-map-embed {
     padding: 0;
   }
@@ -1117,7 +1251,7 @@ $icon-failure: #dc3545;
   top: 0;
   z-index: 2050;
   background-color: #fff;
-  margin:0 -15px;
+  margin: 0 -15px;
 }
 
 .searchbar-inner {
@@ -1137,7 +1271,8 @@ $icon-failure: #dc3545;
   .btn {
     background-color: #fff;
   }
-  .btn:hover, .btn:active {
+  .btn:hover,
+  .btn:active {
     background-color: #666;
   }
 }
@@ -1146,7 +1281,7 @@ $icon-failure: #dc3545;
   width: 80%;
 }
 
-@media screen and (max-width: 960px){
+@media screen and (max-width: 960px) {
   .map-search {
     width: 60%;
   }
@@ -1174,7 +1309,7 @@ $icon-failure: #dc3545;
   }
 }
 
-@media screen and (min-width: 768px){
+@media screen and (min-width: 768px) {
   .redo-search {
     left: 0;
     width: 30%;
@@ -1186,7 +1321,7 @@ $icon-failure: #dc3545;
   }
 }
 
-@media screen and (min-width: 768px){
+@media screen and (min-width: 768px) {
   .searchbar-inner {
     padding: 0 15px;
   }
@@ -1201,7 +1336,7 @@ $icon-failure: #dc3545;
   padding-left: 0;
 }
 
-@media screen and (min-width: 768px){
+@media screen and (min-width: 768px) {
   .map-column {
     padding-right: 15px;
     padding-left: 5px;
@@ -1236,8 +1371,7 @@ $icon-failure: #dc3545;
   }
 }
 
-
-@media screen and (min-width: 768px){
+@media screen and (min-width: 768px) {
   .map-container {
     height: 80vh;
     position: sticky;
@@ -1269,7 +1403,7 @@ $icon-failure: #dc3545;
   padding-left: 0;
 }
 
-@media screen and (min-width: 768px){
+@media screen and (min-width: 768px) {
   .sidebar-column {
     padding-right: 0px;
     padding-left: 15px;
@@ -1304,8 +1438,8 @@ $icon-failure: #dc3545;
   position: relative;
   flex: 1 1 auto;
   width: 1%;
-  border-top-end-radius: 0;
-  border-bottom-end-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
   margin-bottom: 0;
 }
 .clearer {
@@ -1346,5 +1480,4 @@ $icon-failure: #dc3545;
 .color-legend li span {
   color: #333;
 }
-
 </style>

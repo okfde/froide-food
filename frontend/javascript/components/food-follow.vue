@@ -1,17 +1,24 @@
 <template>
   <div v-if="!canFollow">
     <div class="d-grid">
-      <button v-if="follows" class="input-large btn btn-sm" :class="{'hover-btn-danger': !justFollowed}" @click.stop="unfollow">
+      <button
+        v-if="follows"
+        class="input-large btn btn-sm"
+        :class="{ 'hover-btn-danger': !justFollowed }"
+        @click.stop="unfollow">
         <span v-if="!justFollowed" class="on-hover">
           <i class="fa fa-remove" aria-hidden="true"></i>
           Anfrage entfolgen
         </span>
-        <span :class="{'on-display': !justFollowed}">
+        <span :class="{ 'on-display': !justFollowed }">
           <i class="fa fa-star" aria-hidden="true"></i>
           Sie folgen dieser Anfrage!
         </span>
       </button>
-      <button v-else class="input-large btn hover-btn-success btn-sm" @click.stop="doFollow">
+      <button
+        v-else
+        class="input-large btn hover-btn-success btn-sm"
+        @click.stop="doFollow">
         <span class="on-hover">
           <i class="fa fa-star" aria-hidden="true"></i>
           Anfrage folgen?
@@ -26,8 +33,7 @@
 </template>
 
 <script>
-
-import {postData} from '../lib/utils.js'
+import { postData } from '../lib/utils.js'
 
 export default {
   name: 'food-follow',
@@ -36,52 +42,54 @@ export default {
       type: Object
     }
   },
-  data () {
+  data() {
     return {
       working: false,
-      justFollowed: false,
+      justFollowed: false
     }
   },
   computed: {
-    canFollow () {
+    canFollow() {
       return this.unknown || this.follow.canFollow
     },
-    follows () {
+    follows() {
       return this.unknown || this.follow.follows
     },
-    unknown () {
+    unknown() {
       return this.follow === undefined
     },
-    requestId () {
+    requestId() {
       let parts = this.follow.request.split('/')
       return parseInt(parts[parts.length - 2])
     }
   },
   methods: {
-    doFollow () {
+    doFollow() {
       this.justFollowed = true
       postData(
         '/api/v1/following/',
-        {'request': this.requestId},
+        { request: this.requestId },
         this.$root.csrfToken
       ).then((data) => {
         this.$emit('followed', data['url'])
-        window.setTimeout(() => this.justFollowed = false, 2000)
+        window.setTimeout(() => (this.justFollowed = false), 2000)
       })
     },
-    unfollow () {
+    unfollow() {
       if (this.justFollowed) {
         return
       }
-      window.fetch(this.follow.resource_uri, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          'X-CSRFToken': this.$root.csrfToken
-        }
-      }).then(() => {
-        this.$emit('unfollowed')
-      })
+      window
+        .fetch(this.follow.resource_uri, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': this.$root.csrfToken
+          }
+        })
+        .then(() => {
+          this.$emit('unfollowed')
+        })
     }
   }
 }

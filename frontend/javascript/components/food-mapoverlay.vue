@@ -1,13 +1,23 @@
 <template>
   <transition name="mapoverlay">
-    <div class="food-mapoverlay container-fluid" :class="{'closing': closing}" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend" :style="{transform: currentTransform}">
+    <div
+      class="food-mapoverlay container-fluid"
+      :class="{ closing: closing }"
+      @touchstart="touchstart"
+      @touchmove="touchmove"
+      @touchend="touchend"
+      :style="{ transform: currentTransform }">
       <div class="row">
         <div class="col-12 info-column">
           <div class="mapoverlay-header">
             <h4 class="venue-name">
               {{ data.name }}
             </h4>
-            <button type="button" class="close" aria-label="Close" @click="$emit('close')">
+            <button
+              type="button"
+              class="close"
+              aria-label="Close"
+              @click="$emit('close')">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -26,13 +36,20 @@
                     <span v-else>Anfrage gestellt!</span>
                   </p>
                   <p v-if="requestComplete">
-                    <a :href="requestUrl" target="_blank" @click.prevent="setDetail">
+                    <a
+                      :href="requestUrl"
+                      target="_blank"
+                      @click.prevent="setDetail">
                       zu den Berichten&nbsp;&rarr;
                     </a>
                   </p>
                 </div>
                 <p v-if="canRequest">
-                  <a @click.prevent.stop="startRequest" class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
+                  <a
+                    @click.prevent.stop="startRequest"
+                    class="btn btn-primary btn-sm make-request-btn"
+                    :href="makeRequestUrl"
+                    target="_blank">
                     Hygienekontrolle anfragen&nbsp;&rarr;
                   </a>
                 </p>
@@ -40,8 +57,7 @@
                   v-if="user && !requestComplete"
                   :follow="data.follow"
                   @followed="$emit('followed', $event)"
-                  @unfollowed="$emit('unfollowed')"
-                ></food-follow>
+                  @unfollowed="$emit('unfollowed')"></food-follow>
               </div>
             </div>
           </div>
@@ -73,7 +89,7 @@ export default {
       type: Object
     }
   },
-  data () {
+  data() {
     return {
       touchYStart: null,
       touchYCurrent: null,
@@ -82,10 +98,10 @@ export default {
     }
   },
   computed: {
-    currentTransform () {
+    currentTransform() {
       return `translateY(${this.offset}px)`
     },
-    offset () {
+    offset() {
       let offset = this.defaultOffset
       if (this.touchYStart !== null && this.touchYCurrent !== null) {
         offset = this.touchYCurrent - this.touchYStart
@@ -97,24 +113,26 @@ export default {
     }
   },
   methods: {
-    close () {
+    close() {
       this.closing = true
       this.defaultOffset = 300
       this.touchYStart = null
       this.touchYCurrent = null
-      window.setTimeout(() => { this.$emit('close') }, 300)
+      window.setTimeout(() => {
+        this.$emit('close')
+      }, 300)
     },
-    touchstart (e) {
+    touchstart(e) {
       this.touchYStart = e.touches[0].pageY
     },
-    touchmove (e) {
+    touchmove(e) {
       e.preventDefault()
       this.touchYCurrent = e.touches[0].pageY
       if (this.offset > 100) {
         this.close()
       }
     },
-    touchend () {
+    touchend() {
       if (this.offset > 20) {
         this.close()
       } else {
@@ -128,7 +146,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .food-mapoverlay {
   position: absolute;
   bottom: 5px;
@@ -140,7 +157,7 @@ export default {
   border-radius: 5px;
 }
 
-@media screen and (min-width: 480px){
+@media screen and (min-width: 480px) {
   .food-mapoverlay {
     left: 15%;
     right: 15%;
@@ -149,9 +166,9 @@ export default {
 }
 
 .mapoverlay-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
 .mapoverlay-header .close {
@@ -201,16 +218,18 @@ export default {
   transition: transform 0.4s linear;
 }
 
-.mapoverlay-enter, .mapoverlay-leave-to {
+.mapoverlay-enter,
+.mapoverlay-leave-to {
   transform: translateY(300px);
 }
 
-.mapoverlay-enter-active, .fade-leave-active {
+.mapoverlay-enter-active,
+.fade-leave-active {
   transition: transform 0.3s ease-in-out;
 }
 
 .mapoverlay-leave-active {
-  transition: all .3s ease-in-out;
+  transition: all 0.3s ease-in-out;
 }
 
 .provider-credit {
@@ -236,5 +255,4 @@ export default {
   color: #888;
   text-decoration: none;
 }
-
 </style>

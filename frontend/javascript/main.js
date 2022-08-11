@@ -3,7 +3,7 @@ import '../styles/main.scss'
 import Vue from 'vue'
 import VueLazyload from 'vue-lazyload'
 
-import {renderComponent} from '~froide/frontend/javascript/lib/vue-helper'
+import { renderComponent } from '~froide/frontend/javascript/lib/vue-helper'
 
 import FoodMap from './components/food-map'
 
@@ -13,7 +13,7 @@ Vue.use(VueLazyload, {
 
 Vue.config.productionTip = false
 
-function createFoodMap (selector) {
+function createFoodMap(selector) {
   /* eslint-disable no-new */
   new Vue({
     components: { FoodMap },

@@ -6,11 +6,15 @@
       </div>
     </div>
     <div class="row">
-      <div v-for="filter in filters" class="col-12 col-sm-6 col-md-3">
+      <div
+        v-for="filter in filters"
+        :key="filter.name"
+        class="col-12 col-sm-6 col-md-3">
         <label class="filter-label">
-          <input type="checkbox"
+          <input
+            type="checkbox"
             @change="$emit('change', filter)"
-            :checked="filter.active">
+            :checked="filter.active" />
           <span class="fa" :class="filter.icon" aria-hidden="true"></span>
           {{ filter.name }}
         </label>
@@ -29,7 +33,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'food-filter',
   props: {

@@ -5,8 +5,7 @@
 </template>
 
 <script>
-
 export default {
-  name: 'food-loader',
+  name: 'food-loader'
 }
 </script>

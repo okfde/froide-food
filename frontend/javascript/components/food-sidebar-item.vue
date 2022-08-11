@@ -1,18 +1,27 @@
 <template>
   <div class="sidebar-item" :id="'sidebar-' + itemId">
-    <div class="sidebar-item-inner" :class="{requested: hasRequest, highlighted: isSelected}" @click="$emit('select', data)">
+    <div
+      class="sidebar-item-inner"
+      :class="{ requested: hasRequest, highlighted: isSelected }"
+      @click="$emit('select', data)">
       <div class="container-fluid">
         <div class="row">
           <div v-if="isDummy" class="col-3 col-md-4 image-column">
-            <div class="image-column-inner" >
-              <div class="dummy-provider dummy" :class="{'dummy-blinker': isDummy}"></div>
+            <div class="image-column-inner">
+              <div
+                class="dummy-provider dummy"
+                :class="{ 'dummy-blinker': isDummy }"></div>
             </div>
           </div>
           <div class="col info-column">
             <h5 v-if="data.name" class="venue-name">
               {{ data.name }}
               <small v-if="osmLink" class="float-end">
-                <a :href="osmLink" class="text-muted" target="_blank" rel="noopener">
+                <a
+                  :href="osmLink"
+                  class="text-muted"
+                  target="_blank"
+                  rel="noopener">
                   <span class="fa fa-map-o text-black-50"></span>
                   <span class="visually-hidden">OpenStreetMap</span>
                 </a>
@@ -21,7 +30,9 @@
             <div v-else class="venue-name-dummy dummy dummy-blinker"></div>
 
             <p v-if="data.address" class="venue-address">{{ data.address }}</p>
-            <div v-else-if="isDummy" class="venue-address-dummy dummy dummy-blinker"></div>
+            <div
+              v-else-if="isDummy"
+              class="venue-address-dummy dummy dummy-blinker"></div>
             <template v-if="!isDummy">
               <div v-if="hasRequest" class="request-status">
                 <p :class="requestColor">
@@ -34,14 +45,21 @@
                   <span v-else>Anfrage gestellt, Bestätigung läuft...</span>
                 </p>
                 <p v-if="requestComplete">
-                  <a :href="requestUrl" target="_blank" @click.prevent.stop="setDetail">
+                  <a
+                    :href="requestUrl"
+                    target="_blank"
+                    @click.prevent.stop="setDetail">
                     zu den Berichten&nbsp;&rarr;
                   </a>
                 </p>
               </div>
               <p v-if="canRequest">
-                <a @click.prevent.stop="startRequest" class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
-                  Hygienekontrolle<br class="d-block d-sm-none"/>
+                <a
+                  @click.prevent.stop="startRequest"
+                  class="btn btn-primary btn-sm make-request-btn"
+                  :href="makeRequestUrl"
+                  target="_blank">
+                  Hygienekontrolle<br class="d-block d-sm-none" />
                   anfragen&nbsp;&rarr;
                 </a>
               </p>
@@ -49,11 +67,9 @@
                 v-if="user && !requestComplete"
                 :follow="data.follow"
                 @followed="$emit('followed', $event)"
-                @unfollowed="$emit('unfollowed')"
-              ></food-follow>
+                @unfollowed="$emit('unfollowed')"></food-follow>
             </template>
-            <div v-else class="dummy-actions dummy">
-            </div>
+            <div v-else class="dummy-actions dummy"></div>
           </div>
         </div>
       </div>
@@ -90,7 +106,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .sidebar-item {
   padding: 0;
   width: 100%;
@@ -105,7 +120,7 @@ export default {
   padding-top: 0.5rem;
 }
 
-@media screen and (min-width: 768px){
+@media screen and (min-width: 768px) {
   .sidebar-item:first-child .sidebar-item-inner {
     padding-top: 1rem;
   }
@@ -120,14 +135,13 @@ export default {
   min-width: 110px;
 }
 
-@media screen and (min-width: 768px){
+@media screen and (min-width: 768px) {
   .image-column {
     padding: 0 5px 0 5px;
   }
 }
 
-
-@media screen and (min-width: 768px){
+@media screen and (min-width: 768px) {
   .map-container {
     height: 80vh;
   }
@@ -137,7 +151,8 @@ export default {
   }
 }
 
-.image-column-inner, .image-column-inner-link {
+.image-column-inner,
+.image-column-inner-link {
   display: block;
   background-color: #eee;
   padding: 0;
@@ -249,5 +264,4 @@ export default {
   color: #888;
   text-decoration: none;
 }
-
 </style>

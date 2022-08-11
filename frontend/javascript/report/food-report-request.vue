@@ -6,14 +6,11 @@
       :message="message"
       :request="request"
       :config="config"
-      @addreport="addReport"
-    ></food-report-message>
+      @addreport="addReport"></food-report-message>
   </div>
-
 </template>
 
 <script>
-
 import FoodReportMessage from './food-report-message'
 
 // https://fragdenstaat.de/api/v1/request/47665/
@@ -32,16 +29,15 @@ export default {
       type: Object
     }
   },
-  mounted () {
-  },
-  data () {
+  mounted() {},
+  data() {
     return {}
   },
   computed: {
-    csrfToken () {
+    csrfToken() {
       return this.$root.csrfToken
     },
-    messages () {
+    messages() {
       let messages = this.request.messages.filter((m, i) => {
         return m.is_response
       })
@@ -50,7 +46,7 @@ export default {
     }
   },
   methods: {
-    addReport (data) {
+    addReport(data) {
       this.$emit('addreport', {
         ...data,
         foirequest: this.request.id
@@ -60,23 +56,22 @@ export default {
 }
 </script>
 
-
 <style lang="scss" scoped>
-  .loading {
-    height: 100vh;
-    padding-top: 30%;
-    background-color: #fff;
-    // animation: blinker 0.8s linear infinite;
-    text-align: center;
-  }
+.loading {
+  height: 100vh;
+  padding-top: 30%;
+  background-color: #fff;
+  // animation: blinker 0.8s linear infinite;
+  text-align: center;
+}
 
-  .loading img {
-    width: 10%;
-  }
+.loading img {
+  width: 10%;
+}
 
-  @keyframes blinker {
-    50% {
-      opacity: 0.25;
-    }
+@keyframes blinker {
+  50% {
+    opacity: 0.25;
   }
+}
 </style>

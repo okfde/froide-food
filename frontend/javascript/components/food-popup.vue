@@ -25,8 +25,12 @@
           </p>
         </div>
         <p v-if="canRequest">
-          <a @click.prevent.stop="startRequest" class="btn btn-primary btn-sm make-request-btn" :href="makeRequestUrl"  target="_blank">
-            Hygienekontrolle<br class="d-block d-sm-none"/>
+          <a
+            @click.prevent.stop="startRequest"
+            class="btn btn-primary btn-sm make-request-btn"
+            :href="makeRequestUrl"
+            target="_blank">
+            Hygienekontrolle<br class="d-block d-sm-none" />
             anfragen&nbsp;&rarr;
           </a>
         </p>
@@ -53,7 +57,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .venue-name {
   min-width: 240px;
 }
@@ -94,5 +97,4 @@ export default {
 .request-status {
   font-size: 0.9rem;
 }
-
 </style>
