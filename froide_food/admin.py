@@ -1,22 +1,22 @@
 from datetime import timedelta
 
-from django.contrib import admin
 from django.conf.urls import url
-from django.utils import timezone
+from django.contrib import admin
 from django.core.exceptions import PermissionDenied
+from django.utils import timezone
 
 from leaflet.admin import LeafletGeoAdmin
 
+from froide.account.models import User, UserTag
 from froide.foirequest.models import FoiRequest
 from froide.helper.admin_utils import make_nullfilter
 from froide.helper.csv_utils import export_csv_response
-from froide.account.models import User, UserTag
 
 from .models import (
+    FoodAuthorityStatus,
+    FoodSafetyReport,
     VenueRequest,
     VenueRequestItem,
-    FoodSafetyReport,
-    FoodAuthorityStatus,
 )
 
 

@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('froide_food', '0008_auto_20180710_1039'),
+        ("froide_food", "0008_auto_20180710_1039"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='venuerequest',
-            name='last_resolution',
+            model_name="venuerequest",
+            name="last_resolution",
             field=models.CharField(blank=True, max_length=50),
         ),
     ]

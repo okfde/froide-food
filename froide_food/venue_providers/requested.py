@@ -1,17 +1,14 @@
 from django.db.models import Prefetch
 
 from ..models import VenueRequest, VenueRequestItem
-
 from .amenity import AmenityVenueProvider
 
 
 class RequestedVenueProvider(AmenityVenueProvider):
     def get_queryset(self):
         qs = VenueRequest.objects.filter(last_request__isnull=False)
-        vris = VenueRequestItem.objects.select_related('foirequest')
-        qs = qs.prefetch_related(
-            Prefetch('request_items', queryset=vris)
-        )
+        vris = VenueRequestItem.objects.select_related("foirequest")
+        qs = qs.prefetch_related(Prefetch("request_items", queryset=vris))
         return qs
 
     def search_places(self, *args, **kwargs):

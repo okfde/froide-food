@@ -1,20 +1,19 @@
 from django.urls import path
-from django.views.generic import TemplateView
 from django.views.decorators.cache import cache_page
+from django.views.generic import TemplateView
 
 from froide.api import api_router
 
 from .api_views import VenueViewSet
 from .views import (
-    index,
     embed,
+    index,
     make_request,
-    stats,
     osm_help,
-    show_reports,
     requests_in_region,
+    show_reports,
+    stats,
 )
-
 
 api_router.register(r"venue", VenueViewSet, basename="venue")
 

@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('froide_food', '0001_initial'),
+        ("froide_food", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='venuerequest',
-            name='context',
+            model_name="venuerequest",
+            name="context",
             field=models.JSONField(blank=True, default=dict),
         ),
     ]

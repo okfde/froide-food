@@ -6,8 +6,8 @@ from django.db import migrations
 
 
 def add_request_infos(apps, schema_editor):
-    VenueRequest = apps.get_model('froide_food', 'VenueRequest')
-    VenueRequestItem = apps.get_model('froide_food', 'VenueRequestItem')
+    VenueRequest = apps.get_model("froide_food", "VenueRequest")
+    VenueRequestItem = apps.get_model("froide_food", "VenueRequestItem")
 
     for vr in VenueRequest.objects.all():
         vris = VenueRequestItem.objects.filter(venue=vr)
@@ -22,7 +22,7 @@ def add_request_infos(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('froide_food', '0009_venuerequest_last_resolution'),
+        ("froide_food", "0009_venuerequest_last_resolution"),
     ]
 
     operations = [

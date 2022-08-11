@@ -1,9 +1,9 @@
 from django import forms
 from django.utils import timezone
 
-from froide.foirequest.models import FoiRequest, FoiMessage, FoiAttachment
+from froide.foirequest.models import FoiAttachment, FoiMessage, FoiRequest
 
-from .models import VenueRequestItem, FoodSafetyReport
+from .models import FoodSafetyReport, VenueRequestItem
 
 
 class ReportForm(forms.Form):
@@ -12,32 +12,22 @@ class ReportForm(forms.Form):
     complaints = forms.BooleanField(required=False)
     disgusting = forms.BooleanField(required=False)
     attachment = forms.ModelChoiceField(
-        required=False,
-        queryset=FoiAttachment.objects.all()
+        required=False, queryset=FoiAttachment.objects.all()
     )
-    message = forms.ModelChoiceField(
-        required=False,
-        queryset=FoiMessage.objects.all()
-    )
-    foirequest = forms.ModelChoiceField(
-        queryset=FoiRequest.objects.all()
-    )
+    message = forms.ModelChoiceField(required=False, queryset=FoiMessage.objects.all())
+    foirequest = forms.ModelChoiceField(queryset=FoiRequest.objects.all())
 
     def save(self):
         data = self.cleaned_data
         try:
-            request_item = VenueRequestItem.objects.get(
-                foirequest=data['foirequest']
-            )
+            request_item = VenueRequestItem.objects.get(foirequest=data["foirequest"])
         except VenueRequestItem.DoesNotExist:
             return
 
-        if not data['unresolved']:
+        if not data["unresolved"]:
             self.save_report(request_item, data)
         else:
-            FoiRequest.objects.filter(id=data['foirequest'].id).update(
-                resolution=''
-            )
+            FoiRequest.objects.filter(id=data["foirequest"].id).update(resolution="")
 
         VenueRequestItem.objects.filter(id=request_item.id).update(
             checked_date=timezone.now()
@@ -48,19 +38,19 @@ class ReportForm(forms.Form):
         venue = request_item.venue
         amenity = None
         provider_name = venue.get_provider()
-        if provider_name == 'amenity':
+        if provider_name == "amenity":
             provider = venue.get_venue_provider()
             amenity = provider.get_object(venue.ident)
 
         report, created = FoodSafetyReport.objects.update_or_create(
             request_item=request_item,
             venue=venue,
-            date=data['reportdate'],
+            date=data["reportdate"],
             defaults={
-                'message': data['message'],
-                'attachment': data['attachment'],
-                'amenity': amenity,
-                'complaints': data['complaints'],
-                'disgusting': data['disgusting']
-            }
+                "message": data["message"],
+                "attachment": data["attachment"],
+                "amenity": amenity,
+                "complaints": data["complaints"],
+                "disgusting": data["disgusting"],
+            },
         )

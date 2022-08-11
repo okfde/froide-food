@@ -6,11 +6,11 @@ from django.db import migrations
 
 
 def store_last_status(apps, schema_editor):
-    VenueRequest = apps.get_model('froide_food', 'VenueRequest')
-    VenueRequestItem = apps.get_model('froide_food', 'VenueRequestItem')
+    VenueRequest = apps.get_model("froide_food", "VenueRequest")
+    VenueRequestItem = apps.get_model("froide_food", "VenueRequestItem")
 
     for venue in VenueRequest.objects.all():
-        vris = VenueRequestItem.objects.filter(venue=venue).order_by('-timestamp')
+        vris = VenueRequestItem.objects.filter(venue=venue).order_by("-timestamp")
         if vris:
             vri = vris[0]
             venue.last_request = vri.timestamp
@@ -22,7 +22,7 @@ def store_last_status(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('froide_food', '0006_auto_20180612_1231'),
+        ("froide_food", "0006_auto_20180612_1231"),
     ]
 
     operations = [

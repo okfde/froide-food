@@ -7,18 +7,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('froide_food', '0010_auto_20181008_1816'),
+        ("froide_food", "0010_auto_20181008_1816"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='venuerequest',
-            name='address',
+            model_name="venuerequest",
+            name="address",
             field=models.TextField(blank=True),
         ),
         migrations.AddField(
-            model_name='venuerequest',
-            name='geo',
-            field=django.contrib.gis.db.models.fields.PointField(blank=True, geography=True, null=True, srid=4326),
+            model_name="venuerequest",
+            name="geo",
+            field=django.contrib.gis.db.models.fields.PointField(
+                blank=True, geography=True, null=True, srid=4326
+            ),
         ),
     ]

@@ -8,8 +8,8 @@ register = template.Library()
 @register.filter
 def request_population_ratio(value):
     if isinstance(value, dict):
-        req = value['request_count']
-        pop = value['population']
+        req = value["request_count"]
+        pop = value["population"]
     else:
         req = value.request_count
         pop = value.population
@@ -21,7 +21,7 @@ def in_mio(value):
     return round(value / 1_000_000, 2)
 
 
-@register.inclusion_tag('froide_food/_authority_status.html')
+@register.inclusion_tag("froide_food/_authority_status.html")
 def food_authority_status(foirequest):
     try:
         food_authority_status = FoodAuthorityStatus.objects.get(
@@ -29,6 +29,4 @@ def food_authority_status(foirequest):
         )
     except FoodAuthorityStatus.DoesNotExist:
         return {}
-    return {
-        'food_authority_status': food_authority_status
-    }
+    return {"food_authority_status": food_authority_status}

@@ -8,18 +8,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('froide_food', '0005_auto_20180607_1628'),
+        ("froide_food", "0005_auto_20180607_1628"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='venuerequest',
-            name='last_request',
+            model_name="venuerequest",
+            name="last_request",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='venuerequest',
-            name='last_status',
+            model_name="venuerequest",
+            name="last_status",
             field=models.CharField(blank=True, max_length=50),
         ),
     ]

@@ -1,129 +1,116 @@
 import logging
 from difflib import SequenceMatcher
 
-from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
+from django.contrib.gis.measure import D
 
 from django_amenities.models import Amenity
 
-from .base import BaseVenueProvider
 from ..geocode import geocode, reverse_geocode
 from ..utils import is_address_bad, normalize_name
+from .base import BaseVenueProvider
 
-logger = logging.getLogger('froide')
+logger = logging.getLogger("froide")
 
 
 FILTERS = [
     {
-        'name': 'Bäckerei/Konditorei',
-        'icon': 'fa-pie-chart',
-        'active': False,
-        'categories': ['bakery']
+        "name": "Bäckerei/Konditorei",
+        "icon": "fa-pie-chart",
+        "active": False,
+        "categories": ["bakery"],
     },
     {
-        'name': 'Restaurant/Gaststätte',
-        'icon': 'fa-cutlery',
-        'active': False,
-        'categories': ['restaurant']
+        "name": "Restaurant/Gaststätte",
+        "icon": "fa-cutlery",
+        "active": False,
+        "categories": ["restaurant"],
+    },
+    {"name": "Café", "icon": "fa-coffee", "active": False, "categories": ["cafe"]},
+    {"name": "Bar", "icon": "fa-glass", "active": False, "categories": ["bar", "pub"]},
+    {
+        "name": "Biergarten",
+        "icon": "fa-beer",
+        "active": False,
+        "categories": ["biergarten"],
     },
     {
-        'name': 'Café',
-        'icon': 'fa-coffee',
-        'active': False,
-        'categories': ['cafe']
+        "name": "Eisdiele",
+        "icon": "fa-child",
+        "active": False,
+        "categories": ["ice_cream"],
     },
     {
-        'name': 'Bar',
-        'icon': 'fa-glass',
-        'active': False,
-        'categories': ['bar', 'pub']
+        "name": "Kiosk/Spätkauf",
+        "icon": "fa-beer",
+        "active": False,
+        "categories": ["alcohol", "beverages", "kiosk"],
     },
     {
-        'name': 'Biergarten',
-        'icon': 'fa-beer',
-        'active': False,
-        'categories': ['biergarten']
+        "name": "Diskothek/Club",
+        "icon": "fa-diamond",
+        "active": False,
+        "categories": ["nightclub"],
     },
     {
-        'name': 'Eisdiele',
-        'icon': 'fa-child',
-        'active': False,
-        'categories': ['ice_cream']
+        "name": "Imbiss",
+        "icon": "fa-soccer-ball-o",
+        "active": False,
+        "categories": ["foodtrucks", "foodstands"],
     },
     {
-        'name': 'Kiosk/Spätkauf',
-        'icon': 'fa-beer',
-        'active': False,
-        'categories': ['alcohol', 'beverages', 'kiosk']
+        "name": "Systemgastronomie",
+        "icon": "fa-bars",
+        "active": False,
+        "categories": ["fast_food", "food_court"],
     },
     {
-        'name': 'Diskothek/Club',
-        'icon': 'fa-diamond',
-        'active': False,
-        'categories': ['nightclub']
+        "name": "Supermarkt/Discounter",
+        "icon": "fa-shopping-cart",
+        "active": False,
+        "categories": ["supermarket", "convenience"],
     },
     {
-        'name': 'Imbiss',
-        'icon': 'fa-soccer-ball-o',
-        'active': False,
-        'categories': ['foodtrucks', 'foodstands']
+        "name": "Einzelhandel",
+        "icon": "fa-shopping-basket",
+        "active": False,
+        "categories": ["department_store", "wholesale", "general"],
     },
+    {"name": "Tankstelle", "icon": "fa-car", "active": False, "categories": ["fuel"]},
+    {"name": "Kino", "icon": "fa-film", "active": False, "categories": ["cinema"]},
     {
-        'name': 'Systemgastronomie',
-        'icon': 'fa-bars',
-        'active': False,
-        'categories': ['fast_food', 'food_court']
+        "name": "Hotel",
+        "icon": "fa-bed",
+        "active": False,
+        "categories": ["hotel", "hostel"],
     },
-    {
-        'name': 'Supermarkt/Discounter',
-        'icon': 'fa-shopping-cart',
-        'active': False,
-        'categories': ['supermarket', 'convenience']
-    },
-    {
-        'name': 'Einzelhandel',
-        'icon': 'fa-shopping-basket',
-        'active': False,
-        'categories': ['department_store', 'wholesale', 'general']
-    },
-    {
-        'name': 'Tankstelle',
-        'icon': 'fa-car',
-        'active': False,
-        'categories': ['fuel']
-    },
-    {
-        'name': 'Kino',
-        'icon': 'fa-film',
-        'active': False,
-        'categories': ['cinema']
-    },
-    {
-        'name': 'Hotel',
-        'icon': 'fa-bed',
-        'active': False,
-        'categories': ['hotel', 'hostel']
-    }
 ]
 
 
 def get_filter_mapping():
     for fil in FILTERS:
-        for cat in fil['categories']:
+        for cat in fil["categories"]:
             yield cat, cat
 
 
 class AmenityVenueProvider(BaseVenueProvider):
-    name = 'amenity'
+    name = "amenity"
     FILTERS = FILTERS
     ORDER_ZOOM_LEVEL = 15
 
     def get_queryset(self):
-        return Amenity.objects.filter(topics__contains=['food'])
+        return Amenity.objects.filter(topics__contains=["food"])
 
-    def get_places(self, location=None, coordinates=None,
-                   q=None, categories=None, radius=None, zoom=None):
+    def get_places(
+        self,
+        location=None,
+        coordinates=None,
+        q=None,
+        categories=None,
+        radius=None,
+        zoom=None,
+    ):
         location_search = False
         if location is not None:
             location_search = True
@@ -140,45 +127,40 @@ class AmenityVenueProvider(BaseVenueProvider):
 
         results = (
             self.get_queryset()
-            .exclude(name='')
+            .exclude(name="")
             .filter(geo__dwithin=(point, radius))
             .filter(geo__distance_lte=(point, D(m=radius)))
         )
         order_distance = zoom is None or zoom >= self.ORDER_ZOOM_LEVEL
         if not location_search and order_distance:
-            results = (
-                results
-                .annotate(distance=Distance("geo", point))
-                .order_by("distance")
+            results = results.annotate(distance=Distance("geo", point)).order_by(
+                "distance"
             )
         else:
-            results = results.order_by('?')
+            results = results.order_by("?")
 
         if q is not None:
             results = results.filter(name__icontains=q.lower())
 
         results = results[:100]
 
-        return [
-            self.extract_result(r)
-            for r in results
-        ]
+        return [self.extract_result(r) for r in results]
 
     def extract_result(self, r):
         return {
-            'ident': '%s:%s' % (self.name, r.ident),
-            'lat': r.geo.coords[1],
-            'lng': r.geo.coords[0],
-            'name': r.name,
-            'address': r.address,
-            'city': r.city,
-            'category': r.category
+            "ident": "%s:%s" % (self.name, r.ident),
+            "lat": r.geo.coords[1],
+            "lng": r.geo.coords[0],
+            "name": r.name,
+            "address": r.address,
+            "city": r.city,
+            "category": r.category,
         }
 
     def get_object(self, ident):
-        if ident.startswith('amenity:'):
-            ident = ident.replace('amenity:', '')
-        pk = ident.split('_')[0]
+        if ident.startswith("amenity:"):
+            ident = ident.replace("amenity:", "")
+        pk = ident.split("_")[0]
         try:
             return Amenity.objects.get(pk=pk)
         except Amenity.DoesNotExist:
@@ -202,10 +184,10 @@ class AmenityVenueProvider(BaseVenueProvider):
         raw = result.raw
         fixed = False
         fix_list = (
-            ('street', 'text'),
-            ('postcode', 'postcode'),
-            ('housenumber', 'address'),
-            ('city', 'place'),
+            ("street", "text"),
+            ("postcode", "postcode"),
+            ("housenumber", "address"),
+            ("city", "place"),
         )
         for k, v in fix_list:
             try:
@@ -218,26 +200,19 @@ class AmenityVenueProvider(BaseVenueProvider):
             amenity.save()
 
     def match_place(self, latlng, name):
-        radius_thresholds = (
-            (30, 0.8),
-            (20, 0.7),
-            (10, 0.6)
-        )
+        radius_thresholds = ((30, 0.8), (20, 0.7), (10, 0.6))
 
         point = Point(latlng[1], latlng[0])
         for radius, threshold in radius_thresholds:
-            print('Trying with', radius, threshold)
+            print("Trying with", radius, threshold)
             results = (
-                Amenity.objects
-                .filter(geo__dwithin=(point, radius))
+                Amenity.objects.filter(geo__dwithin=(point, radius))
                 .filter(geo__distance_lte=(point, D(m=radius)))
                 .annotate(distance=Distance("geo", point))
                 .order_by("distance")
             )[:5]
             name = normalize_name(name)
-            matches = list(
-                rank_match_results(results, name, radius, threshold)
-            )
+            matches = list(rank_match_results(results, name, radius, threshold))
             if matches:
                 # Sort by ratio, highest first
                 matches.sort(key=lambda x: x[0], reverse=True)
@@ -251,6 +226,6 @@ def rank_match_results(results, name, radius, threshold):
             continue
         r_name = normalize_name(r.name)
         ratio = SequenceMatcher(None, name, r_name).ratio()
-        print('Checking: ', r.name, ' | ', name, ratio)
+        print("Checking: ", r.name, " | ", name, ratio)
         if ratio >= threshold:
             yield ratio, r

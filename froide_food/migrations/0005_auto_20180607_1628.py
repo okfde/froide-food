@@ -8,20 +8,20 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('froide_food', '0004_auto_20180607_1618'),
+        ("froide_food", "0004_auto_20180607_1618"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='venuerequest',
-            name='foirequest',
+            model_name="venuerequest",
+            name="foirequest",
         ),
         migrations.RemoveField(
-            model_name='venuerequest',
-            name='publicbody',
+            model_name="venuerequest",
+            name="publicbody",
         ),
         migrations.RemoveField(
-            model_name='venuerequest',
-            name='timestamp',
+            model_name="venuerequest",
+            name="timestamp",
         ),
     ]

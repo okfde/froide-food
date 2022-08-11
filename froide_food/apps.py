@@ -9,9 +9,10 @@ class FroideFoodConfig(AppConfig):
     verbose_name = _("Froide Food App")
 
     def ready(self):
-        from .listeners import connect_request_object, connect_request_status_changed
-        from froide.foirequest.models import FoiRequest
         from froide.account.export import registry
+        from froide.foirequest.models import FoiRequest
+
+        from .listeners import connect_request_object, connect_request_status_changed
 
         registry.register(export_user_data)
 
@@ -19,6 +20,7 @@ class FroideFoodConfig(AppConfig):
         FoiRequest.status_changed.connect(connect_request_status_changed)
 
         from django_amenities import registry
+
         from .updater import FoodUpdater
 
         registry.register(FoodUpdater())
@@ -26,6 +28,7 @@ class FroideFoodConfig(AppConfig):
 
 def export_user_data(user):
     from froide.foirequest.models.request import get_absolute_domain_short_url
+
     from .models import VenueRequestItem
 
     venue_requests = VenueRequestItem.objects.filter(
