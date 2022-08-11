@@ -27,7 +27,6 @@
     <food-report-request
       v-if="request"
       :request="request"
-      :config="config"
       @addreport="addReport"></food-report-request>
   </div>
 </template>
@@ -42,11 +41,6 @@ export default {
   mixins: [],
   components: {
     FoodReportRequest
-  },
-  props: {
-    config: {
-      type: Object
-    }
   },
   mounted() {
     this.getNextRequest()

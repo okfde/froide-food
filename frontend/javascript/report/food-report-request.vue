@@ -5,7 +5,6 @@
       :key="message.id"
       :message="message"
       :request="request"
-      :config="config"
       @addreport="addReport"></food-report-message>
   </div>
 </template>
@@ -22,9 +21,6 @@ export default {
     FoodReportMessage
   },
   props: {
-    config: {
-      type: Object
-    },
     request: {
       type: Object
     }

@@ -106,9 +106,6 @@ export default {
   mixins: [],
   components: {},
   props: {
-    config: {
-      type: Object
-    },
     message: {
       type: Object
     },
