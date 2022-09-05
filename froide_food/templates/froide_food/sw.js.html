@@ -1,15 +1,11 @@
-{% load static %}
+{% load static frontendbuild %}
 var CACHE_NAME = 'froide-food';
 
 var PRECACHE_FILES = [
-  '{% static "js/main.js" %}',
-  '{% static "js/common.js" %}',
-  '{% static "js/food.js" %}',
-  '{% static "css/food.css" %}',
-  '{% static "css/main.css" %}',
-  '{% static "fonts/fontawesome-webfont.woff2" %}',
-  '{% static "img/okfde.svg" %}',
-  '{% static "food/manifest.json" %}',
+  {% getfrontendfiles "main.js" as assets %}
+  {% for block, output_list in assets %}{% for output in output_list %}'{{ output|safe }}',{% endfor %}{% endfor %}
+  {% getfrontendfiles "food.js" as assets %}
+  {% for block, output_list in assets %}{% for output in output_list %}'{{ output|safe }}',{% endfor %}{% endfor %}
 ];
 
 var STATIC_FILES = PRECACHE_FILES.slice();

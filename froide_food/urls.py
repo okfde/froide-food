@@ -29,7 +29,8 @@ urlpatterns = [
         "sw.js",
         cache_page(None)(
             TemplateView.as_view(
-                template_name="froide_food/sw.js", content_type="application/javascript"
+                template_name="froide_food/sw.js.html",
+                content_type="application/javascript",
             )
         ),
         name="food-service_worker",
