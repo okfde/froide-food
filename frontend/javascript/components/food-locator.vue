@@ -49,19 +49,17 @@
                     v-if="location.length > 0"
                     @click.stop="location = ''"></span>
                 </div>
-                <div class="">
-                  <button
-                    class="btn"
-                    :class="{
-                      'btn-success': validLocation,
-                      'btn-outline-secondary': !validLocation
-                    }"
-                    type="button"
-                    @click.prevent="locationLookup"
-                    :disabled="!validLocation">
-                    Auf geht’s!
-                  </button>
-                </div>
+                <button
+                  class="btn"
+                  :class="{
+                    'btn-success': validLocation,
+                    'btn-outline-secondary': !validLocation
+                  }"
+                  type="button"
+                  @click.prevent="locationLookup"
+                  :disabled="!validLocation">
+                  Auf geht’s!
+                </button>
               </div>
               <div>
                 <small>
@@ -283,9 +281,13 @@ export default {
   position: relative;
   flex: 1 1 auto;
   width: 1%;
-  border-top-end-radius: 0;
-  border-bottom-end-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
   margin-bottom: 0;
+}
+.clearable-input .form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 .clearer {
   position: absolute;
