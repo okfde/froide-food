@@ -1,4 +1,4 @@
-import '../styles/main.scss'
+import '../styles/food.scss'
 
 import Vue from 'vue'
 import VueLazyload from 'vue-lazyload'
