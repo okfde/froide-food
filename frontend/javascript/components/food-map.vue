@@ -560,7 +560,7 @@ export default {
     this.$root.config = this.config
     var self = this
 
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && this.config.swUrl) {
       let scope = this.config.swUrl.replace(/^(.*\/)[\w.]+$/, '$1')
       navigator.serviceWorker
         .register(this.config.swUrl, { scope: scope })

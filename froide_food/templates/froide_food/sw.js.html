@@ -50,56 +50,56 @@ for (var i = 0; i < STATIC_FILES.length; i += 1) {
   NORMALIZED_CACHE_DICT[normalize(STATIC_FILES[i])] = true;
 }
 
-self.addEventListener('install', function(event) {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(function (cache) {
-      cache.addAll(PRECACHE_FILES);
-    })
-  );
-});
+// self.addEventListener('install', function(event) {
+//   event.waitUntil(
+//     caches.open(CACHE_NAME).then(function (cache) {
+//       cache.addAll(PRECACHE_FILES);
+//     })
+//   );
+// });
 
-self.addEventListener('fetch', function(event) {
-  if (event.request.method !== 'GET') {
-    return
-  }
-  if (event.request.url.indexOf(STATIC_URL) === -1 && event.request.url.indexOf(MEDIA_URL) === -1) {
-    return
-  }
-  event.respondWith(
-    caches.open(CACHE_NAME).then(function(cache) {
-      return cache.match(event.request).then(function (response) {
-        var fetchOptions = {
-          mode: 'no-cors'
-        }
-        if (event.request.url.indexOf('.woff2') !== -1) {
-          fetchOptions.mode = 'cors'
-        }
-        return response || fetch(event.request, fetchOptions).then(function(response) {
-          cache.put(event.request, response.clone());
-          return response;
-        });
-      });
-    })
-  );
-});
+// self.addEventListener('fetch', function(event) {
+//   if (event.request.method !== 'GET') {
+//     return
+//   }
+//   if (event.request.url.indexOf(STATIC_URL) === -1 && event.request.url.indexOf(MEDIA_URL) === -1) {
+//     return
+//   }
+//   event.respondWith(
+//     caches.open(CACHE_NAME).then(function(cache) {
+//       return cache.match(event.request).then(function (response) {
+//         var fetchOptions = {
+//           mode: 'no-cors'
+//         }
+//         if (event.request.url.indexOf('.woff2') !== -1) {
+//           fetchOptions.mode = 'cors'
+//         }
+//         return response || fetch(event.request, fetchOptions).then(function(response) {
+//           cache.put(event.request, response.clone());
+//           return response;
+//         });
+//       });
+//     })
+//   );
+// });
 
-self.addEventListener('activate', function(event) {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(function (cache) {
-      cache.keys().then(function(keys) {
-        keys.forEach(function(request, index, array) {
-          var key = request.url;
-          if (!STATIC_HTTP) {
-            key = key.replace(MAIN_DOMAIN, '');
-          }
-          if (CACHE_DICT[key] === undefined) {
-            var normalizedKey = normalize(key)
-            if (NORMALIZED_CACHE_DICT[normalizedKey] !== undefined) { 
-              cache.delete(request);
-            }
-          }
-        });
-      });
-    })
-  );
-});
+// self.addEventListener('activate', function(event) {
+//   event.waitUntil(
+//     caches.open(CACHE_NAME).then(function (cache) {
+//       cache.keys().then(function(keys) {
+//         keys.forEach(function(request, index, array) {
+//           var key = request.url;
+//           if (!STATIC_HTTP) {
+//             key = key.replace(MAIN_DOMAIN, '');
+//           }
+//           if (CACHE_DICT[key] === undefined) {
+//             var normalizedKey = normalize(key)
+//             if (NORMALIZED_CACHE_DICT[normalizedKey] !== undefined) { 
+//               cache.delete(request);
+//             }
+//           }
+//         });
+//       });
+//     })
+//   );
+// });
