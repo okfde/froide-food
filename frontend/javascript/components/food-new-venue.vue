@@ -1,16 +1,15 @@
 <template>
-  <div class="modal-mask" @click.self="$emit('close')">
+  <div class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">Details des fehlenden Betriebs</h4>
           <button
             type="button"
-            class="close"
+            class="btn-close"
+            data-bs-dismiss="modal"
             aria-label="Close"
-            @click="$emit('close')">
-            <span aria-hidden="true">&times;</span>
-          </button>
+            @click="$emit('close')" />
         </div>
         <div class="modal-body">
           <div class="row">
@@ -143,20 +142,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.modal-mask {
-  position: absolute;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  transition: opacity 0.3s ease;
-}
-.is-embed .modal-mask {
-  top: 10px;
-}
 .loading {
   padding-top: 3em 0;
   background-color: #fff;

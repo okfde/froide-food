@@ -45,14 +45,12 @@
                 <i class="fa fa-search" aria-hidden="true"></i>
                 <span class="d-none d-sm-none d-md-inline">Suchen</span>
               </button>
-              <div class="me-auto">
-                <button
-                  class="btn btn-outline-secondary"
-                  @click="setLocator(true)">
-                  <i class="fa fa-location-arrow" aria-hidden="true"></i>
-                  <span class="d-none d-sm-none d-md-inline">Ort</span>
-                </button>
-              </div>
+              <button
+                class="btn btn-outline-secondary"
+                @click="setLocator(true)">
+                <i class="fa fa-location-arrow" aria-hidden="true"></i>
+                <span class="d-none d-sm-none d-md-inline">Ort</span>
+              </button>
               <button
                 class="btn btn-outline-secondary"
                 :class="{ active: showFilter }"
@@ -277,7 +275,6 @@
           </div>
         </div>
         <food-locator
-          v-if="showLocator"
           :defaultPostcode="postcode"
           :defaultLocation="locationName"
           :exampleCity="city"
@@ -286,18 +283,19 @@
           :error-message="locatorErrorMessage"
           :geolocation-disabled="geolocationDisabled"
           :isMobile="isMobile"
+          ref="foodlocator"
           @close="setLocator(false)"
           @postcodeChosen="postcodeChosen"
           @coordinatesChosen="coordinatesChosen"
           @locationChosen="locationChosen"></food-locator>
         <food-detail
-          v-if="showDetail"
           :data="showDetail"
-          @close="showDetail = null"
+          ref="fooddetail"
+          @close="setDetail(null)"
           @detailfetched="detailFetched"></food-detail>
         <food-new-venue
-          v-if="showNewVenue"
-          @close="showNewVenue = false"
+          ref="newvenue"
+          @close="setNewVenue(false)"
           @detailfetched="detailFetched"
           @venuecreated="venueCreated"></food-new-venue>
       </div>
@@ -315,8 +313,6 @@ import 'leaflet/dist/leaflet.css'
 import {
   LMap,
   LTileLayer,
-  LControlLayers,
-  LControlAttribution,
   LControlZoom,
   LControl,
   LMarker,
@@ -327,6 +323,7 @@ import 'leaflet.icon.glyph'
 import bbox from '@turf/bbox'
 import smoothScroll from '../lib/smoothscroll'
 import SlideUpDown from 'vue-slide-up-down'
+import Modal from 'bootstrap/js/dist/modal'
 
 import FoodPopup from './food-popup'
 import FoodSidebarItem from './food-sidebar-item'
@@ -486,11 +483,14 @@ export default {
       zoom: zoom,
       locationKnown: locationKnown,
       showLocator: false,
+      locatorModal: null,
       showFilter: false,
       showDetail: null,
+      detailModal: null,
       showRequestForm: null,
       autoUpdate: true,
       showNewVenue: false,
+      newVenueModal: null,
       user: this.userInfo,
       filters: this.config.filters,
       maxBounds: maxBounds,
@@ -709,7 +709,7 @@ export default {
       return a
     },
     modalActive() {
-      return this.showLocator || this.showDetail
+      return this.showLocator || this.showDetail || this.showNewVenue
     },
     colorLegend() {
       return {
@@ -1104,21 +1104,47 @@ export default {
       window.localStorage.setItem('froide-food:center', JSON.stringify(latlng))
     },
     setDetail(data) {
+      if (this.detailModal === null) {
+        this.detailModal = new Modal(this.$refs.fooddetail.$el)
+        this.$refs.fooddetail.$el.addEventListener('hidden.bs.modal', () => {
+          this.setDetail(null)
+        })
+      }
       this.showDetail = data
       if (data) {
-        this.goToMap()
+        this.detailModal.show()
+      } else {
+        this.detailModal.hide()
       }
     },
     setLocator(data) {
+      if (this.locatorModal === null) {
+        this.locatorModal = new Modal(this.$refs.foodlocator.$el)
+        this.$refs.foodlocator.$el.addEventListener('hidden.bs.modal', () => {
+          this.setLocator(false)
+        })
+      }
       this.showLocator = data
       if (data) {
+        this.locatorModal.show()
         this.goToMap()
+      } else {
+        this.locatorModal.hide()
       }
     },
     setNewVenue(show) {
+      if (this.newVenueModal === null) {
+        this.newVenueModal = new Modal(this.$refs.newvenue.$el)
+        this.$refs.newvenue.$el.addEventListener('hidden.bs.modal', () => {
+          this.setNewVenue(false)
+        })
+      }
       this.showNewVenue = show
       if (show) {
+        this.newVenueModal.show()
         this.goToMap()
+      } else {
+        this.newVenueModal.hide()
       }
     },
     startRequest(data) {
@@ -1239,8 +1265,8 @@ $icon-failure: #dc3545;
   position: -webkit-sticky;
   position: sticky;
   top: 0;
-  z-index: 2050;
-  background-color: #fff;
+  z-index: 1046;
+  background-color: var(--bs-white);
   margin: 0 -15px;
 }
 
@@ -1252,19 +1278,12 @@ $icon-failure: #dc3545;
   position: absolute;
   top: 0;
   right: 0;
-  z-index: 2000;
+  z-index: 1046;
   width: 50%;
   transition: width 0.8s ease-out;
   margin-top: 1rem;
   margin-right: 1rem;
-
-  .btn {
-    background-color: #fff;
-  }
-  .btn:hover,
-  .btn:active {
-    background-color: #666;
-  }
+  background-color: var(--bs-white);
 }
 
 .map-search-full {
@@ -1282,7 +1301,7 @@ $icon-failure: #dc3545;
 
 .redo-search {
   position: absolute;
-  z-index: 2000;
+  z-index: 1047;
   width: auto;
 
   top: 0;
@@ -1341,12 +1360,7 @@ $icon-failure: #dc3545;
 }
 
 .sidebar {
-  background-color: #fff;
-}
-
-.sidebar.modal-active {
-  height: 90vh;
-  overflow: hidden;
+  background-color: var(--bs-white);
 }
 
 .is-embed {
@@ -1387,7 +1401,7 @@ $icon-failure: #dc3545;
 
 .sidebar-column {
   transform: translate3d(0px, 0px, 0px);
-  z-index: 2020;
+  z-index: 1045;
   margin-top: -1px;
   padding-right: 0;
   padding-left: 0;
@@ -1401,10 +1415,10 @@ $icon-failure: #dc3545;
 }
 
 .divider-column {
-  background-color: #fff;
+  background-color: var(--bs-white);
   border-bottom: 2px solid #eee;
   padding: 0.25rem 0;
-  z-index: 2025;
+  z-index: 1045;
   position: -webkit-sticky;
   position: sticky;
   top: 37px;
@@ -1418,7 +1432,7 @@ $icon-failure: #dc3545;
   margin: 0;
   a {
     padding: 0.25rem 0.5rem;
-    background: #eee;
+    background-color: var(--bs-white);
     color: #333;
     border-radius: 5px;
   }
@@ -1456,13 +1470,13 @@ $icon-failure: #dc3545;
   display: flex;
   justify-content: flex-end;
   padding: 15px;
-  background-color: #fff;
+  background-color: var(--bs-white);
 }
 
 .color-legend {
   margin-bottom: 0;
   padding: 0.5rem;
-  background-color: #fff;
+  background-color: var(--bs-white);
   list-style: none;
 }
 

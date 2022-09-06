@@ -1,43 +1,45 @@
-import {renderDate, getPlaceStatus, getRequestStatus} from '../lib/utils'
+import { renderDate, getPlaceStatus, getRequestStatus } from '../lib/utils'
 
 const DAYS_BETWEEN_REQUEST = 90
 
 var FoodItemMixin = {
   computed: {
-    itemId () {
+    itemId() {
       return this.data.id
     },
-    makeRequestUrl () {
-      return `${this.config.requestUrl}?ident=${encodeURIComponent(this.data.ident)}`
+    makeRequestUrl() {
+      return `${this.config.requestUrl}?ident=${encodeURIComponent(
+        this.data.ident
+      )}`
     },
-    hasRequest () {
+    hasRequest() {
       return this.lastRequest !== null || this.data.requested
     },
-    isSelected () {
+    isSelected() {
       return this.data.id === this.selectedVenueId
     },
-    isCustom () {
+    isCustom() {
       return !!this.data.custom
     },
-    isDummy () {
+    isDummy() {
       return !this.hasIdent
     },
-    hasIdent () {
+    hasIdent() {
       return this.data.ident
     },
-    isGoogle () {
+    isGoogle() {
       return this.hasIdent && this.data.ident.indexOf('google:') === 0
     },
-    isYelp () {
+    isYelp() {
       return this.hasIdent && this.data.ident.indexOf('yelp:') === 0
     },
-    isFoursquare () {
+    isFoursquare() {
       return this.hasIdent && this.data.ident.indexOf('foursquare:') === 0
     },
-    isOsm () {
+    isOsm() {
       return this.hasIdent && this.data.ident.indexOf('amenity:') === 0
     },
-    osmLink () {
+    osmLink() {
       if (this.isOsm) {
         let osmid = this.data.ident.split('_')[1]
         if (osmid.length < 15) {
@@ -47,29 +49,29 @@ var FoodItemMixin = {
       }
       return ''
     },
-    lastRequest () {
+    lastRequest() {
       if (this.data.requests && this.data.requests.length > 0) {
         return this.data.requests[0]
       }
       return null
     },
-    daysSinceLastRequest () {
+    daysSinceLastRequest() {
       let requestDate = new Date(this.lastRequest.timestamp)
       let now = new Date()
       let difference = (now - requestDate) / (1000 * 60 * 60 * 24)
       return difference
     },
-    lastRequestDate () {
+    lastRequestDate() {
       if (this.hasRequest) {
         return renderDate(this.lastRequest.timestamp)
       }
       return null
     },
-    daysUntilNextRequest () {
+    daysUntilNextRequest() {
       let days = DAYS_BETWEEN_REQUEST - this.daysSinceLastRequest
       return Math.max(0, Math.ceil(days))
     },
-    canRequest () {
+    canRequest() {
       if (this.data.requested) {
         return false
       }
@@ -85,13 +87,15 @@ var FoodItemMixin = {
       }
       return this.daysSinceLastRequest > DAYS_BETWEEN_REQUEST
     },
-    requestComplete () {
+    requestComplete() {
       return this.data.requests.some((r) => {
         let status = getRequestStatus(r.status, r.resolution)
-        return status !== 'normal' && status !== 'pending' && status !== 'withdrawn'
+        return (
+          status !== 'normal' && status !== 'pending' && status !== 'withdrawn'
+        )
       })
     },
-    requestStatusColor () {
+    requestStatusColor() {
       let status = getPlaceStatus(this.data)
       switch (status) {
         case 'normal':
@@ -108,23 +112,23 @@ var FoodItemMixin = {
           return ['Anfrage abgeschlossen', 'info']
       }
     },
-    requestStatus () {
+    requestStatus() {
       return this.requestStatusColor[0]
     },
-    requestColor () {
+    requestColor() {
       return 'text-' + this.requestStatusColor[1]
     },
-    requestUrl () {
+    requestUrl() {
       if (this.hasRequest) {
         return this.lastRequest.url
       }
     }
   },
   methods: {
-    setDetail () {
+    setDetail() {
       this.$emit('detail', this.data)
     },
-    startRequest () {
+    startRequest() {
       this.$emit('startRequest', this.data)
     }
   }

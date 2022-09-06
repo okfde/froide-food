@@ -15,11 +15,9 @@
             </h4>
             <button
               type="button"
-              class="close"
+              class="btn-close"
               aria-label="Close"
-              @click="$emit('close')">
-              <span aria-hidden="true">&times;</span>
-            </button>
+              @click="$emit('close')" />
           </div>
           <div class="row">
             <div class="col-12">
@@ -152,7 +150,7 @@ export default {
   left: 3%;
   right: 3%;
   width: 94%;
-  z-index: 2400;
+  z-index: 1048;
   background-color: #fff;
   border-radius: 5px;
 }

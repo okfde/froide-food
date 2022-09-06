@@ -76,7 +76,6 @@ export default {
 }
 
 .venue-address {
-  color: #687683;
   font-size: 1rem;
   display: inline-block;
   margin: 0 0 0.5rem;
@@ -86,12 +85,12 @@ export default {
 .to-request-button {
   display: block;
   font-size: 1rem;
-  color: #28a745;
+  color: var(--bs-success);
 }
 
 .make-request-btn {
-  color: white;
   white-space: normal !important;
+  color: var(--bs-btn-color) !important;
 }
 
 .request-status {
