@@ -1,8 +1,8 @@
 from datetime import timedelta
 
-from django.conf.urls import url
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
+from django.urls import path
 from django.utils import timezone
 
 from leaflet.admin import LeafletGeoAdmin
@@ -55,8 +55,8 @@ class VenueRequestAdmin(LeafletGeoAdmin):
     def get_urls(self):
         urls = super(VenueRequestAdmin, self).get_urls()
         my_urls = [
-            url(
-                r"^export-users/$",
+            path(
+                "export-users/",
                 self.admin_site.admin_view(self.export_users),
                 name="froide_food-admin-export_users",
             ),
