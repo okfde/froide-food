@@ -14,7 +14,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 
 from froide.foirequest.views import MakeRequestView
 from froide.georegion.models import GeoRegion
-from froide.helper.utils import get_redirect, render_403
+from froide.helper.utils import get_redirect, is_ajax, render_403
 
 from .forms import ReportForm
 from .models import VenueRequest, VenueRequestItem
@@ -143,7 +143,7 @@ def osm_help(request):
                 venue.save()
             except VenueRequest.DoesNotExist:
                 pass
-        if request.is_ajax():
+        if is_ajax(request):
             return JsonResponse({})
         return redirect("food-osm_help")
 
@@ -345,7 +345,7 @@ def show_reports(request):
     if not request.user.has_perm("froide_food.add_foodsafetyreport"):
         return render_403(request)
 
-    if request.is_ajax():
+    if is_ajax(request):
         if request.method == "GET":
             vri = VenueRequestItem.objects.filter(
                 Q(foirequest__resolution="successful")
