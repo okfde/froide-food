@@ -166,7 +166,7 @@ def get_request_count(request, pb):
         request_count = FoiRequest.objects.filter(
             public_body=pb,
             user=request.user,
-            first_message__gte=timezone.now() - TIME_PERIOD,
+            created_at__gte=timezone.now() - TIME_PERIOD,
         ).count()
         return request_count
     return 0
@@ -297,7 +297,7 @@ def connect_foirequest(foirequest, provider):
 
     vri = VenueRequestItem.objects.create(
         venue=vr,
-        timestamp=foirequest.first_message,
+        timestamp=foirequest.created_at,
         foirequest=foirequest,
         publicbody=foirequest.public_body,
     )

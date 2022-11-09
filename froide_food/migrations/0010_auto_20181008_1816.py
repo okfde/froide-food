@@ -13,7 +13,7 @@ def add_request_infos(apps, schema_editor):
         vris = VenueRequestItem.objects.filter(venue=vr)
         if vris:
             vri = vris[0]
-            vr.last_request = vri.foirequest.first_message
+            vr.last_request = vri.foirequest.created_at
             vr.last_status = vri.foirequest.status
             vr.last_resolution = vri.foirequest.resolution
             vr.save()
