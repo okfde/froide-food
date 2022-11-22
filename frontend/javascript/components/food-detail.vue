@@ -67,11 +67,6 @@ export default {
       default: null
     }
   },
-  mounted() {
-    if (this.data && !this.data.full) {
-      this.getDetail(this.data)
-    }
-  },
   data() {
     return {
       fetching: false
@@ -80,6 +75,13 @@ export default {
   filters: {
     date: function (d) {
       return renderDate(d)
+    }
+  },
+  watch: {
+    data: function (data) {
+      if (data && !data.full) {
+        this.getDetail(data)
+      }
     }
   }
 }
