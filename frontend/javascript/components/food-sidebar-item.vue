@@ -167,8 +167,8 @@ export default {
 }
 
 .info-column {
-  padding-left: 15px;
-  padding-right: 10px;
+  padding-left: calc(var(--bs-gutter-x) * 0.5);
+  padding-right: calc(var(--bs-gutter-x) * 0.5);
 }
 
 .venue-address {

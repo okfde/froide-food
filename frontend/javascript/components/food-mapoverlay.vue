@@ -179,7 +179,7 @@ export default {
 }
 
 .info-column {
-  padding: 15px;
+  padding: calc(var(--bs-gutter-x) * 0.5);
 }
 
 .venue-img {
@@ -232,7 +232,7 @@ export default {
 
 .provider-credit {
   display: block;
-  padding: 15px;
+  padding: calc(var(--bs-gutter-x) * 0.5);
   background-color: #f5f5f5;
   margin-right: 5px;
   margin-bottom: 5px;

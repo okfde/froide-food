@@ -1267,7 +1267,7 @@ $icon-failure: #dc3545;
   top: 0;
   z-index: 1046;
   background-color: var(--bs-white);
-  margin: 0 -15px;
+  margin: 0 calc(var(--bs-gutter-x) * -0.5);
 }
 
 .searchbar-inner {
@@ -1332,7 +1332,7 @@ $icon-failure: #dc3545;
 
 @media screen and (min-width: 768px) {
   .searchbar-inner {
-    padding: 0 15px;
+    padding: 0 calc(var(--bs-gutter-x) * 0.5);
   }
 }
 
@@ -1347,7 +1347,7 @@ $icon-failure: #dc3545;
 
 @media screen and (min-width: 768px) {
   .map-column {
-    padding-right: 15px;
+    padding-right: calc(var(--bs-gutter-x) * 0.5);
     padding-left: 5px;
   }
 }
@@ -1410,7 +1410,7 @@ $icon-failure: #dc3545;
 @media screen and (min-width: 768px) {
   .sidebar-column {
     padding-right: 0px;
-    padding-left: 15px;
+    padding-left: calc(var(--bs-gutter-x) * 0.5);
   }
 }
 
@@ -1463,13 +1463,13 @@ $icon-failure: #dc3545;
 
 .new-venue-area {
   text-align: center;
-  padding: 15px 0;
+  padding: calc(var(--bs-gutter-x) * 0.5) 0;
 }
 
 .switch-filter {
   display: flex;
   justify-content: flex-end;
-  padding: 15px;
+  padding: calc(var(--bs-gutter-x) * 0.5);
   background-color: var(--bs-white);
 }
 
