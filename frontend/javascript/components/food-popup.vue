@@ -27,11 +27,10 @@
         <p v-if="canRequest">
           <a
             @click.prevent.stop="startRequest"
-            class="btn btn-primary btn-sm make-request-btn"
+            class="btn btn-primary btn-sm"
             :href="makeRequestUrl"
             target="_blank">
-            Hygienekontrolle<br class="d-block d-sm-none" />
-            anfragen&nbsp;&rarr;
+            Hygienekontrolle anfragen&nbsp;&rarr;
           </a>
         </p>
       </div>
@@ -86,11 +85,6 @@ export default {
   display: block;
   font-size: 1rem;
   color: var(--bs-success);
-}
-
-.make-request-btn {
-  white-space: normal !important;
-  color: var(--bs-btn-color) !important;
 }
 
 .request-status {

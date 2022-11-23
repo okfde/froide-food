@@ -45,7 +45,7 @@
                 <p v-if="canRequest">
                   <a
                     @click.prevent.stop="startRequest"
-                    class="btn btn-primary btn-sm make-request-btn"
+                    class="btn btn-primary btn-sm"
                     :href="makeRequestUrl"
                     target="_blank">
                     Hygienekontrolle anfragen&nbsp;&rarr;

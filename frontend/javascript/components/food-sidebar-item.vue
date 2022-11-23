@@ -56,11 +56,10 @@
               <p v-if="canRequest">
                 <a
                   @click.prevent.stop="startRequest"
-                  class="btn btn-primary btn-sm make-request-btn"
+                  class="btn btn-primary btn-sm"
                   :href="makeRequestUrl"
                   target="_blank">
-                  Hygienekontrolle<br class="d-block d-sm-none" />
-                  anfragen&nbsp;&rarr;
+                  Hygienekontrolle anfragen&nbsp;&rarr;
                 </a>
               </p>
               <food-follow
@@ -229,10 +228,6 @@ export default {
   height: 70px;
   width: 100%;
   background-color: #aaa;
-}
-
-.make-request-btn {
-  white-space: normal !important;
 }
 
 .request-status {
