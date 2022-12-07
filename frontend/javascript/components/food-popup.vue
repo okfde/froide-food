@@ -56,6 +56,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.btn.btn-primary {
+  color: var(--bs-btn-color) !important;
+}
 .venue-name {
   min-width: 240px;
 }
