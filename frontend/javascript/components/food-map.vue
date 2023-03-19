@@ -308,15 +308,9 @@
 <script>
 /* global L */
 
-import Vue from 'vue'
-
 import 'leaflet/dist/leaflet.css'
 
 import bbox from '@turf/bbox'
-import Modal from 'bootstrap/js/dist/modal'
-import 'leaflet'
-import 'leaflet.icon.glyph'
-import SlideUpDown from 'vue-slide-up-down'
 import {
   LControl,
   LControlZoom,
@@ -325,7 +319,11 @@ import {
   LPopup,
   LTileLayer,
   LTooltip
-} from 'vue2-leaflet'
+} from '@vue-leaflet/vue-leaflet'
+import Modal from 'bootstrap/js/dist/modal'
+import 'leaflet'
+import 'leaflet.icon.glyph'
+import SlideUpDown from 'vue-slide-up-down'
 import smoothScroll from '../lib/smoothscroll'
 
 import FoodDetail from './food-detail'
@@ -354,20 +352,31 @@ var getIdFromPopup = (e) => {
   return node.id.split('-').slice(1).join('-')
 }
 
-Vue.directive('scroll', {
-  inserted: function (el, binding) {
+const scroll = {
+  mounted(el, binding, vnode) {
     let scrollElement = el
     if (binding.modifiers.window) {
       scrollElement = window
     }
-    let f = function (evt) {
+    const f = function (evt) {
       if (binding.value(evt, el)) {
         scrollElement.removeEventListener('scroll', f)
       }
     }
     scrollElement.addEventListener('scroll', f)
   }
-})
+}
+
+const focusmarker = {
+  // When the bound element is inserted into the DOM...
+  updated: (el, binding, vnode) => {
+    if (vnode.key === binding.instance.selectedVenueId) {
+      binding.instance.mapObject.setZIndexOffset(300)
+    } else {
+      binding.instance.mapObject.setZIndexOffset(0)
+    }
+  }
+}
 
 const GERMANY_BOUNDS = [
   [56.9449741808516, 24.609375000000004],
@@ -385,6 +394,10 @@ function getColorMode() {
 
 export default {
   name: 'food-map',
+  directives: {
+    scroll,
+    focusmarker
+  },
   props: {
     config: {
       type: Object
@@ -554,8 +567,6 @@ export default {
   },
   created() {
     this.$root.config = this.config
-    var self = this
-
     if ('serviceWorker' in navigator && this.config.swUrl) {
       let scope = this.config.swUrl.replace(/^(.*\/)[\w.]+$/, '$1')
       navigator.serviceWorker
@@ -984,7 +995,7 @@ export default {
             let venueIndex = this.venueMap[venueId]
             let venue = this.venues[venueIndex]
             if (venue) {
-              Vue.set(venue, 'follow', obj)
+              venue.follow = obj
             }
           })
         })
@@ -1022,7 +1033,7 @@ export default {
       this.selectedVenueId = null
       if (marker) {
         this.map.closePopup()
-        Vue.set(marker, 'icon', this.getIcon(marker))
+        marker.icon = this.getIcon(marker)
       }
     },
     markerClick(marker, pan) {
@@ -1050,11 +1061,11 @@ export default {
       } else {
         this.goToMap()
       }
-      Vue.set(marker, 'icon', this.getIcon(marker))
+      marker.icon = this.getIcon(marker)
       this.preventMapMoved()
     },
     imageLoaded(data) {
-      Vue.set(data, 'imageLoaded', true)
+      data.imageLoaded = true
     },
     goToMap() {
       let fmc = this.$refs.foodMapContainer
