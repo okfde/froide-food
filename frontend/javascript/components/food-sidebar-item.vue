@@ -22,7 +22,7 @@
                   class="text-muted"
                   target="_blank"
                   rel="noopener">
-                  <span class="fa fa-map-o text-black-50"></span>
+                  <span class="fa fa-map-o text-body"></span>
                   <span class="visually-hidden">OpenStreetMap</span>
                 </a>
               </small>
@@ -179,7 +179,7 @@ export default {
 }
 
 .dummy {
-  background-color: #ddd;
+  background-color: var(--bs-secondary-bg);
   display: block;
 }
 .dummy-blinker {
@@ -215,7 +215,7 @@ export default {
 }
 
 .highlighted {
-  background-color: #fffbbf;
+  background-color: var(--bs-light-bg-subtle);
 }
 
 .venue-img {

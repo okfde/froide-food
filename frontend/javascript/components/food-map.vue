@@ -156,7 +156,7 @@
                 :options="mapOptions"
                 :max-bounds="maxBounds">
                 <l-tile-layer
-                  :url="tileProvider.url"
+                  :url="tileUrl"
                   :attribution="tileProvider.attribution" />
                 <l-control-zoom position="bottomright" />
                 <l-control position="bottomleft">
@@ -241,11 +241,13 @@
                   </p>
                   <p v-else>Keine Betriebe an diesem Ort gefunden.</p>
                 </template>
-                <button class="btn btn-sm btn-light" @click="setNewVenue(true)">
+                <button
+                  class="btn btn-sm btn-secondary mb-1"
+                  @click="setNewVenue(true)">
                   Betrieb nicht gefunden?
                 </button>
                 <a
-                  class="btn btn-sm btn-light ms-1"
+                  class="btn btn-sm btn-secondary ms-1 mb-1"
                   target="_blank"
                   href="/kampagnen/lebensmittelkontrolle/faq/#falsch">
                   Daten falsch?
@@ -310,40 +312,41 @@ import Vue from 'vue'
 
 import 'leaflet/dist/leaflet.css'
 
+import bbox from '@turf/bbox'
+import Modal from 'bootstrap/js/dist/modal'
+import 'leaflet'
+import 'leaflet.icon.glyph'
+import SlideUpDown from 'vue-slide-up-down'
 import {
-  LMap,
-  LTileLayer,
-  LControlZoom,
   LControl,
+  LControlZoom,
+  LMap,
   LMarker,
   LPopup,
+  LTileLayer,
   LTooltip
 } from 'vue2-leaflet'
-import 'leaflet.icon.glyph'
-import bbox from '@turf/bbox'
 import smoothScroll from '../lib/smoothscroll'
-import SlideUpDown from 'vue-slide-up-down'
-import Modal from 'bootstrap/js/dist/modal'
 
-import FoodPopup from './food-popup'
-import FoodSidebarItem from './food-sidebar-item'
+import FoodDetail from './food-detail'
+import FoodFilter from './food-filter'
+import FoodLoader from './food-loader'
 import FoodLocator from './food-locator'
 import FoodMapoverlay from './food-mapoverlay'
-import FoodFilter from './food-filter'
-import FoodDetail from './food-detail'
-import FoodLoader from './food-loader'
-import FoodRequest from './food-request'
 import FoodNewVenue from './food-new-venue'
+import FoodPopup from './food-popup'
+import FoodRequest from './food-request'
+import FoodSidebarItem from './food-sidebar-item'
 import SwitchButton from './switch-button'
 
 import {
-  getPlaceStatus,
-  getPinURL,
-  getPinColor,
-  getQueryVariable,
+  COLORS,
   canUseLocalStorage,
-  latlngToGrid,
-  COLORS
+  getPinColor,
+  getPinURL,
+  getPlaceStatus,
+  getQueryVariable,
+  latlngToGrid
 } from '../lib/utils'
 
 var getIdFromPopup = (e) => {
@@ -374,6 +377,10 @@ const DETAIL_ZOOM_LEVEL = 12
 const DEFAULT_ZOOM = 6
 const DEFAULT_POS = [51.00289959043832, 10.245523452758789]
 const MIN_DISTANCE_MOVED_REFRESH = 800 // in meters
+
+function getColorMode() {
+  return document.documentElement.getAttribute('data-bs-theme') || 'light'
+}
 
 export default {
   name: 'food-map',
@@ -526,11 +533,9 @@ export default {
       markerOptions: {
         riseOnHover: true
       },
+      colorMode: getColorMode(),
       tileProvider: {
         name: 'Carto',
-        url: `//cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}${
-          window.L.Browser.retina ? '@2x' : ''
-        }.png`,
         // url: 'https://api.mapbox.com/styles/v1/{username}/{style}/tiles/{tileSize}/{z}/{x}/{y}{r}?access_token={accessToken}',
         // url: 'https://api.tiles.mapbox.com/v4/{style}/{z}/{x}/{y}.png?access_token={accessToken}',
         // url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -571,6 +576,14 @@ export default {
           vnode.componentInstance.mapObject.setZIndexOffset(0)
         }
       }
+    })
+
+    const observer = new MutationObserver(
+      () => (this.colorMode = getColorMode())
+    )
+    observer.observe(document.documentElement, {
+      attributeFilter: ['data-bs-theme'],
+      attributeOldValue: true
     })
   },
   mounted() {
@@ -614,6 +627,11 @@ export default {
   computed: {
     map() {
       return this.$refs.map.mapObject
+    },
+    tileUrl() {
+      return `//cartodb-basemaps-{s}.global.ssl.fastly.net/${
+        this.colorMode
+      }_all/{z}/{x}/{y}${window.L.Browser.retina ? '@2x' : ''}.png`
     },
     currentUrl() {
       let url = `${this.config.appUrl}?latlng=${this.center[0]},${this.center[1]}`
@@ -1266,7 +1284,7 @@ $icon-failure: #dc3545;
   position: sticky;
   top: 0;
   z-index: 1046;
-  background-color: var(--bs-white);
+  background-color: var(--bs-body-bg);
   margin: 0 calc(var(--bs-gutter-x) * -0.5);
 }
 
@@ -1283,7 +1301,7 @@ $icon-failure: #dc3545;
   transition: width 0.8s ease-out;
   margin-top: 1rem;
   margin-right: 1rem;
-  background-color: var(--bs-white);
+  background-color: var(--bs-body-bg);
 }
 
 .map-search-full {
@@ -1360,7 +1378,7 @@ $icon-failure: #dc3545;
 }
 
 .sidebar {
-  background-color: var(--bs-white);
+  background-color: var(--bs-body-bg);
 }
 
 .is-embed {
@@ -1415,7 +1433,7 @@ $icon-failure: #dc3545;
 }
 
 .divider-column {
-  background-color: var(--bs-white);
+  background-color: var(--bs-body-bg);
   border-bottom: 2px solid #eee;
   padding: 0.25rem 0;
   z-index: 1045;
@@ -1432,7 +1450,7 @@ $icon-failure: #dc3545;
   margin: 0;
   a {
     padding: 0.25rem 0.5rem;
-    background-color: var(--bs-white);
+    background-color: var(--bs-body-bg);
     color: #333;
     border-radius: 5px;
   }
@@ -1470,13 +1488,13 @@ $icon-failure: #dc3545;
   display: flex;
   justify-content: flex-end;
   padding: calc(var(--bs-gutter-x) * 0.5);
-  background-color: var(--bs-white);
+  background-color: var(--bs-body-bg);
 }
 
 .color-legend {
   margin-bottom: 0;
   padding: 0.5rem;
-  background-color: var(--bs-white);
+  background-color: var(--bs-body-bg);
   list-style: none;
 }
 
@@ -1486,6 +1504,26 @@ $icon-failure: #dc3545;
 }
 
 .color-legend li span {
-  color: #333;
+  color: var(--bs-body);
+}
+</style>
+
+<style global>
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip,
+.leaflet-bar a {
+  background: var(--bs-body-bg);
+  color: var(--bs-body);
+}
+.leaflet-bar a.leaflet-disabled {
+  background: var(--bs-body-bg);
+}
+.leaflet-container {
+  background-color: var(--bs-secondary-bg);
+}
+.leaflet-container .leaflet-control-attribution,
+.leaflet-container .leaflet-control-attribution a {
+  background: var(--bs-body-bg);
+  color: var(--bs-secondary);
 }
 </style>

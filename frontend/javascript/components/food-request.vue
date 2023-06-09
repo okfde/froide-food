@@ -111,10 +111,10 @@ import UserRegistration from '~froide/frontend/javascript/components/makerequest
 import UserTerms from '~froide/frontend/javascript/components/makerequest/user-terms.vue'
 import { selectBestLaw } from '~froide/frontend/javascript/lib/law-select'
 
-import FoodLoader from './food-loader'
-import FoodRecommend from './food-recommend'
 import FoodDetailMixin from '../lib/detailmixin'
 import FoodItemMixin from '../lib/mixin.js'
+import FoodLoader from './food-loader'
+import FoodRecommend from './food-recommend'
 
 const MAX_REQUEST_COUNT = 3
 const LAW_TYPE = 'VIG'
@@ -244,7 +244,7 @@ export default {
 .loading {
   height: 100vh;
   padding-top: 30%;
-  background-color: #fff;
+  background-color: var(--bs-body-bg);
   // animation: blinker 0.8s linear infinite;
   text-align: center;
 }

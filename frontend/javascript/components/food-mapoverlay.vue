@@ -151,7 +151,7 @@ export default {
   right: 3%;
   width: 94%;
   z-index: 1048;
-  background-color: #fff;
+  background-color: var(--bs-body-bg);
   border-radius: 5px;
 }
 
