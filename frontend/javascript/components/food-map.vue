@@ -377,6 +377,7 @@ const DETAIL_ZOOM_LEVEL = 12
 const DEFAULT_ZOOM = 6
 const DEFAULT_POS = [51.00289959043832, 10.245523452758789]
 const MIN_DISTANCE_MOVED_REFRESH = 800 // in meters
+const MIN_MAP_HEIGHT = 300
 
 function getColorMode() {
   return document.documentElement.getAttribute('data-bs-theme') || 'light'
@@ -1105,7 +1106,7 @@ export default {
       this.isMapTop = isMapTop
       if (!this.stacked) {
         if (!isMapTop) {
-          this.mapHeight = window.innerHeight - mapTop
+          this.mapHeight = Math.max(window.innerHeight - mapTop, MIN_MAP_HEIGHT)
         } else {
           this.mapHeight = null
         }
