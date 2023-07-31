@@ -154,7 +154,8 @@
                 v-model:zoom="zoom"
                 :center="center"
                 :options="mapOptions"
-                :max-bounds="maxBounds">
+                :max-bounds="maxBounds"
+                @ready="mapReady">
                 <l-tile-layer
                   :url="tileUrl"
                   :attribution="tileProvider.attribution" />
@@ -183,9 +184,9 @@
                   :draggable="false"
                   :icon="marker.icon"
                   :options="markerOptions"
+                  :z-index-offset="marker.id === selectedVenueId ? 300 : 0"
                   @click="markerClick(marker, false)"
-                  @touchstart.prevent="markerClick(marker, false)"
-                  v-focusmarker>
+                  @touchstart.prevent="markerClick(marker, false)">
                   <l-tooltip
                     :content="marker.name"
                     :options="tooltipOptions"
@@ -367,17 +368,6 @@ const scroll = {
   }
 }
 
-const focusmarker = {
-  // When the bound element is inserted into the DOM...
-  updated: (el, binding, vnode) => {
-    if (vnode.key === binding.instance.selectedVenueId) {
-      binding.instance.mapObject.setZIndexOffset(300)
-    } else {
-      binding.instance.mapObject.setZIndexOffset(0)
-    }
-  }
-}
-
 const GERMANY_BOUNDS = [
   [56.9449741808516, 24.609375000000004],
   [44.402391829093915, -3.5156250000000004]
@@ -395,12 +385,12 @@ function getColorMode() {
 export default {
   name: 'FoodMap',
   directives: {
-    scroll,
-    focusmarker
+    scroll
   },
   props: {
     config: {
-      type: Object
+      type: Object,
+      required: true
     },
     userInfo: {
       type: Object,
@@ -411,10 +401,12 @@ export default {
       default: null
     },
     requestForm: {
-      type: Object
+      type: Object,
+      required: true
     },
     requestConfig: {
-      type: Object
+      type: Object,
+      required: true
     }
   },
   components: {
@@ -566,7 +558,6 @@ export default {
     }
   },
   created() {
-    this.$root.config = this.config
     if ('serviceWorker' in navigator && this.config.swUrl) {
       let scope = this.config.swUrl.replace(/^(.*\/)[\w.]+$/, '$1')
       navigator.serviceWorker
@@ -587,47 +578,9 @@ export default {
       attributeOldValue: true
     })
   },
-  mounted() {
-    this.$nextTick(() => {
-      this.map.attributionControl.setPrefix('')
-      this.map.on('zoomend', () => {
-        this.mapHasMoved()
-        this.recordMapPosition()
-      })
-      this.map.on('moveend', () => {
-        if (this.searchCenter !== null) {
-          let currentPosition = this.map.getCenter()
-          let distance = this.searchCenter.distanceTo(currentPosition)
-          if (distance < MIN_DISTANCE_MOVED_REFRESH) {
-            return
-          }
-        }
-        this.mapHasMoved()
-        this.recordMapPosition()
-      })
-      this.map.on('click', () => {
-        this.clearSelected()
-      })
-      this.map.on('popupopen', (e) => {
-        let nodeId = getIdFromPopup(e)
-        this.selectedVenueId = nodeId
-      })
-      this.map.on('popupclose', () => {
-        this.clearSelected()
-      })
-      window.addEventListener('resize', () => {
-        this.isStacked()
-      })
-      if (!this.locationKnown) {
-        this.setLocator(true)
-      } else {
-        this.search()
-      }
-    })
-  },
   computed: {
     map() {
-      return this.$refs.map.mapObject
+      return this.$refs.map.leafletObject
     },
     tileUrl() {
       return `//cartodb-basemaps-{s}.global.ssl.fastly.net/${
@@ -740,6 +693,42 @@ export default {
     }
   },
   methods: {
+    mapReady() {
+      this.map.attributionControl.setPrefix('')
+      this.map.on('zoomend', () => {
+        this.mapHasMoved()
+        this.recordMapPosition()
+      })
+      this.map.on('moveend', () => {
+        if (this.searchCenter !== null) {
+          let currentPosition = this.map.getCenter()
+          let distance = this.searchCenter.distanceTo(currentPosition)
+          if (distance < MIN_DISTANCE_MOVED_REFRESH) {
+            return
+          }
+        }
+        this.mapHasMoved()
+        this.recordMapPosition()
+      })
+      this.map.on('click', () => {
+        this.clearSelected()
+      })
+      this.map.on('popupopen', (e) => {
+        let nodeId = getIdFromPopup(e)
+        this.selectedVenueId = nodeId
+      })
+      this.map.on('popupclose', () => {
+        this.clearSelected()
+      })
+      window.addEventListener('resize', () => {
+        this.isStacked()
+      })
+      if (!this.locationKnown) {
+        this.setLocator(true)
+      } else {
+        this.search()
+      }
+    },
     coordinatesChosen(latlng) {
       let center = L.latLng(latlng)
       if (!this.maxBounds.contains(center)) {
