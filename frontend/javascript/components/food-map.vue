@@ -323,7 +323,7 @@ import {
 import Modal from 'bootstrap/js/dist/modal'
 import 'leaflet'
 import 'leaflet.icon.glyph'
-import SlideUpDown from 'vue-slide-up-down'
+import SlideUpDown from 'vue3-slide-up-down'
 import smoothScroll from '../lib/smoothscroll'
 
 import FoodDetail from './food-detail'

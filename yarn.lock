@@ -1958,11 +1958,6 @@ vue-eslint-parser@^9.1.1, vue-eslint-parser@^9.3.1:
     lodash "^4.17.21"
     semver "^7.3.6"
 
-vue-lazyload@^3.0.0-rc.2:
-  version "3.0.0-rc.2"
-  resolved "https://registry.yarnpkg.com/vue-lazyload/-/vue-lazyload-3.0.0-rc.2.tgz#8a3daa598dcbb7349893d3bb39b50695049fb0d8"
-  integrity sha512-Cg7Gqb7jAoiImMPH3EMfAwJ8gZuFoBJCEtA7+TGRljrtktDtV7JAHIyKvuTgQR8DFAd7MhKi1Ys8QHdSrnGdZQ==
-
 vue3-slide-up-down@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/vue3-slide-up-down/-/vue3-slide-up-down-1.2.5.tgz#9df8a706b24919d5efd58e32600fb7d7bf9d476b"
