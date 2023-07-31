@@ -75,7 +75,7 @@
 const DAY_PERIOD = 90
 
 export default {
-  name: 'food-recommend',
+  name: 'FoodRecommend',
   props: {
     requestCount: {
       type: Number
@@ -109,7 +109,7 @@ export default {
       return `Ich mache gerade bei einer Aktion zu Lebensmittelhygiene mit. Könntest du mir helfen und den Kontrollbericht von „${this.placeName}“ anfragen?\n\n${this.socialUrl}`
     },
     smsLink() {
-      if (L.Browser.android) {
+      if (/Android/i.test(navigator.userAgent)) {
         return `sms://?body=${encodeURIComponent(this.socialText)}`
       }
       return `sms://&body=${encodeURIComponent(this.socialText)}`

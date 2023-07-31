@@ -81,7 +81,7 @@ import FoodItemMixin from '../lib/mixin'
 import FoodFollow from './food-follow.vue'
 
 export default {
-  name: 'food-sidebar-item',
+  name: 'FoodSidebarItem',
   mixins: [FoodItemMixin],
   components: {
     FoodFollow

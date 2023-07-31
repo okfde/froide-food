@@ -151,7 +151,7 @@
 
               <l-map
                 ref="map"
-                :zoom.sync="zoom"
+                v-model:zoom="zoom"
                 :center="center"
                 :options="mapOptions"
                 :max-bounds="maxBounds">
@@ -266,7 +266,7 @@
                 :data="data"
                 :config="config"
                 :user="user"
-                :selectedVenueId="selectedVenueId"
+                :selected-venue-id="selectedVenueId"
                 @select="markerClick(data, true)"
                 @detail="setDetail"
                 @startRequest="startRequest"
@@ -277,14 +277,14 @@
           </div>
         </div>
         <food-locator
-          :defaultPostcode="postcode"
-          :defaultLocation="locationName"
-          :exampleCity="city"
-          :locationKnown="locationKnown"
+          :default-postcode="postcode"
+          :default-location="locationName"
+          :example-city="city"
+          :location-known="locationKnown"
           :error="error"
           :error-message="locatorErrorMessage"
           :geolocation-disabled="geolocationDisabled"
-          :isMobile="isMobile"
+          :is-mobile="isMobile"
           ref="foodlocator"
           @close="setLocator(false)"
           @postcodeChosen="postcodeChosen"
@@ -353,7 +353,7 @@ var getIdFromPopup = (e) => {
 }
 
 const scroll = {
-  mounted(el, binding, vnode) {
+  mounted(el, binding) {
     let scrollElement = el
     if (binding.modifiers.window) {
       scrollElement = window
@@ -393,7 +393,7 @@ function getColorMode() {
 }
 
 export default {
-  name: 'food-map',
+  name: 'FoodMap',
   directives: {
     scroll,
     focusmarker
@@ -579,17 +579,6 @@ export default {
         })
     }
 
-    Vue.directive('focusmarker', {
-      // When the bound element is inserted into the DOM...
-      componentUpdated: (el, binding, vnode) => {
-        if (vnode.key === self.selectedVenueId) {
-          vnode.componentInstance.mapObject.setZIndexOffset(300)
-        } else {
-          vnode.componentInstance.mapObject.setZIndexOffset(0)
-        }
-      }
-    })
-
     const observer = new MutationObserver(
       () => (this.colorMode = getColorMode())
     )
@@ -601,11 +590,11 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.map.attributionControl.setPrefix('')
-      this.map.on('zoomend', (e) => {
+      this.map.on('zoomend', () => {
         this.mapHasMoved()
         this.recordMapPosition()
       })
-      this.map.on('moveend', (e) => {
+      this.map.on('moveend', () => {
         if (this.searchCenter !== null) {
           let currentPosition = this.map.getCenter()
           let distance = this.searchCenter.distanceTo(currentPosition)
@@ -616,14 +605,14 @@ export default {
         this.mapHasMoved()
         this.recordMapPosition()
       })
-      this.map.on('click', (e) => {
+      this.map.on('click', () => {
         this.clearSelected()
       })
       this.map.on('popupopen', (e) => {
         let nodeId = getIdFromPopup(e)
         this.selectedVenueId = nodeId
       })
-      this.map.on('popupclose', (e) => {
+      this.map.on('popupclose', () => {
         this.clearSelected()
       })
       window.addEventListener('resize', () => {
@@ -934,7 +923,7 @@ export default {
             }
             return false
           })
-          .map((r, i) => {
+          .map((r) => {
             let d = this.createVenue(r)
             if (d.requests.length > 0 && d.requests[0].id !== null) {
               hasRequests = true
@@ -1084,7 +1073,7 @@ export default {
       this.stacked = window.innerWidth < 768
       return this.stacked
     },
-    handleSidebarScroll(evt, el) {
+    handleSidebarScroll() {
       if (this.modalActive) {
         return
       }

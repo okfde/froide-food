@@ -70,7 +70,7 @@ import FoodItemMixin from '../lib/mixin'
 import FoodFollow from './food-follow.vue'
 
 export default {
-  name: 'food-mapoverlay',
+  name: 'FoodMapoverlay',
   mixins: [FoodItemMixin],
   components: {
     FoodFollow

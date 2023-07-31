@@ -7,19 +7,20 @@ Copyright (c) 2015 Matthias Le Brun
 
 const MAX_DISTANCE_THRESHOLD = 800
 
-const createAnimation = (func, duration = 300) => new Promise((resolve) => {
-  const startDate = Date.now()
-  const tick = () => {
-    const progress = Math.min(1, (Date.now() - startDate) / duration)
-    func(progress)
-    if (progress < 1) {
-      window.requestAnimationFrame(tick)
-    } else {
-      resolve()
+const createAnimation = (func, duration = 300) =>
+  new Promise((resolve) => {
+    const startDate = Date.now()
+    const tick = () => {
+      const progress = Math.min(1, (Date.now() - startDate) / duration)
+      func(progress)
+      if (progress < 1) {
+        window.requestAnimationFrame(tick)
+      } else {
+        resolve()
+      }
     }
-  }
-  tick()
-})
+    tick()
+  })
 
 const scrollTo = function (el, offsetX, offsetY) {
   if (el === window) {
@@ -30,11 +31,10 @@ const scrollTo = function (el, offsetX, offsetY) {
   }
 }
 
-const smoothScroll = ({
-  x = window.pageXOffset,
-  y = window.pageYOffset,
-  el = window
-}, duration) => {
+const smoothScroll = (
+  { x = window.pageXOffset, y = window.pageYOffset, el = window },
+  duration
+) => {
   let initialTop
   let initialLeft
   if (el === window) {

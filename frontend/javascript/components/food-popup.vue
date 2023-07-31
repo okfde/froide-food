@@ -42,7 +42,7 @@
 import FoodItemMixin from '../lib/mixin'
 
 export default {
-  name: 'food-popup',
+  name: 'FoodPopup',
   mixins: [FoodItemMixin],
   props: {
     data: {

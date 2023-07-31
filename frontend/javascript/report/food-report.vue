@@ -37,7 +37,7 @@ import FoodReportRequest from './food-report-request'
 import { getData, postData } from '~froide/frontend/javascript/lib/api.js'
 
 export default {
-  name: 'food-report',
+  name: 'FoodReport',
   mixins: [],
   components: {
     FoodReportRequest
@@ -67,7 +67,7 @@ export default {
         this.reportDates.push(data.reportdate)
       }
       this.loading = true
-      postData('', data, this.$root.csrfToken).then((result) => {
+      postData('', data, this.$root.csrfToken).then(() => {
         this.loading = false
         if (data.unresolved) {
           this.getNextRequest()

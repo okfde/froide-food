@@ -120,7 +120,7 @@ const MAX_REQUEST_COUNT = 3
 const LAW_TYPE = 'VIG'
 
 export default {
-  name: 'food-request',
+  name: 'FoodRequest',
   mixins: [FoodDetailMixin, FoodItemMixin],
   components: {
     RequestForm,
