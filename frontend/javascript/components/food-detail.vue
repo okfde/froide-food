@@ -21,7 +21,7 @@
                 <ul v-if="data.requests.length > 0" class="list-unstyled">
                   <li v-for="req in data.requests" :key="req.id">
                     <h5>
-                      Anfrage vom {{ req.timestamp | date }}
+                      Anfrage vom {{ renderDate(req.timestamp) }}
                       <small class="ms-3">
                         <a :href="req.url" target="_blank">
                           zur Anfrage&nbsp;&rarr;
@@ -58,7 +58,7 @@ import FoodDetailMixin from '../lib/detailmixin'
 import { renderDate } from '../lib/utils'
 
 export default {
-  name: 'food-detail',
+  name: 'FoodDetail',
   components: { FoodLoader },
   mixins: [FoodItemMixin, FoodDetailMixin],
   props: {

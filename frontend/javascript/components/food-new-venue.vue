@@ -97,7 +97,7 @@ import FoodLoader from './food-loader'
 import { postData } from '../lib/utils.js'
 
 export default {
-  name: 'food-new-venue',
+  name: 'FoodNewVenue',
   components: { FoodLoader },
   mounted() {},
   data() {

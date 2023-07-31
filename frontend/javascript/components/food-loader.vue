@@ -6,6 +6,6 @@
 
 <script>
 export default {
-  name: 'food-loader'
+  name: 'FoodLoader'
 }
 </script>

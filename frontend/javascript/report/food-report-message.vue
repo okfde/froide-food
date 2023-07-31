@@ -102,7 +102,7 @@ function makeDate(str) {
 }
 
 export default {
-  name: 'food-report-message',
+  name: 'FoodReportMessage',
   mixins: [],
   components: {},
   props: {
@@ -201,7 +201,6 @@ export default {
     },
     checkSelection() {
       const selection = window.getSelection()
-      const selectionRange = selection.getRangeAt(0)
       // startNode is the element that the selection starts in
       this.setDate(selection.toString())
     }

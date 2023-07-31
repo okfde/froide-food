@@ -15,14 +15,15 @@ import FoodReportMessage from './food-report-message'
 // https://fragdenstaat.de/api/v1/request/47665/
 
 export default {
-  name: 'food-report-request',
+  name: 'FoodReportRequest',
   mixins: [],
   components: {
     FoodReportMessage
   },
   props: {
     request: {
-      type: Object
+      type: Object,
+      required: true
     }
   },
   mounted() {},
@@ -34,7 +35,7 @@ export default {
       return this.$root.csrfToken
     },
     messages() {
-      let messages = this.request.messages.filter((m, i) => {
+      let messages = this.request.messages.filter((m) => {
         return m.is_response
       })
       messages.reverse()

@@ -34,7 +34,7 @@
 
 <script>
 export default {
-  name: 'food-filter',
+  name: 'FoodFilter',
   props: {
     filters: {
       type: Array

@@ -15,7 +15,7 @@
 
 <script>
 export default {
-  name: 'switch-button',
+  name: 'SwitchButton',
   model: {
     prop: 'isEnabled',
     event: 'toggle'

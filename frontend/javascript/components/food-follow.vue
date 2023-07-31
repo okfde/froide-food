@@ -36,7 +36,7 @@
 import { postData } from '../lib/utils.js'
 
 export default {
-  name: 'food-follow',
+  name: 'FoodFollow',
   props: {
     follow: {
       type: Object

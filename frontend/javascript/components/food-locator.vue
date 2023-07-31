@@ -112,7 +112,7 @@
 
 <script>
 export default {
-  name: 'food-locator',
+  name: 'FoodLocator',
   props: {
     defaultPostcode: {
       type: String,
