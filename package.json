@@ -43,7 +43,6 @@
     "leaflet": "^1.8.0",
     "leaflet.icon.glyph": "^0.3.0",
     "vue": "^3.2.47",
-    "vue-lazyload": "^3.0.0-rc.2",
     "vue3-slide-up-down": "^1.2.5"
   }
 }
