@@ -39,9 +39,11 @@ export default {
   name: 'FoodFollow',
   props: {
     follow: {
-      type: Object
+      type: Object,
+      required: true
     }
   },
+  emits: ['followed', 'unfollowed'],
   data() {
     return {
       working: false,
