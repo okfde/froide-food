@@ -525,7 +525,7 @@ export default {
       stacked: this.isStacked(),
       isMapTop: false,
       mapHeight: null,
-      isTouch: L.Browser.touch && L.Browser.mobile,
+      isTouch: navigator.maxTouchPoints > 0,
       listShown: false,
       query: query || '',
       onlyRequested: false,
