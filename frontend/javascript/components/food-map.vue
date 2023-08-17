@@ -59,7 +59,7 @@
                 <span class="d-none d-sm-none d-md-inline">Filter</span>
               </button>
             </div>
-            <slide-up-down :active="showFilter" :duration="300">
+            <slide-up-down v-model="showFilter" :duration="300">
               <div class="switch-filter">
                 <switch-button
                   v-model="onlyRequested"
@@ -137,7 +137,7 @@
                     <span class="d-none d-sm-none d-md-inline">Filter</span>
                   </button>
                 </div>
-                <slide-up-down :active="showFilter" :duration="300">
+                <slide-up-down v-model="showFilter" :duration="300">
                   <div class="switch-filter">
                     <switch-button
                       v-model="onlyRequested"
