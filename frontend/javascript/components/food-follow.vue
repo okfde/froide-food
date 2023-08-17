@@ -40,7 +40,7 @@ export default {
   props: {
     follow: {
       type: Object,
-      required: true
+      default: undefined
     }
   },
   emits: ['followed', 'unfollowed'],
