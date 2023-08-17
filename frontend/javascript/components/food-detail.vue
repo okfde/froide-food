@@ -19,27 +19,10 @@
               <food-loader v-if="fetching"></food-loader>
               <template v-else>
                 <ul v-if="data.requests.length > 0" class="list-unstyled">
-                  <li v-for="req in data.requests" :key="req.id">
-                    <h5>
-                      Anfrage vom {{ renderDate(req.timestamp) }}
-                      <small class="ms-3">
-                        <a :href="req.url" target="_blank">
-                          zur Anfrage&nbsp;&rarr;
-                        </a>
-                      </small>
-                    </h5>
-                    <p v-if="req.documents.length > 0">
-                      Dokumente in dieser Anfrage:
-                    </p>
-                    <ul v-if="req.documents.length > 0">
-                      <li v-for="doc in req.documents" :key="doc.url">
-                        <a :href="doc.url" target="_blank">
-                          {{ doc.name }}
-                        </a>
-                      </li>
-                    </ul>
-                    <p v-else class="text-muted">Noch keine Dokumente.</p>
-                  </li>
+                  <food-detail-request
+                    v-for="req in data.requests"
+                    :key="req.id"
+                    :request="req" />
                 </ul>
                 <p v-else>Noch keine Anfragen</p>
               </template>
@@ -53,19 +36,21 @@
 
 <script>
 import FoodLoader from './food-loader'
+import FoodDetailRequest from './food-detail-request'
 import FoodItemMixin from '../lib/mixin'
 import FoodDetailMixin from '../lib/detailmixin'
 import { renderDate } from '../lib/utils'
 
 export default {
   name: 'FoodDetail',
-  components: { FoodLoader },
+  components: { FoodLoader, FoodDetailRequest },
   mixins: [FoodItemMixin, FoodDetailMixin],
   props: {
     data: {
       type: Object,
       default: null
     }
+    // TODO: should also get userInfo as it's used in deteailmixin (or improve detailmixin)
   },
   data() {
     return {
