@@ -39,7 +39,6 @@ import FoodLoader from './food-loader'
 import FoodDetailRequest from './food-detail-request'
 import FoodItemMixin from '../lib/mixin'
 import FoodDetailMixin from '../lib/detailmixin'
-import { renderDate } from '../lib/utils'
 
 export default {
   name: 'FoodDetail',
@@ -55,11 +54,6 @@ export default {
   data() {
     return {
       fetching: false
-    }
-  },
-  filters: {
-    date: function (d) {
-      return renderDate(d)
     }
   },
   watch: {
