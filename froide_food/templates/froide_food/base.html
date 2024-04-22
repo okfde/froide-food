@@ -1,13 +1,13 @@
 {% extends CMS_TEMPLATE %}
 
-{% load cms_tags %}
+{% load djangocms_alias_tags %}
 
 {% block top_block %}{% endblock %}
 
 {% block body %}
-  {% static_placeholder 'froide_food_header' %}
+  {% static_alias 'froide_food_header' %}
 
   {% block main %}{% endblock %}
 
-  {% static_placeholder 'froide_food_footer' %}
+  {% static_alias 'froide_food_footer' %}
 {% endblock %}
