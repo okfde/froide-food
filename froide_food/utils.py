@@ -5,8 +5,11 @@ from difflib import SequenceMatcher
 from urllib.parse import quote, urlencode
 
 from django.contrib.gis.geos import Point
+from django.db.models import Exists, OuterRef, Q
 from django.urls import reverse
 from django.utils import timezone
+
+from filingcabinet import get_document_model
 
 try:
     from django.contrib.gis.geoip2 import GeoIP2
@@ -22,6 +25,8 @@ from froide.publicbody.models import PublicBody
 
 from .geocode import geocode
 from .models import VenueRequest, VenueRequestItem
+
+Document = get_document_model()
 
 TIME_PERIOD = timedelta(days=90)
 MAX_REQUEST_COUNT = 3
@@ -378,7 +383,11 @@ def depublish_old_reports():
     from .models import FoodSafetyReport
 
     old_reports = FoodSafetyReport.objects.get_expired_reports()
-    need_cleanup = old_reports.filter(attachment__can_approve=True)
+    need_cleanup = old_reports.filter(
+        Q(attachment__can_approve=True)
+        | Q(attachment__document__public=True)
+        | Exists(Document.objects.filter(original=OuterRef("attachment"), public=True))
+    )
 
     for report in need_cleanup:
         if report.attachment:
@@ -387,6 +396,10 @@ def depublish_old_reports():
             report.attachment.save()
             if report.attachment.document:
                 report.attachment.document.unpublish_delayed()
+
+            for doc in Document.objects.filter(original=report.attachment):
+                if doc != report.attachment.document:
+                    doc.unpublish_delayed()
 
         if report.message is None:
             continue
