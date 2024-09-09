@@ -44,5 +44,8 @@
     "leaflet.icon.glyph": "^0.3.0",
     "vue": "^3.2.47",
     "vue3-slide-up-down": "^1.2.5"
+  },
+  "peerDependencies": {
+    "froide": "github:okfde/froide"
   }
 }
