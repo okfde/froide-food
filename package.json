@@ -47,5 +47,6 @@
   },
   "peerDependencies": {
     "froide": "github:okfde/froide"
-  }
+  },
+  "prettier": "prettier-config-standard"
 }
