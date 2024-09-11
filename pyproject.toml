@@ -15,12 +15,12 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Topic :: Utilities",
 ]
-dynamic = ["version"]
-dependencies = ["froide"]
+version = "0.0.1"
+dependencies = ["django-amenities", "requests", "geocoder", "geopy", "fdfgen"]
 
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["froide_food"]
+[tool.setuptools.packages.find]
+include = ["froide_food*"]
