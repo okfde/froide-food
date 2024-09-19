@@ -2,9 +2,6 @@ from django.urls import path
 from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 
-from froide.api import api_router
-
-from .api_views import VenueViewSet
 from .views import (
     embed,
     index,
@@ -14,8 +11,6 @@ from .views import (
     show_reports,
     stats,
 )
-
-api_router.register(r"venue", VenueViewSet, basename="venue")
 
 urlpatterns = [
     path("", index, name="food-index"),
