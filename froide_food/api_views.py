@@ -4,7 +4,7 @@ from rest_framework import serializers, status, viewsets
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
-from froide.foirequest.api_views import throttle_action
+from froide.foirequest.auth import throttle_action
 from froide.publicbody.api_views import PublicBodySerializer
 
 from .models import FoodAuthorityStatus
