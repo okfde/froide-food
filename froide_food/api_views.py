@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
 from froide.foirequest.auth import throttle_action
-from froide.publicbody.api_views import PublicBodySerializer
+from froide.publicbody.serializers import PublicBodySerializer
 
 from .models import FoodAuthorityStatus
 from .utils import get_hygiene_publicbodies, get_request_count, make_request_url
