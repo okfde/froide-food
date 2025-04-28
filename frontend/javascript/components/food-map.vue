@@ -64,7 +64,6 @@
                 <SwitchButton
                   v-model="onlyRequested"
                   color="#FFC006"
-                  @toggle="search"
                   >nur angefragte Betriebe zeigen</SwitchButton
                 >
               </div>
@@ -142,7 +141,6 @@
                     <SwitchButton
                       v-model="onlyRequested"
                       color="#FFC006"
-                      @toggle="search"
                       >nur angefragte Betriebe zeigen</SwitchButton
                     >
                   </div>
@@ -1207,6 +1205,13 @@ export default {
     userUpdated(user) {
       this.user = user
     }
+  },
+  watch: {
+    onlyRequested(newVal) {
+      if (newVal) {
+        this.search()
+      }
+    },
   }
 }
 </script>
