@@ -2,13 +2,13 @@
   <div class="switch-button-control">
     <div
       class="switch-button"
-      :class="{ enabled: isEnabled }"
+      :class="{ enabled: modelValue }"
       @click="toggle"
       :style="{ '--color': color }">
       <div class="button"></div>
     </div>
     <div class="switch-button-label">
-      <slot></slot>
+      <slot />
     </div>
   </div>
 </template>
@@ -16,12 +16,9 @@
 <script>
 export default {
   name: 'SwitchButton',
-  model: {
-    prop: 'isEnabled',
-    event: 'toggle'
-  },
+  emits: ['update:modelValue'],
   props: {
-    isEnabled: Boolean,
+    modelValue: Boolean,
     color: {
       type: String,
       required: false,
@@ -29,8 +26,8 @@ export default {
     }
   },
   methods: {
-    toggle: function () {
-      this.$emit('toggle', !this.isEnabled)
+    toggle() {
+      this.$emit('update:modelValue', !this.modelValue)
     }
   }
 }
