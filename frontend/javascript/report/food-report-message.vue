@@ -127,7 +127,7 @@ export default {
       return this.message.attachments.filter((att) => att.approved)
     },
     date() {
-      let date = this.message.timestamp.split('T')[0].split('-')
+      const date = this.message.timestamp.split('T')[0].split('-')
       date.reverse()
       return date.join('.')
     },
@@ -192,7 +192,7 @@ export default {
       })
     },
     setDate(datestr) {
-      let date = makeDate(datestr)
+      const date = makeDate(datestr)
       if (date !== null) {
         this.reportdate = `${date.getFullYear()}-${leftpad(
           date.getMonth() + 1

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <food-request
+    <FoodRequest
       v-if="showRequestForm"
       :config="requestConfig"
       :request-form="requestForm"
@@ -12,7 +12,7 @@
       @requestmade="requestMade"
       @userupdated="userUpdated"
       @tokenupdated="tokenUpdated"
-      @close="requestFormClosed"></food-request>
+      @close="requestFormClosed"></FoodRequest>
     <div
       v-show="!showRequestForm"
       :class="{ 'food-map-embed': config.embed, 'modal-active': modalActive }"
@@ -59,21 +59,21 @@
                 <span class="d-none d-sm-none d-md-inline">Filter</span>
               </button>
             </div>
-            <slide-up-down v-model="showFilter" :duration="300">
+            <SlideUpDown v-model="showFilter" :duration="300">
               <div class="switch-filter">
-                <switch-button
+                <SwitchButton
                   v-model="onlyRequested"
                   color="#FFC006"
                   @toggle="search"
-                  >nur angefragte Betriebe zeigen</switch-button
+                  >nur angefragte Betriebe zeigen</SwitchButton
                 >
               </div>
-              <food-filter
+              <FoodFilter
                 v-if="false"
                 :filters="filters"
                 @change="filterChanged"
-                @apply="applyFilter"></food-filter>
-            </slide-up-down>
+                @apply="applyFilter"></FoodFilter>
+            </SlideUpDown>
           </div>
         </div>
         <div class="row">
@@ -94,7 +94,7 @@
                 <button
                   v-if="searching"
                   class="btn btn-secondary btn-sm disabled">
-                  <food-loader></food-loader>
+                  <FoodLoader></FoodLoader>
                   Suche läuft&hellip;
                 </button>
               </div>
@@ -137,30 +137,30 @@
                     <span class="d-none d-sm-none d-md-inline">Filter</span>
                   </button>
                 </div>
-                <slide-up-down v-model="showFilter" :duration="300">
+                <SlideUpDown v-model="showFilter" :duration="300">
                   <div class="switch-filter">
-                    <switch-button
+                    <SwitchButton
                       v-model="onlyRequested"
                       color="#FFC006"
                       @toggle="search"
-                      >nur angefragte Betriebe zeigen</switch-button
+                      >nur angefragte Betriebe zeigen</SwitchButton
                     >
                   </div>
-                </slide-up-down>
+                </SlideUpDown>
               </div>
 
-              <l-map
+              <LMap
                 ref="map"
                 v-model:zoom="zoom"
                 :center="center"
                 :options="mapOptions"
                 :max-bounds="maxBounds"
                 @ready="mapReady">
-                <l-tile-layer
+                <LTileLayer
                   :url="tileUrl"
                   :attribution="tileProvider.attribution" />
-                <l-control-zoom position="bottomright" />
-                <l-control position="bottomleft">
+                <LControlZoom position="bottomright" />
+                <LControl position="bottomleft">
                   <ul class="color-legend">
                     <li :style="colorLegend.normal">
                       <span>Jetzt anfragen!</span>
@@ -175,8 +175,8 @@
                       <span>Anfrage abgelehnt</span>
                     </li>
                   </ul>
-                </l-control>
-                <l-marker
+                </LControl>
+                <LMarker
                   v-for="marker in venues"
                   :key="marker.id"
                   :lat-lng="marker.position"
@@ -187,31 +187,33 @@
                   :z-index-offset="marker.id === selectedVenueId ? 300 : 0"
                   @click="markerClick(marker, false)"
                   @touchstart.prevent="markerClick(marker, false)">
-                  <l-tooltip
+                  <LTooltip
                     :content="marker.name"
                     :options="tooltipOptions"
                     v-if="!isMobile" />
-                  <l-popup :options="popupOptions" v-if="!isMobile">
-                    <food-popup
+                  <LPopup :options="popupOptions" v-if="!isMobile">
+                    <FoodPopup
                       :data="marker"
                       :config="config"
-                      @startRequest="startRequest"
+                      @start-request="startRequest"
                       @detail="setDetail" />
-                  </l-popup>
-                </l-marker>
-              </l-map>
-              <food-mapoverlay
-                v-if="stacked && selectedVenue"
-                :data="selectedVenue"
-                :config="config"
-                :user="user"
-                @close="clearSelected"
-                @startRequest="startRequest"
-                @detail="setDetail"
-                @followed="followedRequest(selectedVenue, $event)"
-                @unfollowed="
-                  selectedVenue.follow.follows = false
-                "></food-mapoverlay>
+                  </LPopup>
+                </LMarker>
+              </LMap>
+              <transition name="mapoverlay">
+                <FoodMapoverlay
+                  v-if="stacked && selectedVenue"
+                  :data="selectedVenue"
+                  :config="config"
+                  :user="user"
+                  @close="clearSelected"
+                  @start-request="startRequest"
+                  @detail="setDetail"
+                  @followed="followedRequest(selectedVenue, $event)"
+                  @unfollowed="
+                    selectedVenue.follow.follows = false
+                  "></FoodMapoverlay>
+                </transition>
             </div>
           </div>
 
@@ -255,13 +257,13 @@
                 </a>
               </div>
               <template v-if="searching">
-                <food-sidebar-item
+                <FoodSidebarItem
                   v-for="data in fakeVenues"
                   :key="data.id"
                   :data="data">
-                </food-sidebar-item>
+                </FoodSidebarItem>
               </template>
-              <food-sidebar-item
+              <FoodSidebarItem
                 v-for="data in venues"
                 :key="data.id"
                 :data="data"
@@ -270,14 +272,14 @@
                 :selected-venue-id="selectedVenueId"
                 @select="markerClick(data, true)"
                 @detail="setDetail"
-                @startRequest="startRequest"
-                @imageLoaded="imageLoaded"
+                @start-request="startRequest"
+                @image-loaded="imageLoaded"
                 @followed="followedRequest(data, $event)"
-                @unfollowed="data.follow.follows = false"></food-sidebar-item>
+                @unfollowed="data.follow.follows = false"></FoodSidebarItem>
             </div>
           </div>
         </div>
-        <food-locator
+        <FoodLocator
           :default-postcode="postcode"
           :default-location="locationName"
           :example-city="city"
@@ -288,19 +290,19 @@
           :is-mobile="isMobile"
           ref="foodlocator"
           @close="setLocator(false)"
-          @postcodeChosen="postcodeChosen"
-          @coordinatesChosen="coordinatesChosen"
-          @locationChosen="locationChosen"></food-locator>
-        <food-detail
+          @postcode-chosen="postcodeChosen"
+          @coordinates-chosen="coordinatesChosen"
+          @location-chosen="locationChosen"></FoodLocator>
+        <FoodDetail
           :data="showDetail"
           ref="fooddetail"
           @close="setDetail(null)"
-          @detailfetched="detailFetched"></food-detail>
-        <food-new-venue
+          @detailfetched="detailFetched"></FoodDetail>
+        <FoodNewVenue
           ref="newvenue"
           @close="setNewVenue(false)"
           @detailfetched="detailFetched"
-          @venuecreated="venueCreated"></food-new-venue>
+          @venuecreated="venueCreated"></FoodNewVenue>
       </div>
     </div>
   </div>
@@ -348,8 +350,8 @@ import {
   latlngToGrid
 } from '../lib/utils'
 
-var getIdFromPopup = (e) => {
-  let node = e.popup._content.firstChild
+const getIdFromPopup = (e) => {
+  const node = e.popup._content.firstChild
   return node.id.split('-').slice(1).join('-')
 }
 
@@ -437,9 +439,9 @@ export default {
     let postcode = null
     let requestsMade = []
 
-    let latlng = getQueryVariable('latlng')
-    let query = getQueryVariable('query')
-    let paramIdent = getQueryVariable('ident')
+    const latlng = getQueryVariable('latlng')
+    const query = getQueryVariable('query')
+    const paramIdent = getQueryVariable('ident')
 
     let city = this.config.city
     if (city.country_code && city.country_code !== 'DE') {
@@ -447,7 +449,7 @@ export default {
     }
 
     if (latlng) {
-      let parts = latlng.split(',')
+      const parts = latlng.split(',')
       center = [parseFloat(parts[0]), parseFloat(parts[1])]
       if (center[0] && center[1]) {
         zoom = DETAIL_ZOOM_LEVEL
@@ -559,7 +561,7 @@ export default {
   },
   created() {
     if ('serviceWorker' in navigator && this.config.swUrl) {
-      let scope = this.config.swUrl.replace(/^(.*\/)[\w.]+$/, '$1')
+      const scope = this.config.swUrl.replace(/^(.*\/)[\w.]+$/, '$1')
       navigator.serviceWorker
         .register(this.config.swUrl, { scope: scope })
         .then(function (reg) {
@@ -602,7 +604,7 @@ export default {
       return this.stacked || L.Browser.mobile
     },
     iconCategoryMapping() {
-      let filterIconMapping = {}
+      const filterIconMapping = {}
       this.filters.forEach((f) => {
         f.categories.forEach((c) => {
           filterIconMapping[c] = f.icon
@@ -674,7 +676,7 @@ export default {
       return `height: ${this.mapHeight}px`
     },
     fakeVenues() {
-      let a = []
+      const a = []
       for (let i = 0; i < 50; i += 1) {
         a.push({ id: 'fake-' + i })
       }
@@ -701,8 +703,8 @@ export default {
       })
       this.map.on('moveend', () => {
         if (this.searchCenter !== null) {
-          let currentPosition = this.map.getCenter()
-          let distance = this.searchCenter.distanceTo(currentPosition)
+          const currentPosition = this.map.getCenter()
+          const distance = this.searchCenter.distanceTo(currentPosition)
           if (distance < MIN_DISTANCE_MOVED_REFRESH) {
             return
           }
@@ -714,7 +716,7 @@ export default {
         this.clearSelected()
       })
       this.map.on('popupopen', (e) => {
-        let nodeId = getIdFromPopup(e)
+        const nodeId = getIdFromPopup(e)
         this.selectedVenueId = nodeId
       })
       this.map.on('popupclose', () => {
@@ -730,7 +732,7 @@ export default {
       }
     },
     coordinatesChosen(latlng) {
-      let center = L.latLng(latlng)
+      const center = L.latLng(latlng)
       if (!this.maxBounds.contains(center)) {
         this.geolocationDisabled = true
         this.locatorErrorMessage =
@@ -761,14 +763,14 @@ export default {
             return
           }
           this.locationKnown = true
-          let geoRegion = data.objects[0]
+          const geoRegion = data.objects[0]
           let bounds = bbox(geoRegion.geom)
           bounds = L.latLngBounds([
             [bounds[1], bounds[0]],
             [bounds[3], bounds[2]]
           ])
-          let coords = geoRegion.centroid.coordinates
-          let center = L.latLng([coords[1], coords[0]])
+          const coords = geoRegion.centroid.coordinates
+          const center = L.latLng([coords[1], coords[0]])
           this.map.fitBounds(bounds)
           this.search({ coordinates: center, bounds })
           this.preventMapMoved()
@@ -813,7 +815,7 @@ export default {
     },
     userSearch() {
       if (this.query.match(/^\d{5}$/)) {
-        let p = this.query
+        const p = this.query
         this.query = ''
         return this.postcodeChosen(p)
       }
@@ -855,11 +857,11 @@ export default {
           this.map.distance(bounds.getNorthEast(), bounds.getSouthEast())
         )
         radius = Math.max(Math.round(Math.min(radius, 40000) / 100) * 100, 500)
-        let reqCoords = latlngToGrid(coordinates, radius)
+        const reqCoords = latlngToGrid(coordinates, radius)
         locationParam = `lat=${reqCoords.lat}&lng=${reqCoords.lng}&radius=${radius}&zoom=${this.zoom}`
       }
       this.lastQuery = this.query
-      let categories = this.filterCategories
+      const categories = this.filterCategories
       let cats = categories.map((c) => `categories=${encodeURIComponent(c)}`)
       if (cats.length > 0) {
         cats = '&' + cats.join('&')
@@ -897,12 +899,12 @@ export default {
           this.searchEmpty = true
         }
         this.locationKnown = true
-        var requestMapping = {}
-        var hasRequests = false
+        const requestMapping = {}
+        let hasRequests = false
 
         this.venues = []
-        let duplicates = {}
-        let newVenues = data.results
+        const duplicates = {}
+        const newVenues = data.results
           .filter((r) => {
             const vid = this.getVenueId(r)
             // Filter out duplicates
@@ -913,7 +915,7 @@ export default {
             return false
           })
           .map((r) => {
-            let d = this.createVenue(r)
+            const d = this.createVenue(r)
             if (d.requests.length > 0 && d.requests[0].id !== null) {
               hasRequests = true
               requestMapping[d.requests[0].id] = d.id
@@ -934,10 +936,10 @@ export default {
         })
 
         if (options.location && this.venues.length > 0) {
-          let venueLocations = this.venues.map((r) => {
+          const venueLocations = this.venues.map((r) => {
             return L.latLng(r.position[0], r.position[1])
           })
-          let bounds = L.latLngBounds(venueLocations)
+          const bounds = L.latLngBounds(venueLocations)
 
           if (!this.maxBounds.contains(bounds)) {
             this.locatorErrorMessage =
@@ -955,11 +957,11 @@ export default {
       }
     },
     getFollowers(requestMapping) {
-      let requestIds = []
-      for (let key in requestMapping) {
+      const requestIds = []
+      for (const key in requestMapping) {
         requestIds.push(key)
       }
-      let requests = requestIds.join(',')
+      const requests = requestIds.join(',')
       window
         .fetch(`/api/v1/following/?request=${requests}`)
         .then((response) => {
@@ -967,11 +969,11 @@ export default {
         })
         .then((data) => {
           data.objects.forEach((obj) => {
-            let parts = obj.request.split('/')
-            let requestId = parseInt(parts[parts.length - 2])
-            let venueId = requestMapping[requestId]
-            let venueIndex = this.venueMap[venueId]
-            let venue = this.venues[venueIndex]
+            const parts = obj.request.split('/')
+            const requestId = parseInt(parts[parts.length - 2])
+            const venueId = requestMapping[requestId]
+            const venueIndex = this.venueMap[venueId]
+            const venue = this.venues[venueIndex]
             if (venue) {
               venue.follow = obj
             }
@@ -982,7 +984,7 @@ export default {
       return venue.ident.replace(/:/g, '-')
     },
     createVenue(r) {
-      let d = {
+      const d = {
         position: [r.lat, r.lng],
         id: this.getVenueId(r),
         full: false,
@@ -992,10 +994,10 @@ export default {
       return d
     },
     getIcon(r) {
-      let status = getPlaceStatus(r)
-      let selected = this.selectedVenueId === r.id
-      let color = getPinColor(status, selected)
-      let iconUrl = getPinURL(color)
+      const status = getPlaceStatus(r)
+      const selected = this.selectedVenueId === r.id
+      const color = getPinColor(status, selected)
+      const iconUrl = getPinURL(color)
       return L.icon.glyph({
         className: 'food-marker-icon ',
         prefix: 'fa',
@@ -1007,7 +1009,7 @@ export default {
       if (this.selectedVenueId === null) {
         return
       }
-      let marker = this.venues[this.venueMap[this.selectedVenueId]]
+      const marker = this.venues[this.venueMap[this.selectedVenueId]]
       this.selectedVenueId = null
       if (marker) {
         this.map.closePopup()
@@ -1021,11 +1023,11 @@ export default {
       }
       this.selectedVenueId = marker.id
       if (!this.stacked) {
-        let sidebarId = 'sidebar-' + marker.id
-        let sidebarItem = document.getElementById(sidebarId)
+        const sidebarId = 'sidebar-' + marker.id
+        const sidebarItem = document.getElementById(sidebarId)
         if (sidebarItem) {
           if (sidebarItem.scrollIntoView) {
-            let scrollDifference = Math.abs(
+            const scrollDifference = Math.abs(
               sidebarItem.getBoundingClientRect().top - window.pageYOffset
             )
             sidebarItem.scrollIntoView({
@@ -1046,16 +1048,16 @@ export default {
       data.imageLoaded = true
     },
     goToMap() {
-      let fmc = this.$refs.foodMapContainer
+      const fmc = this.$refs.foodMapContainer
       if (fmc.getBoundingClientRect().top > 0) {
         return
       }
-      let y = fmc.offsetTop
+      const y = fmc.offsetTop
       smoothScroll({ x: 0, y: y, el: this.scrollContainer }, 300)
     },
     goToList() {
-      let y = this.$refs.foodMapContainer.offsetTop
-      let y2 = this.$refs.foodMap.getBoundingClientRect().height
+      const y = this.$refs.foodMapContainer.offsetTop
+      const y2 = this.$refs.foodMap.getBoundingClientRect().height
       smoothScroll({ x: 0, y: y + y2 + 5, el: this.scrollContainer }, 300)
     },
     isStacked() {
@@ -1073,7 +1075,7 @@ export default {
           this.$refs.foodMap.style.top = 0
         })
       }
-      let listTop = this.$refs.foodList.getBoundingClientRect().top
+      const listTop = this.$refs.foodList.getBoundingClientRect().top
       if (listTop < this.dividerSwitchHeight) {
         if (!this.listShown) {
           this.showFilter = false
@@ -1082,9 +1084,9 @@ export default {
       } else {
         this.listShown = false
       }
-      let mapRect = this.$refs.foodMap.getBoundingClientRect()
-      let mapTop = mapRect.top
-      let isMapTop = mapTop <= 0
+      const mapRect = this.$refs.foodMap.getBoundingClientRect()
+      const mapTop = mapRect.top
+      const isMapTop = mapTop <= 0
       if (isMapTop !== this.isMapTop) {
         window.setTimeout(() => {
           this.map.invalidateSize()
@@ -1102,9 +1104,9 @@ export default {
       }
     },
     recordMapPosition() {
-      let latlng = this.map.getCenter()
+      const latlng = this.map.getCenter()
       this.center = [latlng.lat, latlng.lng]
-      let zoom = this.map.getZoom()
+      const zoom = this.map.getZoom()
       if (!canUseLocalStorage(window)) {
         return
       }
@@ -1186,7 +1188,7 @@ export default {
       })
     },
     venueCreated(data) {
-      let newVenue = this.createVenue(data)
+      const newVenue = this.createVenue(data)
       if (this.venueMap[newVenue.id] === undefined) {
         this.venues.push(newVenue)
         this.venueMap[newVenue.id] = this.venues.length - 1
@@ -1515,5 +1517,19 @@ $icon-failure: #dc3545;
 .leaflet-container .leaflet-control-attribution a {
   background: var(--bs-body-bg);
   color: var(--bs-secondary);
+}
+
+.mapoverlay-enter,
+.mapoverlay-leave-to {
+  transform: translateY(300px);
+}
+
+.mapoverlay-enter-active,
+.fade-leave-active {
+  transition: transform 0.3s ease-in-out;
+}
+
+.mapoverlay-leave-active {
+  transition: all 0.3s ease-in-out;
 }
 </style>

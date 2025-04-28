@@ -24,10 +24,10 @@
         </button>
       </div>
     </div>
-    <food-report-request
+    <FoodReportRequest
       v-if="request"
       :request="request"
-      @addreport="addReport"></food-report-request>
+      @addreport="addReport"></FoodReportRequest>
   </div>
 </template>
 

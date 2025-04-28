@@ -1,11 +1,11 @@
 <template>
   <div class="container mt-2">
-    <food-report-message
+    <FoodReportMessage
       v-for="message in messages"
       :key="message.id"
       :message="message"
       :request="request"
-      @addreport="addReport"></food-report-message>
+      @addreport="addReport"></FoodReportMessage>
   </div>
 </template>
 
@@ -35,7 +35,7 @@ export default {
       return this.$root.csrfToken
     },
     messages() {
-      let messages = this.request.messages.filter((m) => {
+      const messages = this.request.messages.filter((m) => {
         return m.is_response
       })
       messages.reverse()

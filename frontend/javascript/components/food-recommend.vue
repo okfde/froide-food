@@ -118,7 +118,7 @@ export default {
       return `whatsapp://send?text=${encodeURIComponent(this.socialText)}`
     },
     mailLink() {
-      let subject = encodeURIComponent(`Kontrollbericht ${this.placeName}`)
+      const subject = encodeURIComponent(`Kontrollbericht ${this.placeName}`)
       return `mailto:?Subject=${subject}&Body=${encodeURIComponent(
         this.socialText
       )}`

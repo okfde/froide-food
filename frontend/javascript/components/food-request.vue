@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-12">
         <div v-if="fetching" class="loading">
-          <food-loader></food-loader>
+          <FoodLoader></FoodLoader>
         </div>
         <template v-else>
           <div class="text-end">
@@ -20,7 +20,7 @@
               </button>
             </p>
           </template>
-          <food-recommend
+          <FoodRecommend
             v-else-if="showWarning"
             :user="userInfo"
             :publicbody="publicBody"
@@ -58,7 +58,7 @@
               :name="k"
               value="1" />
 
-            <request-form
+            <RequestForm
               v-if="!fetching"
               :publicbodies="publicbodies"
               :request-form="requestForm"
@@ -73,15 +73,15 @@
               :hide-editing="true"
               :law-type="lawType"
               :use-pseudonym="false"
-              :config="config"></request-form>
-            <user-registration
+              :config="config"></RequestForm>
+            <UserRegistration
               :form="userForm"
               :config="config"
               :user="userInfo"
               :default-law="defaultLaw"
               :address-help-text="addressHelpText"
-              :address-required="true"></user-registration>
-            <user-terms v-if="!userInfo" :form="userForm"></user-terms>
+              :address-required="true"></UserRegistration>
+            <UserTerms v-if="!userInfo" :form="userForm"></UserTerms>
             <p v-if="!userInfo" class="small text-end">
               Sie erhalten im Rahmen der Aktion „Topf Secret“ einmalig eine
               separate E-Mail von foodwatch. (<a
@@ -187,7 +187,7 @@ export default {
       return this.data.userRequestCount
     },
     params() {
-      let params = {}
+      const params = {}
       if (!this.data.makeRequestURL) {
         return {}
       }
@@ -207,8 +207,8 @@ export default {
       return this.params.body || ''
     },
     hideParams() {
-      var a = []
-      for (let k in this.params) {
+      const a = []
+      for (const k in this.params) {
         if (k.match(/hide_\w+/)) {
           a.push(k)
         }
