@@ -1,68 +1,66 @@
 <template>
-  <transition name="mapoverlay">
-    <div
-      class="food-mapoverlay container-fluid"
-      :class="{ closing: closing }"
-      @touchstart="touchstart"
-      @touchmove="touchmove"
-      @touchend="touchend"
-      :style="{ transform: currentTransform }">
-      <div class="row">
-        <div class="col-12 info-column">
-          <div class="mapoverlay-header">
-            <h4 class="venue-name">
-              {{ data.name }}
-            </h4>
-            <button
-              type="button"
-              class="btn-close"
-              aria-label="Close"
-              @click="$emit('close')" />
-          </div>
-          <div class="row">
-            <div class="col-12">
-              <p class="venue-address">{{ data.address }}</p>
-              <div class="clearfix mt-3">
-                <div v-if="hasRequest" class="request-status">
-                  <p :class="requestColor">
-                    {{ requestStatus }}
-                  </p>
-                  <p>
-                    <a v-if="requestUrl" :href="requestUrl" target="_blank">
-                      zur Anfrage&nbsp;&rarr;
-                    </a>
-                    <span v-else>Anfrage gestellt!</span>
-                  </p>
-                  <p v-if="requestComplete">
-                    <a
-                      :href="requestUrl"
-                      target="_blank"
-                      @click.prevent="setDetail">
-                      zu den Berichten&nbsp;&rarr;
-                    </a>
-                  </p>
-                </div>
-                <p v-if="canRequest">
+  <div
+    class="food-mapoverlay container-fluid"
+    :class="{ closing: closing }"
+    @touchstart="touchstart"
+    @touchmove="touchmove"
+    @touchend="touchend"
+    :style="{ transform: currentTransform }">
+    <div class="row">
+      <div class="col-12 info-column">
+        <div class="mapoverlay-header">
+          <h4 class="venue-name">
+            {{ data.name }}
+          </h4>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            @click="$emit('close')" />
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <p class="venue-address">{{ data.address }}</p>
+            <div class="clearfix mt-3">
+              <div v-if="hasRequest" class="request-status">
+                <p :class="requestColor">
+                  {{ requestStatus }}
+                </p>
+                <p>
+                  <a v-if="requestUrl" :href="requestUrl" target="_blank">
+                    zur Anfrage&nbsp;&rarr;
+                  </a>
+                  <span v-else>Anfrage gestellt!</span>
+                </p>
+                <p v-if="requestComplete">
                   <a
-                    @click.prevent.stop="startRequest"
-                    class="btn btn-primary btn-sm"
-                    :href="makeRequestUrl"
-                    target="_blank">
-                    Hygienekontrolle anfragen&nbsp;&rarr;
+                    :href="requestUrl"
+                    target="_blank"
+                    @click.prevent="setDetail">
+                    zu den Berichten&nbsp;&rarr;
                   </a>
                 </p>
-                <food-follow
-                  v-if="user && !requestComplete"
-                  :follow="data.follow"
-                  @followed="$emit('followed', $event)"
-                  @unfollowed="$emit('unfollowed')"></food-follow>
               </div>
+              <p v-if="canRequest">
+                <a
+                  @click.prevent.stop="startRequest"
+                  class="btn btn-primary btn-sm"
+                  :href="makeRequestUrl"
+                  target="_blank">
+                  Hygienekontrolle anfragen&nbsp;&rarr;
+                </a>
+              </p>
+              <FoodFollow
+                v-if="user && !requestComplete"
+                :follow="data.follow"
+                @followed="$emit('followed', $event)"
+                @unfollowed="$emit('unfollowed')"></FoodFollow>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </transition>
+  </div>
 </template>
 
 <script>
@@ -216,19 +214,6 @@ export default {
   transition: transform 0.4s linear;
 }
 
-.mapoverlay-enter,
-.mapoverlay-leave-to {
-  transform: translateY(300px);
-}
-
-.mapoverlay-enter-active,
-.fade-leave-active {
-  transition: transform 0.3s ease-in-out;
-}
-
-.mapoverlay-leave-active {
-  transition: all 0.3s ease-in-out;
-}
 
 .provider-credit {
   display: block;

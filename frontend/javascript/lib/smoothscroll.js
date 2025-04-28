@@ -44,13 +44,13 @@ const smoothScroll = (
     initialTop = el.scrollTop
     initialLeft = el.scrollLeft
   }
-  let maxDistance = Math.max(Math.abs(initialTop - y), Math.abs(initialLeft, x))
+  const maxDistance = Math.max(Math.abs(initialTop - y), Math.abs(initialLeft, x))
   if (maxDistance > MAX_DISTANCE_THRESHOLD) {
     scrollTo(el, x, y)
   }
   return createAnimation((progress) => {
-    let offsetX = (1 - progress) * initialLeft + x * progress
-    let offsetY = (1 - progress) * initialTop + y * progress
+    const offsetX = (1 - progress) * initialLeft + x * progress
+    const offsetY = (1 - progress) * initialTop + y * progress
     scrollTo(el, offsetX, offsetY)
   }, duration)
 }

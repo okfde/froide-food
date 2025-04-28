@@ -15,7 +15,7 @@
           <div class="row">
             <div class="col-12">
               <div v-if="fetching" class="loading">
-                <food-loader></food-loader>
+                <FoodLoader></FoodLoader>
               </div>
               <template v-else-if="error">
                 <div class="alert alert-danger">

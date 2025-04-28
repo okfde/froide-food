@@ -16,10 +16,10 @@
         <div class="modal-body">
           <div class="row">
             <div class="col-12">
-              <food-loader v-if="fetching"></food-loader>
+              <FoodLoader v-if="fetching"></FoodLoader>
               <template v-else>
                 <ul v-if="data.requests.length > 0" class="list-unstyled">
-                  <food-detail-request
+                  <FoodDetailRequest
                     v-for="req in data.requests"
                     :key="req.id"
                     :request="req" />

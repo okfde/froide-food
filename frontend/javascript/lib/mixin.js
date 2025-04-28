@@ -2,7 +2,7 @@ import { renderDate, getPlaceStatus, getRequestStatus } from '../lib/utils'
 
 const DAYS_BETWEEN_REQUEST = 90
 
-var FoodItemMixin = {
+const FoodItemMixin = {
   computed: {
     itemId() {
       return this.data.id
@@ -41,7 +41,7 @@ var FoodItemMixin = {
     },
     osmLink() {
       if (this.isOsm) {
-        let osmid = this.data.ident.split('_')[1]
+        const osmid = this.data.ident.split('_')[1]
         if (osmid.length < 15) {
           // IDs higher than 10^15 are converted ways/relations from osmconvert
           return `https://www.openstreetmap.org/node/${osmid}`
@@ -56,9 +56,9 @@ var FoodItemMixin = {
       return null
     },
     daysSinceLastRequest() {
-      let requestDate = new Date(this.lastRequest.timestamp)
-      let now = new Date()
-      let difference = (now - requestDate) / (1000 * 60 * 60 * 24)
+      const requestDate = new Date(this.lastRequest.timestamp)
+      const now = new Date()
+      const difference = (now - requestDate) / (1000 * 60 * 60 * 24)
       return difference
     },
     lastRequestDate() {
@@ -68,7 +68,7 @@ var FoodItemMixin = {
       return null
     },
     daysUntilNextRequest() {
-      let days = DAYS_BETWEEN_REQUEST - this.daysSinceLastRequest
+      const days = DAYS_BETWEEN_REQUEST - this.daysSinceLastRequest
       return Math.max(0, Math.ceil(days))
     },
     canRequest() {
@@ -78,7 +78,7 @@ var FoodItemMixin = {
       if (this.lastRequest === null) {
         return true
       }
-      let lastStatus = getRequestStatus(
+      const lastStatus = getRequestStatus(
         this.lastRequest.status,
         this.lastRequest.resolution
       )
@@ -89,14 +89,14 @@ var FoodItemMixin = {
     },
     requestComplete() {
       return this.data.requests.some((r) => {
-        let status = getRequestStatus(r.status, r.resolution)
+        const status = getRequestStatus(r.status, r.resolution)
         return (
           status !== 'normal' && status !== 'pending' && status !== 'withdrawn'
         )
       })
     },
     requestStatusColor() {
-      let status = getPlaceStatus(this.data)
+      const status = getPlaceStatus(this.data)
       switch (status) {
         case 'normal':
           return [null, null]

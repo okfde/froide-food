@@ -62,11 +62,11 @@
                   Hygienekontrolle anfragen&nbsp;&rarr;
                 </a>
               </p>
-              <food-follow
+              <FoodFollow
                 v-if="user && !requestComplete"
                 :follow="data.follow"
                 @followed="$emit('followed', $event)"
-                @unfollowed="$emit('unfollowed')"></food-follow>
+                @unfollowed="$emit('unfollowed')"></FoodFollow>
             </template>
             <div v-else class="dummy-actions dummy"></div>
           </div>

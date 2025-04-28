@@ -1,4 +1,4 @@
-var FoodDetailMixin = {
+const FoodDetailMixin = {
   methods: {
     getDetail(data) {
       this.fetching = true
@@ -49,7 +49,7 @@ var FoodDetailMixin = {
           return response.text()
         })
         .then((text) => {
-          let match = text.match(/name="csrfmiddlewaretoken" value="([^"]+)"/)
+          const match = text.match(/name="csrfmiddlewaretoken" value="([^"]+)"/)
           return match[1]
         })
     }

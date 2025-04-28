@@ -232,7 +232,7 @@ export default {
     geolocationSuccess(pos) {
       this.determiningGeolocation = false
       this.geolocationDetermined = true
-      var crd = pos.coords
+      const crd = pos.coords
       this.$emit('coordinatesChosen', [crd.latitude, crd.longitude])
       if (!this.autoGeolocation) {
         this.$emit('close')

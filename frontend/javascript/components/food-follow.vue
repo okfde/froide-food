@@ -61,7 +61,7 @@ export default {
       return this.follow === undefined
     },
     requestId() {
-      let parts = this.follow.request.split('/')
+      const parts = this.follow.request.split('/')
       return parseInt(parts[parts.length - 2])
     }
   },
