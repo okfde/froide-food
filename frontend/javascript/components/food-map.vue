@@ -186,7 +186,7 @@
                   @click="markerClick(marker, false)"
                   @touchstart.prevent="markerClick(marker, false)">
                   <LTooltip
-                    :content="marker.name"
+                    :content="marker.escapedName"
                     :options="tooltipOptions"
                     v-if="!isMobile" />
                   <LPopup :options="popupOptions" v-if="!isMobile">
@@ -347,6 +347,15 @@ import {
   getQueryVariable,
   latlngToGrid
 } from '../lib/utils'
+
+function escapeHTML(str) {
+    return str.replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/'/g, '&apos;')
+              .replace(/"/g, '&quot;');
+}
+
 
 const getIdFromPopup = (e) => {
   const node = e.popup._content.firstChild
@@ -986,6 +995,7 @@ export default {
         position: [r.lat, r.lng],
         id: this.getVenueId(r),
         full: false,
+        escapedName: escapeHTML(r.name),
         ...r
       }
       d.icon = this.getIcon(d)
