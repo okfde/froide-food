@@ -12,16 +12,20 @@
       @requestmade="requestMade"
       @userupdated="userUpdated"
       @tokenupdated="tokenUpdated"
-      @close="requestFormClosed"></FoodRequest>
+      @close="requestFormClosed"
+    >
+    </FoodRequest>
     <div
       v-show="!showRequestForm"
       :class="{ 'food-map-embed': config.embed, 'modal-active': modalActive }"
-      v-scroll="handleSidebarScroll">
+      v-scroll="handleSidebarScroll"
+    >
       <div
         class="food-map-container container-fluid"
         ref="foodMapContainer"
         id="food-map-container"
-        :class="{ 'is-embed': config.embed }">
+        :class="{ 'is-embed': config.embed }"
+      >
         <div class="searchbar d-block d-md-none" id="searchbar">
           <div class="searchbar-inner">
             <div class="input-group">
@@ -32,38 +36,41 @@
                   :class="{ 'search-query-active': !!lastQuery }"
                   class="form-control"
                   placeholder="Restaurant, Supermarkt, Kiosk etc."
-                  @keydown.enter.prevent="userSearch" />
+                  @keydown.enter.prevent="userSearch"
+                />
                 <span
                   class="clearer fa fa-close"
                   v-if="query.length > 0"
-                  @click="clearSearch"></span>
+                  @click="clearSearch"
+                ></span>
               </div>
               <button
                 class="btn btn-outline-secondary"
                 type="button"
-                @click="userSearch">
+                @click="userSearch"
+              >
                 <i class="fa fa-search" aria-hidden="true"></i>
                 <span class="d-none d-sm-none d-md-inline">Suchen</span>
               </button>
               <button
                 class="btn btn-outline-secondary"
-                @click="setLocator(true)">
+                @click="setLocator(true)"
+              >
                 <i class="fa fa-location-arrow" aria-hidden="true"></i>
                 <span class="d-none d-sm-none d-md-inline">Ort</span>
               </button>
               <button
                 class="btn btn-outline-secondary"
                 :class="{ active: showFilter }"
-                @click="openFilter">
+                @click="openFilter"
+              >
                 <i class="fa fa-gears" aria-hidden="true"></i>
                 <span class="d-none d-sm-none d-md-inline">Filter</span>
               </button>
             </div>
             <SlideUpDown v-model="showFilter" :duration="300">
               <div class="switch-filter">
-                <SwitchButton
-                  v-model="onlyRequested"
-                  color="#FFC006"
+                <SwitchButton v-model="onlyRequested" color="#FFC006"
                   >nur angefragte Betriebe zeigen</SwitchButton
                 >
               </div>
@@ -71,7 +78,8 @@
                 v-if="false"
                 :filters="filters"
                 @change="filterChanged"
-                @apply="applyFilter"></FoodFilter>
+                @apply="applyFilter"
+              ></FoodFilter>
             </SlideUpDown>
           </div>
         </div>
@@ -82,17 +90,20 @@
               ref="foodMap"
               id="food-map"
               :class="mapContainerClass"
-              :style="mapContainerStyle">
+              :style="mapContainerStyle"
+            >
               <div v-if="showRefresh || searching" class="redo-search">
                 <button
                   v-if="showRefresh"
                   class="btn btn-dark"
-                  @click="searchArea">
+                  @click="searchArea"
+                >
                   Im aktuellen Bereich suchen
                 </button>
                 <button
                   v-if="searching"
-                  class="btn btn-secondary btn-sm disabled">
+                  class="btn btn-secondary btn-sm disabled"
+                >
                   <FoodLoader></FoodLoader>
                   Suche läuft&hellip;
                 </button>
@@ -100,7 +111,8 @@
 
               <div
                 class="map-search d-none d-md-block"
-                :class="{ 'map-search-full': !(showRefresh || searching) }">
+                :class="{ 'map-search-full': !(showRefresh || searching) }"
+              >
                 <div class="input-group">
                   <div class="clearable-input">
                     <input
@@ -109,38 +121,41 @@
                       :class="{ 'search-query-active': !!lastQuery }"
                       class="form-control"
                       placeholder="Suche nach Restaurant, Kiosk etc."
-                      @keydown.enter.prevent="userSearch" />
+                      @keydown.enter.prevent="userSearch"
+                    />
                     <span
                       class="clearer fa fa-close"
                       v-if="query.length > 0"
-                      @click="clearSearch"></span>
+                      @click="clearSearch"
+                    ></span>
                   </div>
                   <button
                     class="btn btn-outline-secondary"
                     type="button"
-                    @click="userSearch">
+                    @click="userSearch"
+                  >
                     <i class="fa fa-search" aria-hidden="true"></i>
                     <span class="d-none d-sm-none d-lg-inline">Suchen</span>
                   </button>
                   <button
                     class="btn btn-outline-secondary"
-                    @click="setLocator(true)">
+                    @click="setLocator(true)"
+                  >
                     <i class="fa fa-location-arrow" aria-hidden="true"></i>
                     <span class="d-none d-lg-inline">Ort</span>
                   </button>
                   <button
                     class="btn btn-outline-secondary"
                     :class="{ active: showFilter }"
-                    @click="openFilter">
+                    @click="openFilter"
+                  >
                     <i class="fa fa-gears" aria-hidden="true"></i>
                     <span class="d-none d-sm-none d-md-inline">Filter</span>
                   </button>
                 </div>
                 <SlideUpDown v-model="showFilter" :duration="300">
                   <div class="switch-filter">
-                    <SwitchButton
-                      v-model="onlyRequested"
-                      color="#FFC006"
+                    <SwitchButton v-model="onlyRequested" color="#FFC006"
                       >nur angefragte Betriebe zeigen</SwitchButton
                     >
                   </div>
@@ -153,10 +168,12 @@
                 :center="center"
                 :options="mapOptions"
                 :max-bounds="maxBounds"
-                @ready="mapReady">
+                @ready="mapReady"
+              >
                 <LTileLayer
                   :url="tileUrl"
-                  :attribution="tileProvider.attribution" />
+                  :attribution="tileProvider.attribution"
+                />
                 <LControlZoom position="bottomright" />
                 <LControl position="bottomleft">
                   <ul class="color-legend">
@@ -184,17 +201,20 @@
                   :options="markerOptions"
                   :z-index-offset="marker.id === selectedVenueId ? 300 : 0"
                   @click="markerClick(marker, false)"
-                  @touchstart.prevent="markerClick(marker, false)">
+                  @touchstart.prevent="markerClick(marker, false)"
+                >
                   <LTooltip
                     :content="marker.escapedName"
                     :options="tooltipOptions"
-                    v-if="!isMobile" />
+                    v-if="!isMobile"
+                  />
                   <LPopup :options="popupOptions" v-if="!isMobile">
                     <FoodPopup
                       :data="marker"
                       :config="config"
                       @start-request="startRequest"
-                      @detail="setDetail" />
+                      @detail="setDetail"
+                    />
                   </LPopup>
                 </LMarker>
               </LMap>
@@ -208,10 +228,9 @@
                   @start-request="startRequest"
                   @detail="setDetail"
                   @followed="followedRequest(selectedVenue, $event)"
-                  @unfollowed="
-                    selectedVenue.follow.follows = false
-                  "></FoodMapoverlay>
-                </transition>
+                  @unfollowed="selectedVenue.follow.follows = false"
+                ></FoodMapoverlay>
+              </transition>
             </div>
           </div>
 
@@ -234,7 +253,8 @@
               :class="{ 'modal-active': modalActive }"
               ref="foodList"
               id="food-list"
-              v-scroll.window="handleSidebarScroll">
+              v-scroll.window="handleSidebarScroll"
+            >
               <div class="new-venue-area" v-if="hasSearched || error">
                 <template v-if="searchEmpty">
                   <p v-if="lastQuery">
@@ -244,13 +264,15 @@
                 </template>
                 <button
                   class="btn btn-sm btn-secondary mb-1"
-                  @click="setNewVenue(true)">
+                  @click="setNewVenue(true)"
+                >
                   Betrieb nicht gefunden?
                 </button>
                 <a
                   class="btn btn-sm btn-secondary ms-1 mb-1"
                   target="_blank"
-                  href="/kampagnen/lebensmittelkontrolle/faq/#falsch">
+                  href="/kampagnen/lebensmittelkontrolle/faq/#falsch"
+                >
                   Daten falsch?
                 </a>
               </div>
@@ -258,7 +280,8 @@
                 <FoodSidebarItem
                   v-for="data in fakeVenues"
                   :key="data.id"
-                  :data="data">
+                  :data="data"
+                >
                 </FoodSidebarItem>
               </template>
               <FoodSidebarItem
@@ -273,7 +296,8 @@
                 @start-request="startRequest"
                 @image-loaded="imageLoaded"
                 @followed="followedRequest(data, $event)"
-                @unfollowed="data.follow.follows = false"></FoodSidebarItem>
+                @unfollowed="data.follow.follows = false"
+              ></FoodSidebarItem>
             </div>
           </div>
         </div>
@@ -290,17 +314,23 @@
           @close="setLocator(false)"
           @postcode-chosen="postcodeChosen"
           @coordinates-chosen="coordinatesChosen"
-          @location-chosen="locationChosen"></FoodLocator>
+          @location-chosen="locationChosen"
+        >
+        </FoodLocator>
         <FoodDetail
           :data="showDetail"
           ref="fooddetail"
           @close="setDetail(null)"
-          @detailfetched="detailFetched"></FoodDetail>
+          @detailfetched="detailFetched"
+        >
+        </FoodDetail>
         <FoodNewVenue
           ref="newvenue"
           @close="setNewVenue(false)"
           @detailfetched="detailFetched"
-          @venuecreated="venueCreated"></FoodNewVenue>
+          @venuecreated="venueCreated"
+        >
+        </FoodNewVenue>
       </div>
     </div>
   </div>
@@ -349,13 +379,13 @@ import {
 } from '../lib/utils'
 
 function escapeHTML(str) {
-    return str.replace(/&/g, '&amp;')
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/'/g, '&apos;')
-              .replace(/"/g, '&quot;');
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/'/g, '&apos;')
+    .replace(/"/g, '&quot;')
 }
-
 
 const getIdFromPopup = (e) => {
   const node = e.popup._content.firstChild
@@ -384,7 +414,8 @@ const GERMANY_BOUNDS = [
 const DETAIL_ZOOM_LEVEL = 12
 const DEFAULT_ZOOM = 6
 const DEFAULT_POS = [51.00289959043832, 10.245523452758789]
-const MIN_DISTANCE_MOVED_REFRESH = 800 // in meters
+const MIN_DISTANCE_MOVED_REFRESH = 300 // in meters
+const MAX_VENUES = 500
 const MIN_MAP_HEIGHT = 300
 
 function getColorMode() {
@@ -909,17 +940,20 @@ export default {
         const requestMapping = {}
         let hasRequests = false
 
-        this.venues = []
-        const duplicates = {}
+        if (this.onlyRequested || this.query) {
+          this.venues = []
+        } else if (this.venues.length > MAX_VENUES) {
+          this.venues = this.venues.slice(0, MAX_VENUES)
+        }
+        const duplicates = new Set()
+        this.venues.forEach((v) => {
+          duplicates.add(this.getVenueId(v))
+        })
         const newVenues = data.results
           .filter((r) => {
             const vid = this.getVenueId(r)
             // Filter out duplicates
-            if (duplicates[vid] === undefined) {
-              duplicates[vid] = true
-              return true
-            }
-            return false
+            return !duplicates.has(vid)
           })
           .map((r) => {
             const d = this.createVenue(r)
@@ -936,7 +970,7 @@ export default {
             return d
           })
 
-        this.venues = [...this.venues, ...newVenues]
+        this.venues = [...newVenues, ...this.venues]
         this.venueMap = {}
         this.venues.forEach((d, i) => {
           this.venueMap[d.id] = i
@@ -1083,31 +1117,38 @@ export default {
           this.$refs.foodMap.style.top = 0
         })
       }
-      const listTop = this.$refs.foodList.getBoundingClientRect().top
-      if (listTop < this.dividerSwitchHeight) {
-        if (!this.listShown) {
-          this.showFilter = false
-        }
-        this.listShown = true
-      } else {
-        this.listShown = false
-      }
-      const mapRect = this.$refs.foodMap.getBoundingClientRect()
-      const mapTop = mapRect.top
-      const isMapTop = mapTop <= 0
-      if (isMapTop !== this.isMapTop) {
-        window.setTimeout(() => {
-          this.map.invalidateSize()
-          this.preventMapMoved()
-        }, 1000)
-        this.preventMapMoved()
-      }
-      this.isMapTop = isMapTop
-      if (!this.stacked) {
-        if (!isMapTop) {
-          this.mapHeight = Math.max(window.innerHeight - mapTop, MIN_MAP_HEIGHT)
+      if (this.$refs.foodList) {
+        const listTop = this.$refs.foodList.getBoundingClientRect().top
+        if (listTop < this.dividerSwitchHeight) {
+          if (!this.listShown) {
+            this.showFilter = false
+          }
+          this.listShown = true
         } else {
-          this.mapHeight = null
+          this.listShown = false
+        }
+      }
+      if (this.$refs.foodMap) {
+        const mapRect = this.$refs.foodMap.getBoundingClientRect()
+        const mapTop = mapRect.top
+        const isMapTop = mapTop <= 0
+        if (isMapTop !== this.isMapTop) {
+          window.setTimeout(() => {
+            this.map.invalidateSize()
+            this.preventMapMoved()
+          }, 1000)
+          this.preventMapMoved()
+        }
+        this.isMapTop = isMapTop
+        if (!this.stacked) {
+          if (!isMapTop) {
+            this.mapHeight = Math.max(
+              window.innerHeight - mapTop,
+              MIN_MAP_HEIGHT
+            )
+          } else {
+            this.mapHeight = null
+          }
         }
       }
     },
@@ -1221,7 +1262,7 @@ export default {
       if (newVal) {
         this.search()
       }
-    },
+    }
   }
 }
 </script>
