@@ -1,22 +1,13 @@
 <template>
-  <div
-    class="food-mapoverlay container-fluid"
-    :class="{ closing: closing }"
-    @touchstart="touchstart"
-    @touchmove="touchmove"
-    @touchend="touchend"
-    :style="{ transform: currentTransform }">
+  <div class="food-mapoverlay container-fluid" :class="{ closing: closing }" @touchstart="touchstart"
+    @touchmove="touchmove" @touchend="touchend" :style="{ transform: currentTransform }">
     <div class="row">
       <div class="col-12 info-column">
         <div class="mapoverlay-header">
           <h4 class="venue-name">
             {{ data.name }}
           </h4>
-          <button
-            type="button"
-            class="btn-close"
-            aria-label="Close"
-            @click="$emit('close')" />
+          <button type="button" class="btn-close" aria-label="Close" @click="$emit('close')" />
         </div>
         <div class="row">
           <div class="col-12">
@@ -33,27 +24,18 @@
                   <span v-else>Anfrage gestellt!</span>
                 </p>
                 <p v-if="requestComplete">
-                  <a
-                    :href="requestUrl"
-                    target="_blank"
-                    @click.prevent="setDetail">
+                  <a :href="requestUrl" target="_blank" @click.prevent="setDetail">
                     zu den Berichten&nbsp;&rarr;
                   </a>
                 </p>
               </div>
               <p v-if="canRequest">
-                <a
-                  @click.prevent.stop="startRequest"
-                  class="btn btn-primary btn-sm"
-                  :href="makeRequestUrl"
+                <a @click.prevent.stop="startRequest" class="btn btn-primary btn-sm" :href="makeRequestUrl"
                   target="_blank">
                   Hygienekontrolle anfragen&nbsp;&rarr;
                 </a>
               </p>
-              <FoodFollow
-                v-if="user && !requestComplete"
-                :follow="data.follow"
-                @followed="$emit('followed', $event)"
+              <FoodFollow v-if="user && !requestComplete" :follow="data.follow" @followed="$emit('followed', $event)"
                 @unfollowed="$emit('unfollowed')"></FoodFollow>
             </div>
           </div>
@@ -148,7 +130,7 @@ export default {
   left: 3%;
   right: 3%;
   width: 94%;
-  z-index: 1048;
+  z-index: 930;
   background-color: var(--bs-body-bg);
   border-radius: 5px;
 }
@@ -210,6 +192,7 @@ export default {
 .food-mapoverlay {
   transition: transform 0.1s linear;
 }
+
 .food-mapoverlay.closing {
   transition: transform 0.4s linear;
 }

@@ -1235,6 +1235,7 @@ $icon-failure: #dc3545;
 .icon-normal {
   fill: $icon-normal;
 }
+
 .icon-normal.selected {
   fill: darken($icon-normal, 30%);
 }
@@ -1242,6 +1243,7 @@ $icon-failure: #dc3545;
 .icon-pending {
   fill: $icon-pending;
 }
+
 .icon-pending.selected {
   fill: darken($icon-pending, 30%);
 }
@@ -1249,6 +1251,7 @@ $icon-failure: #dc3545;
 .icon-success {
   fill: $icon-normal;
 }
+
 .icon-success.selected {
   fill: darken($icon-success, 30%);
 }
@@ -1256,6 +1259,7 @@ $icon-failure: #dc3545;
 .icon-failure {
   fill: $icon-failure;
 }
+
 .icon-failure.selected {
   fill: darken($icon-failure, 30%);
 }
@@ -1290,7 +1294,7 @@ $icon-failure: #dc3545;
   position: -webkit-sticky;
   position: sticky;
   top: 0;
-  z-index: 1046;
+  z-index: 910;
   background-color: var(--bs-body-bg);
   margin: 0 calc(var(--bs-gutter-x) * -0.5);
 }
@@ -1303,7 +1307,7 @@ $icon-failure: #dc3545;
   position: absolute;
   top: 0;
   right: 0;
-  z-index: 1046;
+  z-index: 910;
   width: 50%;
   transition: width 0.8s ease-out;
   margin-top: 1rem;
@@ -1319,6 +1323,7 @@ $icon-failure: #dc3545;
   .map-search {
     width: 60%;
   }
+
   .map-search-full {
     width: 90%;
   }
@@ -1326,7 +1331,7 @@ $icon-failure: #dc3545;
 
 .redo-search {
   position: absolute;
-  z-index: 1047;
+  z-index: 920;
   width: auto;
 
   top: 0;
@@ -1338,6 +1343,7 @@ $icon-failure: #dc3545;
   margin-top: 1rem;
 
   pointer-events: none;
+
   .btn {
     pointer-events: auto;
   }
@@ -1349,6 +1355,7 @@ $icon-failure: #dc3545;
     width: 30%;
     text-align: left;
     margin-left: 1rem;
+
     .btn {
       font-size: 0.85rem;
     }
@@ -1392,9 +1399,11 @@ $icon-failure: #dc3545;
   .searchbar {
     padding: 10px 0 0;
   }
+
   .map-column {
     top: 53px;
   }
+
   .divider-column {
     top: 47px;
   }
@@ -1413,6 +1422,7 @@ $icon-failure: #dc3545;
       margin-top: 1rem;
       height: calc(100vh - 2em - 2px);
     }
+
     .sidebar {
       height: calc(100vh - 2em - 2px);
       overflow: scroll;
@@ -1426,7 +1436,7 @@ $icon-failure: #dc3545;
 
 .sidebar-column {
   transform: translate3d(0px, 0px, 0px);
-  z-index: 1045;
+  z-index: 900;
   margin-top: -1px;
   padding-right: 0;
   padding-left: 0;
@@ -1443,7 +1453,7 @@ $icon-failure: #dc3545;
   background-color: var(--bs-body-bg);
   border-bottom: 2px solid #eee;
   padding: 0.25rem 0;
-  z-index: 1045;
+  z-index: 900;
   position: -webkit-sticky;
   position: sticky;
   top: 37px;
@@ -1455,6 +1465,7 @@ $icon-failure: #dc3545;
 
 .divider-button {
   margin: 0;
+
   a {
     padding: 0.25rem 0.5rem;
     background-color: var(--bs-body-bg);
@@ -1471,10 +1482,12 @@ $icon-failure: #dc3545;
   border-bottom-right-radius: 0;
   margin-bottom: 0;
 }
+
 .clearable-input .form-control {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
+
 .clearer {
   position: absolute;
   right: 10px;
@@ -1482,6 +1495,7 @@ $icon-failure: #dc3545;
   color: #999;
   cursor: pointer;
 }
+
 .search-query-active {
   background-color: #f7dc8c;
 }
@@ -1522,12 +1536,15 @@ $icon-failure: #dc3545;
   background: var(--bs-body-bg);
   color: var(--bs-body);
 }
+
 .leaflet-bar a.leaflet-disabled {
   background: var(--bs-body-bg);
 }
+
 .leaflet-container {
   background-color: var(--bs-secondary-bg);
 }
+
 .leaflet-container .leaflet-control-attribution,
 .leaflet-container .leaflet-control-attribution a {
   background: var(--bs-body-bg);
