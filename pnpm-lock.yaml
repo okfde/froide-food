@@ -20,9 +20,6 @@ importers:
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4
-      leaflet.icon.glyph:
-        specifier: ^0.3.0
-        version: 0.3.0
       vue:
         specifier: ^3.2.47
         version: 3.3.4

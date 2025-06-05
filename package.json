@@ -31,7 +31,6 @@
     "@turf/bbox": "^6.5.0",
     "@vue-leaflet/vue-leaflet": "0.8.1",
     "leaflet": "^1.9.4",
-    "leaflet.icon.glyph": "^0.3.0",
     "vue": "^3.2.47",
     "vue3-slide-up-down": "^1.2.5"
   },
