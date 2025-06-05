@@ -964,11 +964,6 @@ export default {
         const requestMapping = {}
         let hasRequests = false
 
-        const resultCoordinates = this.venues.map((r) => {
-          return L.latLng(r.position[0], r.position[1])
-        })
-        const resultBounds = L.latLngBounds(resultCoordinates)
-
         if (this.onlyRequested || this.query) {
           this.venues = []
         } else if (this.venues.length > MAX_VENUES) {
@@ -998,6 +993,11 @@ export default {
             }
             return d
           })
+
+        const resultCoordinates = newVenues.map((r) => {
+          return L.latLng(r.position[0], r.position[1])
+        })
+        const resultBounds = L.latLngBounds(resultCoordinates)
 
         this.venues = [...newVenues, ...this.venues]
         this.venueMap = {}
