@@ -236,14 +236,22 @@
 
           <div class="col-12 d-block d-md-none divider-column" id="divider">
             <p v-if="listShown" class="divider-button">
-              <a @click.prevent="goToMap" @touchend.prevent="goToMap"
-                >zurück zur Karte</a
+              <button
+                class="btn btn-sm btn-outline-secondary"
+                @click.prevent="goToMap"
+                @touchend.prevent="goToMap"
               >
+                zurück zur Karte
+              </button>
             </p>
             <p v-else class="divider-button">
-              <a @click.prevent="goToList" @touchend.prevent="goToList"
-                >zur Liste</a
+              <button
+                class="btn btn-sm btn-outline-secondary"
+                @click.prevent="goToList"
+                @touchend.prevent="goToList"
               >
+                zur Liste
+              </button>
             </p>
           </div>
 
@@ -263,13 +271,13 @@
                   <p v-else>Keine Betriebe an diesem Ort gefunden.</p>
                 </template>
                 <button
-                  class="btn btn-sm btn-secondary mb-1"
+                  class="btn btn-sm btn-link mb-1"
                   @click="setNewVenue(true)"
                 >
                   Betrieb nicht gefunden?
                 </button>
                 <a
-                  class="btn btn-sm btn-secondary ms-1 mb-1"
+                  class="btn btn-sm btn-link ms-1 mb-1"
                   target="_blank"
                   href="/kampagnen/lebensmittelkontrolle/faq/#falsch"
                 >
