@@ -176,7 +176,7 @@
                 />
                 <LControlZoom position="bottomright" />
                 <LControl position="bottomleft">
-                  <ul class="color-legend">
+                  <ul class="color-legend shadow">
                     <li :style="colorLegend.normal">
                       <span>Jetzt anfragen!</span>
                     </li>
