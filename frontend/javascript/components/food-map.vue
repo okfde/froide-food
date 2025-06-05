@@ -337,9 +337,11 @@
 </template>
 
 <script>
-/* global L */
+import * as L from 'leaflet/dist/leaflet-src.esm'
 
 import 'leaflet/dist/leaflet.css'
+
+import '../lib/glyphicon.js'
 
 import bbox from '@turf/bbox'
 import {
@@ -352,8 +354,6 @@ import {
   LTooltip
 } from '@vue-leaflet/vue-leaflet'
 import Modal from 'bootstrap/js/dist/modal'
-import 'leaflet'
-import 'leaflet.icon.glyph'
 import SlideUpDown from 'vue3-slide-up-down'
 import smoothScroll from '../lib/smoothscroll'
 
@@ -591,7 +591,7 @@ export default {
           // style: 'mapbox.streets',
           // username: 'okfde',
           // tileSize: 512,
-          // r: window.L.Browser.retina ? '@2x' : '',
+          // r: L.Browser.retina ? '@2x' : '',
           // accessToken: 'pk.eyJ1Ijoib2tmZGUiLCJhIjoiY2p3aHBpZ2wzMjVxbTQ4bWduM2YwenQ2eCJ9.kzkjyGM8xIEShOZ7ekH5AA'
         }
       }
@@ -625,7 +625,7 @@ export default {
     tileUrl() {
       return `//cartodb-basemaps-{s}.global.ssl.fastly.net/${
         this.colorMode
-      }_all/{z}/{x}/{y}${window.L.Browser.retina ? '@2x' : ''}.png`
+      }_all/{z}/{x}/{y}${L.Browser.retina ? '@2x' : ''}.png`
     },
     currentUrl() {
       let url = `${this.config.appUrl}?latlng=${this.center[0]},${this.center[1]}`
@@ -857,7 +857,7 @@ export default {
         this.query = ''
         return this.postcodeChosen(p)
       }
-      this.search()
+      this.search({ queryStart: true })
     },
     clearSearch() {
       this.query = ''
@@ -896,7 +896,10 @@ export default {
         )
         radius = Math.max(Math.round(Math.min(radius, 40000) / 100) * 100, 500)
         const reqCoords = latlngToGrid(coordinates, radius)
-        locationParam = `lat=${reqCoords.lat}&lng=${reqCoords.lng}&radius=${radius}&zoom=${this.zoom}`
+        locationParam = `lat=${reqCoords.lat}&lng=${reqCoords.lng}`
+        if (!this.query) {
+          locationParam += `&radius=${radius}&zoom=${this.zoom}`
+        }
       }
       this.lastQuery = this.query
       const categories = this.filterCategories
@@ -940,6 +943,11 @@ export default {
         const requestMapping = {}
         let hasRequests = false
 
+        const resultCoordinates = this.venues.map((r) => {
+          return L.latLng(r.position[0], r.position[1])
+        })
+        const resultBounds = L.latLngBounds(resultCoordinates)
+
         if (this.onlyRequested || this.query) {
           this.venues = []
         } else if (this.venues.length > MAX_VENUES) {
@@ -976,19 +984,16 @@ export default {
           this.venueMap[d.id] = i
         })
 
-        if (options.location && this.venues.length > 0) {
-          const venueLocations = this.venues.map((r) => {
-            return L.latLng(r.position[0], r.position[1])
-          })
-          const bounds = L.latLngBounds(venueLocations)
-
-          if (!this.maxBounds.contains(bounds)) {
+        if (options.location && this.resultCoordinates.length > 0) {
+          if (!this.maxBounds.contains(resultBounds)) {
             this.locatorErrorMessage =
               'Dein Ort scheint nicht in Deutschland zu sein!'
             this.setLocator(true)
             return
           }
-          this.map.fitBounds(bounds)
+          this.map.fitBounds(resultBounds)
+        } else if ((this.query || this.onlyRequested) && options.queryStart) {
+          this.map.fitBounds(resultBounds)
         }
         this.preventMapMoved()
         this.searching = false
@@ -1260,7 +1265,7 @@ export default {
   watch: {
     onlyRequested(newVal) {
       if (newVal) {
-        this.search()
+        this.search({ queryStart: true })
       }
     }
   }
