@@ -830,7 +830,7 @@ export default {
           ])
           const coords = geoRegion.centroid.coordinates
           const center = L.latLng([coords[1], coords[0]])
-          this.map.fitBounds(bounds)
+          this.map.fitBounds([bounds.getSouthWest(), bounds.getNorthEast()])
           this.search({ coordinates: center, bounds })
           this.preventMapMoved()
         })
@@ -1012,9 +1012,15 @@ export default {
             this.setLocator(true)
             return
           }
-          this.map.fitBounds(resultBounds)
+          this.map.fitBounds([
+            resultBounds.getSouthWest(),
+            resultBounds.getNorthEast()
+          ])
         } else if ((this.query || this.onlyRequested) && options.queryStart) {
-          this.map.fitBounds(resultBounds)
+          this.map.fitBounds([
+            resultBounds.getSouthWest(),
+            resultBounds.getNorthEast()
+          ])
         }
         this.preventMapMoved()
         this.searching = false
