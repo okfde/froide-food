@@ -1005,7 +1005,7 @@ export default {
           this.venueMap[d.id] = i
         })
 
-        if (options.location && this.resultCoordinates.length > 0) {
+        if (options.location && resultCoordinates.length > 0) {
           if (!this.maxBounds.contains(resultBounds)) {
             this.locatorErrorMessage =
               'Dein Ort scheint nicht in Deutschland zu sein!'
