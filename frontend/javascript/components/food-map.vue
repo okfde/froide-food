@@ -1157,7 +1157,7 @@ export default {
         const mapRect = this.$refs.foodMap.getBoundingClientRect()
         const mapTop = mapRect.top
         const isMapTop = mapTop <= 0
-        if (isMapTop !== this.isMapTop) {
+        if (this.map && isMapTop !== this.isMapTop) {
           window.setTimeout(() => {
             this.map.invalidateSize()
             this.preventMapMoved()
@@ -1537,6 +1537,7 @@ $icon-failure: #dc3545;
     background-color: var(--bs-body-bg);
     color: #333;
     border-radius: 5px;
+    text-decoration: underline;
   }
 }
 
@@ -1636,17 +1637,25 @@ $icon-failure: #dc3545;
   color: var(--bs-secondary);
 }
 
-.mapoverlay-enter,
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out,
+.leaflet-control-zoom-out:hover {
+  text-decoration: none;
+}
+
+.mapoverlay-enter-from,
 .mapoverlay-leave-to {
   transform: translateY(300px);
 }
 
+.mapoverlay-move,
 .mapoverlay-enter-active,
-.fade-leave-active {
-  transition: transform 0.3s ease-in-out;
+.mapoverlay-leave-active {
+  transition: transform 0.5s ease-in-out;
 }
 
 .mapoverlay-leave-active {
-  transition: all 0.3s ease-in-out;
+  position: absolute;
 }
 </style>
