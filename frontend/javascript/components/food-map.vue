@@ -1122,7 +1122,7 @@ export default {
     },
     goToMap() {
       const fmc = this.$refs.foodMapContainer
-      if (fmc.getBoundingClientRect().top > 0) {
+      if (Math.abs(fmc.getBoundingClientRect().top) < 100) {
         return
       }
       const y = fmc.offsetTop
@@ -1217,9 +1217,9 @@ export default {
       this.showLocator = data
       if (data) {
         this.locatorModal.show()
-        this.goToMap()
       } else {
         this.locatorModal.hide()
+        this.goToMap()
       }
     },
     setNewVenue(show) {
