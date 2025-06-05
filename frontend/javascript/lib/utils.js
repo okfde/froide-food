@@ -53,6 +53,13 @@ const COLORS = {
   failure: '#dc3545'
 }
 
+function getContrastColor(status) {
+  if (status === 'pending') {
+    return '#444'
+  }
+  return 'var(--bs-light-text-color, #fff)'
+}
+
 function getPinColor(status, selected) {
   if (selected) {
     switch (status) {
@@ -130,14 +137,7 @@ function postData(url = '', data = {}, csrfToken) {
 }
 
 export {
-  getQueryVariable,
-  renderDate,
-  getPlaceStatus,
-  getRequestStatus,
-  getPinURL,
-  getPinColor,
-  canUseLocalStorage,
-  latlngToGrid,
-  postData,
-  COLORS
+  canUseLocalStorage, COLORS, getContrastColor, getPinColor, getPinURL, getPlaceStatus, getQueryVariable, getRequestStatus, latlngToGrid,
+  postData, renderDate
 }
+

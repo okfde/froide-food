@@ -197,12 +197,24 @@
                   :lat-lng="marker.position"
                   :title="marker.name"
                   :draggable="false"
-                  :icon="marker.icon"
                   :options="markerOptions"
                   :z-index-offset="marker.id === selectedVenueId ? 300 : 0"
                   @click="markerClick(marker, false)"
                   @touchstart.prevent="markerClick(marker, false)"
                 >
+                  <LIcon class-name="food-marker-icon">
+                    <div
+                      :style="{
+                        'background-image': `url(${marker.icon.iconUrl}`
+                      }"
+                    >
+                      <span
+                        class="fa"
+                        :class="marker.icon.className"
+                        :style="{ color: marker.icon.contrastColor }"
+                      ></span>
+                    </div>
+                  </LIcon>
                   <LTooltip
                     :content="marker.escapedName"
                     :options="tooltipOptions"
@@ -349,12 +361,11 @@ import * as L from 'leaflet/dist/leaflet-src.esm'
 
 import 'leaflet/dist/leaflet.css'
 
-import '../lib/glyphicon.js'
-
 import bbox from '@turf/bbox'
 import {
   LControl,
   LControlZoom,
+  LIcon,
   LMap,
   LMarker,
   LPopup,
@@ -379,6 +390,7 @@ import SwitchButton from './switch-button'
 import {
   COLORS,
   canUseLocalStorage,
+  getContrastColor,
   getPinColor,
   getPinURL,
   getPlaceStatus,
@@ -460,6 +472,7 @@ export default {
   components: {
     LMap,
     LTileLayer,
+    LIcon,
     LControlZoom,
     LControl,
     LMarker,
@@ -1053,12 +1066,11 @@ export default {
       const selected = this.selectedVenueId === r.id
       const color = getPinColor(status, selected)
       const iconUrl = getPinURL(color)
-      return L.icon.glyph({
-        className: 'food-marker-icon ',
-        prefix: 'fa',
-        glyph: this.iconCategoryMapping[r.category] || '',
-        iconUrl: iconUrl
-      })
+      return {
+        iconUrl: iconUrl,
+        className: this.iconCategoryMapping[r.category] || '',
+        contrastColor: getContrastColor(status)
+      }
     },
     clearSelected() {
       if (this.selectedVenueId === null) {
@@ -1580,6 +1592,25 @@ $icon-failure: #dc3545;
 
 .color-legend li span {
   color: var(--bs-body);
+}
+
+.food-marker-icon > div {
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-left: -12px;
+  margin-top: -41px;
+  width: 25px;
+  height: 41px;
+}
+.food-marker-icon > div > span {
+  font-size: 11px;
+  display: inline-block;
+  pointer-events: none;
+  text-align: center;
+  line-height: 41px;
+  width: 25px;
+  margin-left: 0;
+  margin-top: -3px;
 }
 </style>
 
