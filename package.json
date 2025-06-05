@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@turf/bbox": "^6.5.0",
-    "@vue-leaflet/vue-leaflet": "0.8.1",
+    "@vue-leaflet/vue-leaflet": "^0.10.1",
     "leaflet": "^1.9.4",
     "vue": "^3.2.47",
     "vue3-slide-up-down": "^1.2.5"

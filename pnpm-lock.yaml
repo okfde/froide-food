@@ -12,8 +12,8 @@ importers:
         specifier: ^6.5.0
         version: 6.5.0
       '@vue-leaflet/vue-leaflet':
-        specifier: 0.8.1
-        version: 0.8.1(leaflet@1.9.4)(vue@3.3.4)
+        specifier: ^0.10.1
+        version: 0.10.1(leaflet@1.9.4)
       froide:
         specifier: github:okfde/froide
         version: https://codeload.github.com/okfde/froide/tar.gz/0c3aa35fa6e09619211c09919ca453e6a1f4e23f(fuse.js@6.6.2)(worker-loader@3.0.8(webpack@5.94.0))
@@ -294,11 +294,14 @@ packages:
   '@uppy/utils@5.9.0':
     resolution: {integrity: sha512-9Ubddd3orCOLYjf0KobwgJ+aTrABSxk9t4X/QdM4qJHVZuMIftkaMplrViRUO+kvIBCXEZDIP2AmS060siDNGw==}
 
-  '@vue-leaflet/vue-leaflet@0.8.1':
-    resolution: {integrity: sha512-fPkySmxI86lUWY7arIV6UShK6tjXkygumLd81N5C2AH/s0gwsL37L+cOMfr+xvSG8KdBWCoHpCUNPpOMPa0IUA==}
+  '@vue-leaflet/vue-leaflet@0.10.1':
+    resolution: {integrity: sha512-RNEDk8TbnwrJl8ujdbKgZRFygLCxd0aBcWLQ05q/pGv4+d0jamE3KXQgQBqGAteE1mbQsk3xoNcqqUgaIGfWVg==}
     peerDependencies:
+      '@types/leaflet': ^1.5.7
       leaflet: ^1.6.0
-      vue: ^3.0.0
+    peerDependenciesMeta:
+      '@types/leaflet':
+        optional: true
 
   '@vue/compiler-core@3.3.4':
     resolution: {integrity: sha512-cquyDNvZ6jTbf/+x+AgM2Arrp6G4Dzbb0R64jiG804HRMfRiFXWI6kqUVqZ6ZR0bQhIoQjB4+2bhNtVwndW15g==}
@@ -1841,7 +1844,7 @@ snapshots:
       lodash: 4.17.21
       preact: 10.23.2
 
-  '@vue-leaflet/vue-leaflet@0.8.1(leaflet@1.9.4)(vue@3.3.4)':
+  '@vue-leaflet/vue-leaflet@0.10.1(leaflet@1.9.4)':
     dependencies:
       leaflet: 1.9.4
       vue: 3.3.4
