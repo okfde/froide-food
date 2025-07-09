@@ -54,13 +54,15 @@
           <iframe
             :src="attachment.file_url"
             frameborder="0"
-            style="width: 100%; height: 90vh; border: 0"></iframe>
+            style="width: 100%; height: 90vh; border: 0"
+          ></iframe>
         </div>
         <embed
           v-else
           :src="attachment.file_url"
           style="max-width: 100%"
-          :type="attachment.filetype" />
+          :type="attachment.filetype"
+        />
       </template>
     </div>
   </div>
@@ -113,6 +115,7 @@ export default {
       type: Object
     }
   },
+  emits: ['addreport'],
   mounted() {},
   data() {
     return {

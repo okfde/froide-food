@@ -5,7 +5,8 @@
       :key="message.id"
       :message="message"
       :request="request"
-      @addreport="addReport"></FoodReportMessage>
+      @addreport="addReport"
+    ></FoodReportMessage>
   </div>
 </template>
 
@@ -26,14 +27,12 @@ export default {
       required: true
     }
   },
+  emits: ['addreport'],
   mounted() {},
   data() {
     return {}
   },
   computed: {
-    csrfToken() {
-      return this.$root.csrfToken
-    },
     messages() {
       const messages = this.request.messages.filter((m) => {
         return m.is_response
