@@ -27,7 +27,8 @@
     <FoodReportRequest
       v-if="request"
       :request="request"
-      @addreport="addReport"></FoodReportRequest>
+      @addreport="addReport"
+    ></FoodReportRequest>
   </div>
 </template>
 
@@ -46,10 +47,6 @@ export default {
     this.getNextRequest()
   },
   data() {
-    this.$root.csrfToken = document.querySelector(
-      '[name=csrfmiddlewaretoken]'
-    ).value
-
     return {
       request: null,
       loading: false,
@@ -58,7 +55,7 @@ export default {
   },
   computed: {
     csrfToken() {
-      return this.$root.csrfToken
+      return document.querySelector('[name=csrfmiddlewaretoken]').value
     }
   },
   methods: {
@@ -67,7 +64,7 @@ export default {
         this.reportDates.push(data.reportdate)
       }
       this.loading = true
-      postData('', data, this.$root.csrfToken).then(() => {
+      postData('', data, this.csrfToken).then(() => {
         this.loading = false
         if (data.unresolved) {
           this.getNextRequest()
