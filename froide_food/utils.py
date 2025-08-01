@@ -41,7 +41,8 @@ PLZ_RE = re.compile(r"(\d{5}) ([\w -]+)")
 
 Q1 = (
     "1. Wann haben die beiden letzten lebensmittelrechtlichen "
-    "Betriebsüberprüfungen im folgenden Betrieb stattgefunden:"
+    "Betriebsüberprüfungen im folgenden Betrieb incl. seinen "
+    "Vorgängerbetrieben stattgefunden:"
 )
 Q2 = (
     "2. Kam es hierbei zu Beanstandungen? Falls ja, beantrage ich "
