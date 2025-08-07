@@ -8,7 +8,6 @@ from django.contrib.gis.geos import Point
 from django.db.models import Exists, OuterRef, Q
 from django.urls import reverse
 from django.utils import timezone
-
 from filingcabinet import get_document_model
 
 try:
@@ -16,12 +15,11 @@ try:
 except ImportError:
     GeoIP2 = None
 
-from geopy.distance import distance as geopy_distance
-
 from froide.foirequest.models import FoiRequest
 from froide.georegion.models import GeoRegion
 from froide.helper.utils import get_client_ip
 from froide.publicbody.models import PublicBody
+from geopy.distance import distance as geopy_distance
 
 from .geocode import geocode
 from .models import VenueRequest, VenueRequestItem
@@ -60,7 +58,8 @@ def get_hygiene_publicbodies(lat, lng):
 
     regions = (
         GeoRegion.objects.filter(
-            geom__covers=point,
+            (Q(geom_detail__isnull=False) & Q(geom_detail__covers=point))
+            | (Q(geom_detail__isnull=True) & Q(geom__covers=point))
         )
         .exclude(kind__in=["country", "zipcode"])
         .order_by("kind")
@@ -116,9 +115,7 @@ def make_request_url(place, publicbody):
 {address}
 
 {q2}
-""".format(
-        q1=Q1, q2=Q2, **place
-    )
+""".format(q1=Q1, q2=Q2, **place)
     ref = ("food:%s" % place["ident"]).encode("utf-8")
     query = {
         "subject": subject.encode("utf-8"),
@@ -413,5 +410,5 @@ def depublish_old_reports():
             report.message.request,
             message=report.message,
             user=None,
-            **{"reason": "Automatically depublished after 5 years."}
+            **{"reason": "Automatically depublished after 5 years."},
         )
