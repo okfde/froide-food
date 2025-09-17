@@ -16,7 +16,7 @@ classifiers = [
   "Topic :: Utilities",
 ]
 version = "0.0.1"
-dependencies = ["django-amenities", "requests", "geocoder", "geopy", "fdfgen"]
+dependencies = ["django-amenities", "requests", "geopy"]
 
 [build-system]
 requires = ["setuptools"]

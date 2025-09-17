@@ -4,7 +4,6 @@ from difflib import SequenceMatcher
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import D
-
 from django_amenities.models import Amenity
 
 from ..geocode import geocode, reverse_geocode
@@ -114,7 +113,7 @@ class AmenityVenueProvider(BaseVenueProvider):
         location_search = False
         if location is not None:
             location_search = True
-            point, formatted_address = geocode(location, address=False)
+            point, formatted_address = geocode(location)
         elif coordinates is not None:
             point = Point(coordinates[1], coordinates[0])
 
@@ -191,7 +190,7 @@ class AmenityVenueProvider(BaseVenueProvider):
         )
         for k, v in fix_list:
             try:
-                if not getattr(amenity, k) and raw[v]:
+                if not getattr(amenity, k) and raw.get(v):
                     fixed = True
                     setattr(amenity, k, raw[v])
             except KeyError:
