@@ -12,16 +12,6 @@ MAPBOX_API_KEY = settings.FROIDE_FOOD_CONFIG.get("api_key_geocode_mapbox")
 PLZ_RE = re.compile(r"^(\d{5})$")
 
 
-def get_reverse_kwargs():
-    if not MAPBOX_API_KEY:
-        raise ValueError
-    return {
-        "key": MAPBOX_API_KEY,
-        "language": "de",
-        "types": "address",
-    }
-
-
 def get_geocoder():
     return MapBox(api_key=MAPBOX_API_KEY)
 
