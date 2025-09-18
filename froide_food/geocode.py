@@ -28,7 +28,7 @@ def run_geocode(search, country="DE"):
         return None
 
 
-def reverse_geocode(latlng: tuple[float, float]) -> dict | None:
+def reverse_geocode(latlng: tuple[float, float]) -> dict[str, str] | None:
     geocoder = get_geocoder()
     try:
         result = geocoder.reverse(latlng)

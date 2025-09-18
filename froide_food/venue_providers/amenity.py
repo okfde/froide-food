@@ -180,7 +180,6 @@ class AmenityVenueProvider(BaseVenueProvider):
         result = reverse_geocode([loc[1], loc[0]])
         if result is None:
             return
-        raw = result.raw
         fixed = False
         fix_list = (
             ("street", "text"),
@@ -190,9 +189,9 @@ class AmenityVenueProvider(BaseVenueProvider):
         )
         for k, v in fix_list:
             try:
-                if not getattr(amenity, k) and raw.get(v):
+                if not getattr(amenity, k) and result.get(v):
                     fixed = True
-                    setattr(amenity, k, raw[v])
+                    setattr(amenity, k, result[v])
             except KeyError:
                 pass
         if fixed:
