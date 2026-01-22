@@ -34,6 +34,24 @@
               zurück
             </button>
           </template>
+          <div class="mt-5" v-if="!fetching && publicBody">
+            <div class="fs-3">
+              An: {{ publicBody.name }}
+              <a :href="publicBody.site_url" target="_blank">
+                <span class="fa fa-info-circle" />
+              </a>
+            </div>
+            <div
+              v-if="defaultLaw?.request_note_html"
+              class="alert alert-warning my-2"
+              v-html="defaultLaw.request_note_html"
+              />
+            <div
+              v-if="publicBody?.request_note_html"
+              class="alert alert-warning my-2"
+              v-html="publicBody.request_note_html"
+              />
+          </div>
           <form
             v-else
             method="post"
@@ -72,16 +90,27 @@
               :hide-full-text="true"
               :hide-editing="true"
               :law-type="lawType"
-              :use-pseudonym="false"
               :config="config"></RequestForm>
-            <UserRegistration
-              :form="userForm"
-              :config="config"
-              :user="userInfo"
-              :default-law="defaultLaw"
-              :address-help-text="addressHelpText"
-              :address-required="true"></UserRegistration>
-            <UserTerms v-if="!userInfo" :form="userForm"></UserTerms>
+            <div class="card mb-3">
+              <div class="card-body">
+                <UserCreateAccount
+                  v-if="!userInfo"
+                  :config="config"
+                  :request-form="requestForm"
+                  :user-form="userForm"
+                  :default-law="defaultLaw"
+                  :address-help-text="addressHelpText"
+                  :address-required="true"
+                  >
+                  <template #userPublicPreamble>
+                    <span v-html="userForm.fields.private?.help_text" />
+                  </template>
+                </UserCreateAccount>
+                <UserConfirmation
+                  :form="userForm"
+                  />
+              </div>
+            </div>
             <p v-if="!userInfo" class="small text-end">
               Sie erhalten im Rahmen der Aktion „Topf Secret“ einmalig eine
               separate E-Mail von foodwatch. (<a
@@ -107,8 +136,9 @@
 
 <script>
 import RequestForm from '~froide/frontend/javascript/components/makerequest/request-form.vue'
-import UserRegistration from '~froide/frontend/javascript/components/makerequest/user-registration.vue'
-import UserTerms from '~froide/frontend/javascript/components/makerequest/user-terms.vue'
+import StoreValueMixin from 'froide/frontend/javascript/components/makerequest/lib/store-values-mixin'
+import UserCreateAccount from 'froide/frontend/javascript/components/makerequest/user-create-account.vue'
+import UserConfirmation from 'froide/frontend/javascript/components/makerequest/user-confirmation.vue'
 import { selectBestLaw } from '~froide/frontend/javascript/lib/law-select'
 
 import FoodDetailMixin from '../lib/detailmixin'
@@ -121,13 +151,13 @@ const LAW_TYPE = 'VIG'
 
 export default {
   name: 'FoodRequest',
-  mixins: [FoodDetailMixin, FoodItemMixin],
+  mixins: [FoodDetailMixin, FoodItemMixin, StoreValueMixin],
   components: {
     RequestForm,
     FoodLoader,
     FoodRecommend,
-    UserTerms,
-    UserRegistration
+    UserCreateAccount,
+    UserConfirmation
   },
   props: {
     data: {
@@ -158,6 +188,7 @@ export default {
   },
   data() {
     return {
+      pbScope: 'food-',
       fetching: !this.data.full,
       lawType: LAW_TYPE,
       closedWarning: false,
@@ -165,6 +196,9 @@ export default {
       addressHelpText:
         'Ihre Adresse wird nicht öffentlich angezeigt. <strong class="text-danger">Es kann passieren, dass die zuständige Behörde auf Nachfrage des Betriebs Ihren Namen und Ihre Anschrift an den Betrieb weiterleitet.</strong>'
     }
+  },
+  created() {
+    this.initAllStoreValues()
   },
   computed: {
     csrfToken() {
