@@ -90,10 +90,9 @@
               :hide-editing="true"
               :law-type="lawType"
               :config="config"></RequestForm>
-            <div class="card mb-3">
+            <div class="card mb-3" v-if="!userInfo">
               <div class="card-body">
                 <UserCreateAccount
-                  v-if="!userInfo"
                   :config="config"
                   :request-form="requestForm"
                   :user-form="userForm"
