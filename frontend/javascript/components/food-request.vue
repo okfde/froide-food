@@ -34,24 +34,6 @@
               zurück
             </button>
           </template>
-          <div class="mt-5" v-if="!fetching && publicBody">
-            <div class="fs-3">
-              An: {{ publicBody.name }}
-              <a :href="publicBody.site_url" target="_blank">
-                <span class="fa fa-info-circle" />
-              </a>
-            </div>
-            <div
-              v-if="defaultLaw?.request_note_html"
-              class="alert alert-warning my-2"
-              v-html="defaultLaw.request_note_html"
-              />
-            <div
-              v-if="publicBody?.request_note_html"
-              class="alert alert-warning my-2"
-              v-html="publicBody.request_note_html"
-              />
-          </div>
           <form
             v-else
             method="post"
@@ -75,7 +57,24 @@
               :key="k"
               :name="k"
               value="1" />
-
+            <div class="mt-5" v-if="!fetching && publicBody">
+              <div class="fs-3">
+                An: {{ publicBody.name }}
+                <a :href="publicBody.site_url" target="_blank">
+                  <span class="fa fa-info-circle" />
+                </a>
+              </div>
+              <div
+                v-if="defaultLaw?.request_note_html"
+                class="alert alert-warning my-2"
+                v-html="defaultLaw.request_note_html"
+                />
+              <div
+                v-if="publicBody?.request_note_html"
+                class="alert alert-warning my-2"
+                v-html="publicBody.request_note_html"
+                />
+            </div>
             <RequestForm
               v-if="!fetching"
               :publicbodies="publicbodies"
