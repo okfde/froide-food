@@ -28,6 +28,10 @@ class VenueRequest(models.Model):
         Amenity, null=True, blank=True, on_delete=models.SET_NULL
     )
 
+    rerequestable = models.BooleanField(
+        default=True, help_text=_("Can venue be re-requested?")
+    )
+
     class Meta:
         verbose_name = _("Venue Request")
         verbose_name_plural = _("Venue Requests")
