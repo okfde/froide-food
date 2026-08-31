@@ -603,18 +603,8 @@ export default {
       colorMode: getColorMode(),
       tileProvider: {
         name: 'Carto',
-        // url: 'https://api.mapbox.com/styles/v1/{username}/{style}/tiles/{tileSize}/{z}/{x}/{y}{r}?access_token={accessToken}',
-        // url: 'https://api.tiles.mapbox.com/v4/{style}/{z}/{x}/{y}.png?access_token={accessToken}',
-        // url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         attribution:
-          '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>',
-        options: {
-          // style: 'mapbox.streets',
-          // username: 'okfde',
-          // tileSize: 512,
-          // r: L.Browser.retina ? '@2x' : '',
-          // accessToken: 'pk.eyJ1Ijoib2tmZGUiLCJhIjoiY2p3aHBpZ2wzMjVxbTQ4bWduM2YwenQ2eCJ9.kzkjyGM8xIEShOZ7ekH5AA'
-        }
+          '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>'
       }
     }
   },
@@ -644,9 +634,9 @@ export default {
       return this.$refs.map.leafletObject
     },
     tileUrl() {
-      return `//cartodb-basemaps-{s}.global.ssl.fastly.net/${
+      return `https://{s}.basemaps.cartocdn.com/rastertiles/${
         this.colorMode
-      }_all/{z}/{x}/{y}${L.Browser.retina ? '@2x' : ''}.png`
+      }_all/{z}/{x}/{y}}${L.Browser.retina ? '@2x' : ''}.png?key=cb1_2n7i_1_5aa3a7088d21f7ccc61aaf96`
     },
     currentUrl() {
       let url = `${this.config.appUrl}?latlng=${this.center[0]},${this.center[1]}`
